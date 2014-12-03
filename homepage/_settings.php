@@ -394,13 +394,7 @@ define('DEFAULT_IMAGE_CATEGORIE', '');
 /*** Benutzerverwaltung *****************************/
 if (ACP_USER_SYSTEM_EN) {
 	/**
-	 * Anzuzeigende Gruppen
-	 * Default 0 -> Alle Gruppen anzeigen
-	 */
-	//define('PLUGIN_ACCESS_SHOW_GROUPS_ONLY', (1<<1));
-	
-	/**
-	 Benutzereigene Felder
+	 * Benutzerdefinierte Felder
 	 */
 	$UserSystem_customParameters = array(
 				array('user_description', 'text', 'Beschreibung')
