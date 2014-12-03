@@ -1,0 +1,172 @@
+@charset "utf-8";
+
+ /*
+ =====================================================
+ Name ........: Gestaltung Popups vom WYMeditor
+ Projekt .....: CMS2 ACP
+ Datiename ...: wymeditor_popup.css
+ -----------------------------------------------------
+ Version .....: 1.0
+ Datum .......: 07.07.2011
+ Autor .......: Kevin Gerber
+ =====================================================
+ */
+
+@import "form.css";
+
+body.wym_dialog_insert * {
+	margin:0;
+	padding:0;
+	font-family:Verdana;
+}
+body.wym_dialog_insert {
+	margin:0;
+	padding:0;
+	background-color:#f1f1f1;
+	font-family:Verdana;
+	font-size:10pt;
+}
+body.wym_dialog_insert h1 {
+	margin:0;
+	padding:15px 5px;
+	background-color:#555;
+	color:#ddd;
+	font-size:12pt;
+}
+body.wym_dialog_insert h2 {
+	margin:0;
+	margin-bottom:-5px;
+	padding:0 3px;
+	border-bottom:2px solid #555;
+	color:#555;
+	font-size:10pt;
+}
+body.wym_dialog_insert p {
+	margin:5px 3px;
+}
+form {
+	margin:5px;
+}
+form.form_standard label.line, form.form_standard label.line_hide {
+	width:22%;
+}
+
+div.box_ok, div.box_error, div.box_info, div.box_important {
+	border:2px solid #f1f1f1;
+	margin:10px 15px -5px 15px;
+	color:#615d5a;
+}
+div.box_ok h1, div.box_error h1, div.box_info h1, div.box_important h1 {
+	display:none;
+}
+
+div.box_ok {
+	border-color:#8eb830;
+	background-color:#f5f9ec;
+}
+div.box_error {
+	border-color:#c14e39;
+	background-color:#fbf3f1;
+}
+div.box_info {
+	border-color:#3ba2c3;
+	background-color:#edf7fa;
+
+}
+div.box_important {
+	border-color:#884;
+	background-color:#ffe;
+}
+
+/*** Frames */
+/* Kompletes Popup besteht sichtbar aus einem iFrame */
+.form_hide {
+	display:none;
+}
+body.wym_dialog_insert iframe {
+	margin:0;
+	height:310px;
+	width:100%;
+	border:0px none;
+	overflow:hidden;
+	background-color:#f1f1f1;
+}
+div#options {
+	position:absolute;
+	top:15px;
+	right:0px;
+}
+div#options img {
+	margin-right:5px;
+	height:32px;
+	width:32px;
+	border:none;
+}
+div#pos-fixed {
+	position:fixed;
+	top:0px;
+	left:0px;
+	width:100%;
+	padding-bottom:2px;
+	background-color:#f1f1f1;
+}
+div#pos-dummy-std {
+	height:50px;
+}
+div#pos-dummy-form {
+	height:102px;
+}
+
+div.data-list {
+	
+}
+div.data-list ol {
+	list-style-type:none;
+	width:99%;
+}
+div.data-list ol li a {
+	display:block;
+	padding:0 5px;
+	line-height:25px;
+	color:#000;
+	text-decoration:none;
+}
+div.data-list ol li a:hover {
+	background-color:#e0ebf5;
+}
+
+div.data-list-img {
+	padding:10px;
+}
+div.data-list-img a img {
+	display:block;
+	float:left;
+	margin:5px;
+	max-height:100px;
+	max-width:100px;
+	border:1px solid #c9c5c1;
+}
+div.data-list-img a:hover img {
+	border-color:#359;
+}
+
+/*** Popupfenster Dateiupload ************************************************/
+div.popup {
+	position:absolute;
+	top:50%;
+	left:50%;
+	width:320px;
+	height:50px;
+	margin-top:-25px;
+	margin-left:-160px;
+	padding:5px;
+	border:2px solid #555;
+	background-color:#f1f1f1;
+	color:#555;
+}
+div.popup h1 {
+	padding:0;
+	background-color:transparent;
+	color:#555;
+	font-size:1em;
+}

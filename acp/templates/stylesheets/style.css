@@ -1,0 +1,411 @@
+@charset "utf-8";
+
+ /*
+ =====================================================
+ Name ........: Gestaltung Design
+ Projekt .....: CMS2 ACP
+ Datiename ...: style2.css
+ -----------------------------------------------------
+ Version .....: 1.0
+ Datum .......: 12.05.2011
+ Autor .......: Kevin Gerber
+ =====================================================
+ */
+
+@import "form.css";
+
+* {
+	margin:0;
+	padding:0;
+	font-family:Verdana;
+}
+body {
+	background-color:#f1f1f1;
+	font-size:10pt;
+}
+
+#head {
+	margin-bottom:20px;
+	height:101px;
+	background-color:#555;
+	color:#ddd;
+}
+#head p.info_right {
+	float:right;
+	padding:1%;
+}
+#head p.info_right a {
+	color:#ddd;
+	text-decoration:none;
+	font-weight:bold;
+}
+#head p.servertime {
+	position:absolute;
+	right:1%;
+	top:80px;
+}
+#head h1 {
+	padding:20px 1%;
+	font-size:1.8em;
+}
+
+/*** Hauptmenu (Oben) ********************************************************/
+#head ol {
+	margin-left:1%;
+	list-style-type: none;
+}
+#head ol li {
+	float:left;
+}
+#head ol li a {
+	display:block;
+	margin-right:2px;
+	padding:0 20px;
+	height:32px;
+	line-height:32px;
+	text-align:center;
+	text-decoration:none;
+	font-weight:bold;
+	color:#ddd;
+}
+#head ol li a:hover, #head ol li a.active {
+	background-image:url(../../img/menu.gif);
+	color:#eee;
+}
+
+/*** Linke Seite (Menue) *****************************************************/
+#left {
+	float:left;
+	margin-left:1%;
+	width:18%;
+
+}
+#left ol {
+	/*margin-bottom:20px;*/
+	width:100%;
+	list-style-type:none;
+	background-color:#fff;
+}
+#left ol li a {
+	display:block;
+	height:30px;
+	line-height:30px;
+	padding-left:15px;
+	text-decoration:none;
+	color:#000;
+	border-top:1px solid #c9c5c1;
+}
+#left ol li.first a {
+	border:none;
+}
+#left ol li a:hover {
+	border-left:10px solid #e0ebf5;
+	padding-left:5px;
+}
+#left ol li ol li a {
+	padding-left:30px;
+}
+#left ol li.first ol li a {
+    border-top:1px solid #c9c5c1;
+}
+#left ol li ol li a:hover {
+	padding-left:20px;
+}
+#left div {
+	margin-bottom:20px;
+	padding:5px;
+	background-color:#fff;
+}
+#left h1 {
+	margin:20px 0 5px 0;
+	padding:2px 5px;
+	background-color:#359;
+	color:#ddd;
+	font-size:1em;
+}
+#left h1.first {
+	margin-top:0;
+}
+#left div.icons_add p {
+	margin:5px;
+}
+#left div.icons_add p img {
+	float:left;
+	margin-right:10px;
+}
+#left div.html_tools a {
+	margin:5px;
+	text-decoration:none;
+	line-height:26px;
+}
+
+/*** Inhalt ******************************************************************/
+#content {
+	margin:0 1% 20px 21%;
+	padding:1%;
+	background-color:#fff;
+	background-image:url(../../img/bg_content.gif);
+	background-position:right;
+	background-repeat:repeat-y;
+}
+#content h1 {
+	margin:30px 0 20px 0;
+	width:50%;
+	font-size:1.5em;
+	color:#359;
+	border-bottom:2px solid #359;
+}
+#content h1.first {
+	margin-top:0;
+}
+#content h2 {
+	margin:10px 0;
+	font-size:1.1em;
+	color:#359;
+}
+a {
+	color:#359;
+}
+a:hover {
+	text-decoration:none;
+}
+img {
+	border:none;
+}
+
+/*** Tabellen ****************************************************************/
+#content table {
+	margin:10px 0;
+	width:93%;
+	border-collapse:collapse;
+}
+#content table tr.table_title {
+	background-color:#555;
+	color:#ddd;
+	font-weight:bold;
+	font-style:italic;
+}
+#content table tr.table_odd {
+	background-color:#ddd;
+}
+#content table tr.table_even {
+	background-color:#f1f1f1;
+}
+#content table tr td {
+	padding:4px;
+}
+#content table tr td.icon {
+	width:20px;
+	text-align:center;
+}
+#content table tr td.icon img {
+	border:none;
+	width:16px;
+	height:16px;
+}
+#content table tr.tre-hover, html body table tr.tre-select {
+    background-color: #e0ebf5;
+}
+
+/*** Informationszeilen und Text-Bloecke *************************************/
+#content ol.message {
+	float:right;
+	margin-top:-20px;
+	width:100%;
+	list-style:none;
+}
+#content ol.message li {
+	clear:left;
+	padding:20px 0;
+}
+#content ol.message li h1 {
+	display:block;
+	float:left;
+	width:20%;
+	margin:0 10px 0 0;
+	padding:3px 5px;
+	border:none;
+	background-color:#f1f1f1;
+	color:#615d5a;
+	font-style:italic;
+	font-weight:normal;
+	font-size:10pt;
+	line-height:18px;
+}
+#content ol.message li div {
+	float:left;
+	width:70%;
+	padding:2px 3px;		/* Schriftgroesse */
+	border:1px solid #c9c5c1;
+	font-size:10pt;			/* Schriftgroesse */
+	line-height:18px;
+}
+#content ol.message li div div {
+	float:none;			/* Vererbung rueckgaengig */
+	width:auto;
+	padding:0;
+	border:none;
+	margin-top:5px;			/* Formatierung */
+	padding-top:5px;
+	border-top:1px solid #c9c5c1;
+	font-style:italic;
+	color:#615d5a;
+}
+#content ol.message li.watchme div {
+	border-color:#c14e39;
+}
+#content ol.message li.watchme div div {
+	border-color:#c9c5c1;
+}
+#content ol.message li div hr {
+	margin:5px 50% 4px 0;
+	border-color:#fff;
+	border-top:1px solid #c9c5c1;
+}
+#content ol.message li div p {
+	margin-top:3px;
+	color:#615d5a;
+}
+#content ol.message li div p.icons {
+	float:right;
+}
+#content ol.message li div p.icons img {
+	margin-left:12px;
+	border:none;
+}
+
+/*** Informations-Felder (Boxen) *********************************************/
+#content div.box {
+	margin:20px 0px;
+	padding:5px;
+	/*padding-left:47px;			Erst bei Hintergrundbildern */
+	width:92%;
+	border:2px solid white;
+	background-repeat:no-repeat;
+	background-position:5px 50%;
+	color:#615d5a;
+}
+#content div.box h1 {
+	margin:0;
+	color:#615d5a;
+	font-size:1.2em;
+	font-weight:bold;
+	border:none;
+}
+#content div.box p {
+	margin:0;
+}
+#content div.ok {
+	border-color:#8eb830;
+	background-color:#f5f9ec;
+	/*background-image:url(/img/status/ok.png);*/
+}
+#content div.error {
+	border-color:#c14e39;
+	background-color:#fbf3f1;
+	/*background-image:url(/img/status/error.png);*/
+}
+#content div.info {
+	border-color:#3ba2c3;
+	background-color:#edf7fa;
+	/*background-image:url(/img/status/info.png);*/
+}
+#content div.important {
+	border-color:#884;
+	background-color:#ffe;
+	/*background-image:url(/img/status/important.png);*/
+}
+
+/*** Popupfenster Dateiupload ************************************************/
+div.popup {
+	position:absolute;
+	top:50%;
+	left:50%;
+	width:320px;
+	height:50px;
+	margin-top:-25px;
+	margin-left:-160px;
+	padding:5px;
+	border:2px solid #555;
+	background-color:#f1f1f1;
+	color:#555;
+}
+div.popup h1 {
+	color:#555;
+	font-size:1em;
+}
+
+/*** Fotoalbum Bilder ********************************************************/
+#content div.photo {
+	float:left;
+	position:relative;
+	overflow:hidden;
+	margin: 15px 15px 0 0;
+	padding:7px;
+	border:1px solid #c9c5c1;
+}
+#content div.photo p {
+	opacity:0;
+	position:absolute;
+	top:7px;
+	right:7px;
+	z-index:99;
+	padding:5px;
+	background-color:rgba(255,255,255,0.75);
+	transition:all 0.5s ease;
+}
+#content div.photo:hover p {
+	opacity:1;
+}
+#content div.photo div.caption {
+	position:absolute;
+	top:120px;
+	right:7px;
+	left:7px;
+	width:auto;
+	text-align:center;
+	opacity: 0;
+	background-color:rgba(255,255,255,0.75); 
+	transition: all 0.4s ease-in-out;
+	padding:5px;
+	line-height:100%;
+	font-size:0.9em;
+}
+#content div.photo:hover div.caption {
+	top:80px;
+	opacity:1;
+}
+#content p.photo-clear {
+	clear:left;
+	height:1px;
+	font-size:0.1em;
+}
+
+/*** Statistik Tabellen ******************************************************/
+#content table tr td.stats-month {
+	width:130px;
+}
+#content table tr td.stats-number {
+	padding-right:5px;
+	width:30px;
+	text-align:right;
+}
+#content table tr td span.stats-bar {
+	display:block;
+	height:16px;
+	background-color:#359;
+	font-size:0.1pt;
+}
+#content table tr td.stats-day {
+	width:20px;
+	text-align:right;
+}
+#content table tr td.stats-weekday {
+	width:18px;
+}
+span.boxnumber {
+	display:inline-block;
+	margin-right:5px;
+	width:45px;
+	text-align:right;
+}

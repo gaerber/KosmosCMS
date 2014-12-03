@@ -1,0 +1,86 @@
+@charset "utf-8";
+
+/*
+=====================================================
+Name ........: Formatierung der Anmeldeseite
+Projekt .....: CMS 2.0
+Datiename ...: login.css
+-----------------------------------------------------
+Version .....: 2.0
+Datum .......: 11.07.2011
+Autor .......: Kevin Gerber
+=====================================================
+*/
+
+@import "form.css";
+
+* {
+	margin:0;
+	padding:0;
+	font-size:10pt;
+	font-family:Verdana;
+}
+body {
+	background-color:#edede8;
+}
+
+#webdesign {
+	position:absolute;
+	right:10px;
+	bottom:10px;
+	margin:0;
+	padding:0;
+	height:40px;
+	font-size:14pt;
+	font-weight:bold;
+	line-height:40px;
+	color:#bbb;
+}
+#webdesign img {
+	float:right;
+	margin-left:15px;
+	border:none;
+	height:40px;
+}
+
+#center {
+	position: absolute;
+	top:50%;
+	width:100%;
+	text-align:center;
+}
+#content {
+	position: absolute;
+	left:50%;
+	width:590px;
+	height:200px;
+	margin-top:-105px;
+	margin-left:-300px;
+	padding:10px;
+	text-align:justify;
+	background-color:#fff;
+	background-image:url(../../img/bg_rand_weiss.gif);
+	background-position:top left;
+	background-repeat:no-repeat;
+	color:#615d5a;
+}
+#content h1 {
+	font-size:17pt;
+}
+#content h2 {
+	margin-top:12px;
+	margin-bottom:0;
+	font-style:italic;
+	font-size:11pt;
+}
+#content p {
+	margin-top:12px;
+	color:#c14e39;
+	font-weight:bold;
+}
+form.form_acp_standard label.line, form.form_acp_standard label.line_hide {
+	width:30%;
+}
+form.form_acp_standard input.input_text {
+	width:60%;
+}

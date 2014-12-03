@@ -1,0 +1,38 @@
+<h1 class="first">Kontoübersicht</h1>
+<p>Sie sind als {user_name} mit der Email Adresse {user_email} angemeldet. Ihre letzte Anmeldung war am {user_lastlogin}.</p>
+
+<p><a href="?profile">» Profil ändern</a>
+<br /><a href="?password">» Passwort ändern</a>
+<br /><a href="?cms_logout">» Abmelden</a></p>
+
+<h2>Kundeninformationen</h2>
+<table class="tuser-data">
+  <tr>
+    <td class="title-col">Benutzernamen</td>
+    <td>{user_login}</td>
+  </tr>
+  <tr>
+    <td class="title-col">Namen</td>
+    <td>{user_name}</td>
+  </tr>
+  <tr>
+    <td class="title-col">Anschrift</td>
+    <td>{user_address}</td>
+  </tr>
+  <tr>
+    <td class="title-col">Telefon Nummer</td>
+    <td>{user_tel}</td>
+  </tr>
+  <tr>
+    <td class="title-col">Email Adresse</td>
+    <td>{user_email}</td>
+  </tr>
+  <tr>
+    <td class="title-col">Website</td>
+    <td><a href="{user_website}" target="_blank">{user_website}</a></td>
+  </tr>
+  <tr>
+    <td class="title-col">Registrationsdatum</td>
+    <td>{user_regist}</td>
+  </tr>
+</table>

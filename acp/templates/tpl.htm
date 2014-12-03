@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
+<head>
+  <meta http-equiv="content-type" content="application/xhtml+xml;charset=utf-8" />
+  <title>Swiss Webdesign - CMS Administration</title>
+  <link rel="stylesheet" type="text/css" href="templates/stylesheets/style.css" />
+  <script src="templates/javascript/public_functions.js" type="text/javascript"></script>
+  <script src="templates/javascript/table-row-effect.js" type="text/javascript"></script>
+  <!-- jQuery library is required, see http://jquery.com/ -->
+  <script src="templates/javascript/jquery/jquery1-7-2.js" type="text/javascript"></script>
+  <!-- WYMeditor main JS file, minified version -->
+  <script src="templates/javascript/wymeditor/jquery.wymeditor.min.js" type="text/javascript"></script>
+  <script src="templates/javascript/wymeditor/plugins/embed/jquery.wymeditor.embed.js" type="text/javascript"></script>
+  <!-- Drag and drop file upload -->
+  <script src="templates/javascript/dropzone.js" type="text/javascript"></script>
+  {head}
+</head>
+
+<body>
+
+<script src="templates/javascript/wz_tooltip.js" type="text/javascript" language="javascript"></script>
+
+<div id="head">
+  <p class="info_right">{admin_name} - <a href="?page=logout">Abmelden</a></p>
+  <p class="servertime">{servertime}</p>
+
+  <h1>CMS Administration</h1>
+
+  <ol>
+{menu_header}
+  </ol>
+</div>
+
+<div id="left">
+  <h1 class="first">Menü</h1>
+  <ol>
+{menu_second}
+  </ol>
+</div>
+
+<div id="content">
+{content}
+</div>
+
+</body>
+</html>

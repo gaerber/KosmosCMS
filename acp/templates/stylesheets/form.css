@@ -1,0 +1,348 @@
+@charset "utf-8";
+
+ /*
+ =====================================================
+ Name ........: Formatierung Formulare
+ Projekt .....: gaerber.ch
+ Datiename ...: formulare.css
+ -----------------------------------------------------
+ Version .....: 1.1.2
+ Datum .......: 06.02.2014
+ Autor .......: Kevin Gerber
+ =====================================================
+ */
+
+form.form_acp_standard {
+	margin:-10px 0;
+	padding:0;
+	width:99.5%;		/* IE 6 Bugfix */
+}
+form.form_acp_standard  ol {
+	float:right;
+	list-style:none;	
+	margin:10px 0;
+	padding:0;
+	width:100%;
+}
+form.form_acp_standard ol li {
+	clear:left;
+	padding:3px 0;
+}
+form.form_acp_standard ol li#drop-files {
+	display:none;
+}
+form.form_acp_standard ol li.spam-protect, form.form_acp_standard ol li.input-hidden {
+	display:none;
+}
+p.form-after {
+	clear:right;		/* Workarround Dreispaltenlayoout */
+	height:1px;
+	font-size:0.1em;	/* IE 6 Bugfix */
+}
+
+/*** Labels, Textfelder & -boxen *********************************************/
+form.form_acp_standard label.line, form.form_acp_standard label.line_hide {
+	display:block;
+	float:left;
+	width:20%;
+	margin:0 10px 0 0;
+	padding:3px 5px;
+	background-color:#f1f1f1;
+	/*text-align:right;*/
+	color:#615d5a;
+	font-style:italic;
+	
+	font-size:10pt;
+	line-height:18px;
+}
+form.form_acp_standard label.line_hide {
+	background:none;
+}
+form.form_acp_standard input.input_text, form.form_acp_standard textarea,
+		form.form_acp_standard select, form.form_acp_standard input.input_file {
+	width:70%;
+	padding:3px;			/* Schriftgroesse */
+	border:1px solid #c9c5c1;
+	font-family:Verdana;
+	font-size:1em;
+	
+	font-size:10pt;			/* Schriftgroesse */
+}
+form.form_acp_standard input.input_text:focus, form.form_acp_standard textarea:focus,
+		form.form_acp_standard select:focus, form.form_acp_standard input.input_file:focus,
+		form.form_acp_standard ol li input.input_btn:focus {
+	border-color:#359;
+}
+
+/*** Checkboxen und Radio ****************************************************/
+form.form_acp_standard ol li span.input_box {
+	display:block;
+	float:left;
+	position:relative;
+	height:22px;
+	width:22px;
+	margin-bottom:3px;
+	border:1px solid #c9c5c1;
+}
+form.form_acp_standard ol li span.input_box input {
+	position:absolute;
+	top:3px;
+	left:3px;
+	height:16px;
+	width:16px;
+}
+form.form_acp_standard ol li label.input_box {
+	display:block;
+	width:35%;
+	float:left;
+	padding:3px 5px;		/* Schriftgroesse */
+	font-size:10pt;			/* Schriftgroesse */
+	border:1px solid #c9c5c1;
+	border-left:none;
+}
+
+/*** Selektierfelder *********************************************************/
+form.form_acp_standard select, form.form_acp_standard input.input_file {
+	padding:2px 0;			/* Schriftgroesse */
+	width:70.5%;
+}
+
+/*** Bilder aud dem Dateisystem **********************************************/
+form.form_acp_standard ol li div.images div {
+	float:left;
+	margin:0 10px 4px 0;
+	padding:2px;
+	border:1px solid #c9c5c1;
+}
+form.form_acp_standard ol li div.images div img {
+	max-height:120px;
+}
+form.form_acp_standard ol li div.images p {
+	margin-bottom:10px;
+}
+/*** Buttons *****************************************************************/
+form.form_acp_standard ol li input.input_btn {
+	margin-right:10px;
+	padding:3px 3px;		/* Schriftgroesse */
+	border:1px solid #c9c5c1;
+	background-color:#edede8;
+	font-family:Verdana;
+	font-size:1em;
+	
+	font-size:10pt;			/* Schriftgroesse */
+}
+
+/*** Pflichtangaben **********************************************************/
+form.form_acp_standard li.obligation label {
+	background-repeat:no-repeat;
+	background-position:right top;
+	background-image:url();
+}
+form.form_acp_standard li.empty input.input_text, form.form_acp_standard li.empty textarea,
+		form.form_acp_standard li.empty select, form.form_acp_standard li.empty span.input_box {
+	border-color:#c14e39;
+}
+
+p.form_end {
+	clear:both;
+	margin:0;
+	padding:0;
+	height:1px;
+	font-size:0.1pt;
+}
+
+/*** Grupenwahl **************************************************************/
+form.form_acp_standard ol li.select_groups {
+	display:none;
+}
+form.form_acp_standard ol li.select_groups_view {
+	display:block;
+}
+
+
+
+ /*
+ =====================================================
+ Name ........: Formatierung Dropzone
+ -----------------------------------------------------
+ Version .....: 1.0
+ Datum .......: 10.11.2014
+ Autor .......: Kevin Gerber
+ =====================================================
+ */
+
+#content form.form_acp_fileupload {
+	margin:10px 0;
+	width:95%;
+	border:1px solid #333;
+}
+#content form.form_acp_fileupload ol li {
+	position:relative;
+	clear:right;
+	
+	min-height:24px;
+}
+/*** Labels, Textfelder & -boxen *********************************************/
+#content form.form_acp_fileupload label.line, #content form.form_acp_fileupload label.line_hide {
+	position:absolute;
+	left:40px;
+	width:35%;
+	background-color:transparent;
+}
+form.form_acp_fileupload input.input_text, form.form_acp_fileupload textarea,
+		form.form_acp_fileupload select, form.form_acp_fileupload input.input_file {
+	width:22px;
+}
+/*** Formularfelder **********************************************************/
+#content form.form_acp_fileupload ol {
+	margin:0;
+	background-color:#f1f1f1;
+}
+#content form.form_acp_fileupload ol li {
+	padding:3px 10px;
+}
+/*** Animation Progress Bar **************************************************/
+div.slider-bar-animated {
+	background-image:linear-gradient(45deg,rgba(255,255,255,.25) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.25) 50%,rgba(255,255,255,.25) 75%,transparent 75%,transparent);
+	background-size:40px 40px;
+	box-shadow:inset 0px 2px 5px rgba(255,255,255,0.75);
+	animation:slider-bar-animated 1s linear infinite;
+}
+@keyframes slider-bar-animated {
+	from {
+		background-position:0 0;
+	}
+	to {
+		background-position:40px 0;
+	}
+}
+/*** Dropzone Feld ***********************************************************/
+form.form_acp_fileupload ol li#drop-files {
+	display:block;
+	margin:0;
+	padding:5px;
+	border-bottom:1px dashed #333;
+	line-height:50px;
+	text-align:center;
+	
+	cursor:pointer;
+}
+#dropzone li.dropping {
+	background-color:#359;
+}
+form.form_acp_fileupload ol li#drop-files p {
+	position:absolute;
+	top:0;
+	right:0;
+	padding:3px;
+	line-height:normal;
+	background-color:#c9c5c1;
+	border-bottom:1px solid #333;
+	border-left:1px solid #333;
+}
+form.form_acp_fileupload ol li#drop-files p:hover {
+	background-color:#359;
+}
+#dropzone div.drop-infos {
+	border-top:1px solid #333;
+}
+/*** Progress Bar ************************************************************/
+#dropzone div#drop-progress {
+	position:relative;
+	margin:20px 10px 10px 10px;
+	height:20px;
+	background-color:rgba(201, 197, 193, 1);
+	border:1px solid #333;
+	text-align:right;
+	line-height:20px;
+	box-shadow:inset 0px 2px 5px rgba(255,255,255,0.75);
+	
+	background-image:linear-gradient(45deg,rgba(255,255,255,.25) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.25) 50%,rgba(255,255,255,.25) 75%,transparent 75%,transparent);
+	background-size:40px 40px;
+	box-shadow:inset 0px 2px 5px rgba(255,255,255,0.75);
+	animation:slider-bar-animated 1s linear infinite;
+}
+#dropzone div#drop-progress div.slider-bar {
+	float:left;
+	height:20px;
+	width:0%;
+	background-color:#8eb830;
+	box-shadow:inset 0px 2px 5px rgba(255,255,255,0.75);
+}
+
+
+#dropzone div#drop-progress p {
+	position:absolute;
+	top:0;
+	right:5px;
+	font-weight:bold;
+}
+/*** Vorschau Bilder *********************************************************/
+#dropzone div#dropped-files > div {
+	position:relative;
+	float:left;
+	margin:10px;
+	padding:0;
+	height:154px;
+	width:180px;
+	overflow:hidden;
+	border:5px solid #fff;
+	background-color:white;
+	box-shadow: 0 0 2px 2px #d5d5d5;
+
+}
+#dropzone div#dropped-files > div > div.image {
+	border:none;
+	height:120px;
+	width:180px;
+}
+
+#dropzone div#dropped-files > div > div.progress {
+	border:1px solid #333;
+	background-color:rgba(201, 197, 193, 1);
+	text-align:center;
+	font-size:0.8em;
+	font-weight:bold;
+	line-height:13px;
+	box-shadow:inset 0px 2px 5px rgba(255,255,255,0.75);
+}
+#dropzone div#dropped-files > div.waiting > div.progress, #dropzone div#dropped-files > div.uploading > div.progress {
+	background-image:linear-gradient(45deg,rgba(255,255,255,.25) 25%,transparent 25%,transparent 50%,rgba(255,255,255,.25) 50%,rgba(255,255,255,.25) 75%,transparent 75%,transparent);
+	background-size:40px 40px;
+	box-shadow:inset 0px 2px 5px rgba(255,255,255,0.75);
+	animation:slider-bar-animated 1s linear infinite;
+}
+#dropzone div#dropped-files > div.uploading > div.progress {
+	background-color:#8eb830;
+}
+#dropzone div#dropped-files > div.uploaded > div.progress {
+	background-color:#8eb830;
+}
+#dropzone div#dropped-files > div.aborted > div.progress {
+	background-color:#c14e39;
+}
+#dropzone div#dropped-files div div.filename {
+	width:300px;
+	height:18px;
+	overflow:hidden;
+	line-height:18px;
+	
+}
+/*** Fehlermeldungen *********************************************************/
+#dropzone div#dropped-files > div > div.error-message {
+	position:absolute;
+	top:-30px;
+	padding:5px;
+	width:170px;
+	background-color:rgba(193,78,57, 0.5);
+	
+	text-align:center;
+	font-weight:bold;
+	
+	transition: all 0.5s ease;
+	opacity:0;
+}
+#dropzone div#dropped-files > div:hover > div.error-message {
+	top:0;
+	opacity:1;
+}
