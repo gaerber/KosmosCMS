@@ -451,10 +451,7 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 			echo '<p class="photo-clear"></p>';
 		}
 		else {
-			if ($line_ctr > 0) {
-				echo ActionReport(REPORT_INFO, 'Keine Fotos', 'In diesem Album sind noch keine Fotos vorhanden.');
-			}
-			else {
+			if ($line_ctr == 0) {
 				echo ActionReport(REPORT_INFO, 'Album leer', 'Dieses Album ist noch leer.');
 			}
 		}
