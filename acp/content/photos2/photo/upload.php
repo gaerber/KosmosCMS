@@ -125,7 +125,7 @@ if (($current_album = readAlbumConfig2($ftp, $current_path)) && $current_album['
 							}
 						}
 						else {
-							echo ActionReport(REPORT_ERROR, 'Foto hochgeladen',
+							echo ActionReport(REPORT_ERROR, 'Thumbnail nicht erstellt',
 									'Das Foto wurde erfolgreich hochgeladen, aber das Thumbnail konnte 
 									nicht erstellt werden.');
 						}

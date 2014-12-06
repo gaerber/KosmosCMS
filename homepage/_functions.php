@@ -919,6 +919,7 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
 			/* Temporaerer Speicherort auf Server */
 			$image_scaled_temp = tempnam(FILESYSTEM_TEMP, 'img');
 	
+			$bool = false;
 			if (file_exists($image_scaled_temp)) {
 	            switch($size_src[2]) {
 	                /* GIF */
@@ -931,7 +932,7 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
 	                	break;
 	                /* PNG */
 	                case 3:
-	                    $bool = ImagePNG($img_thumb, $image_scaled_temp, $quality);
+	                    $bool = ImagePNG($img_thumb, $image_scaled_temp, round($quality / 10, 0));
 	                    break;
 	            }
 	            
@@ -941,9 +942,6 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
 					$bool = $ftp->FilePut($img_dest, $image_scaled_temp);
 	            }
 	            unlink($image_scaled_temp);
-      		}
-      		else {
-      			$bool = false;
       		}
 
             /* Bilder loeschen */
