@@ -57,7 +57,6 @@ $(document).ready(function() {
 		// Stop the default action, which is to redirect the page
 		// To the dropped file
 		e.preventDefault();
-
 		transferFiles(e.dataTransfer.files);
 	});
 
