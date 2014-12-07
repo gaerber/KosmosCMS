@@ -18,6 +18,7 @@
  |1.1.1   | 05.07.2011 | Bearbeitungsfunktionen
  |1.2     | 14.02.2012 | Modul: Ordner sperre
  |2.0     | 05.12.2012 | Vollstaendig FTP abgetrennt
+ |2.0.1   | 07.12.2015 | Infoboxen
  -----------------------------------------------------
  Beschreibung :
  Verwaltung der oeffentlichen Dateien und

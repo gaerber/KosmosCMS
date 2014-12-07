@@ -15,6 +15,7 @@
  |--------|------------|--------------------
  |2.0     | 05.05.2011 | Uebernommen und geaendert
  |2.0.2   | 14.09.2012 | writeAlbumConfig() hinzu
+ |2.0.3   | 07.12.2014 | printInfoBox() hinzu
  -----------------------------------------------------
  Beschreibung :
  Alle Funktionen fuer den ACP, ausgenommen PlugIns.
