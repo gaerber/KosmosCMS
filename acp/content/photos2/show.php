@@ -58,12 +58,13 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 	if ($current_album['id'] > 0) {
 		$a = explode('/', $album);
 		array_pop($a);array_pop($a);
-		echo ActionReport(REPORT_INFO, 'Album: '.$current_album['caption'], $current_album['description'].'<br />'
-				.'<a href="?page=photos2-show&album='.implode('/', $a).'" onmouseover="Tip(\'Übergeordnetes Fotoalbum\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/return.png" alt="" /></a>
-				&nbsp;
-				<a href="?page=photos2-show&amp;do=thumb-album&amp;album='.implode('/', $a).'&amp;id='.$current_album['id'].'" onmouseover="Tip(\'Thumbnails neu generieren\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/thumb.png" alt="" /></a>
-				&nbsp;
-				<a href="?page=photos2-album-edit&amp;album='.$album.'" onmouseover="Tip(\'Album '.$current_album['caption'].' bearbeiten\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/album_edit.png" alt="" /></a>');
+
+		$icons = array(
+				array('icon' => 'img/icons/plugins/photos/return.png', 'url' => '?page=photos2-show&album='.implode('/', $a), 'comment' => 'Übergeordnetes Fotoalbum'),
+				array('icon' => 'img/icons/plugins/photos/thumb.png', 'url' => '?page=photos2-show&amp;do=thumb-album&amp;album='.implode('/', $a).'&amp;id='.$current_album['id'], 'comment' => 'Thumbnails neu generieren'),
+				array('icon' => 'img/icons/plugins/photos/album_edit.png', 'url' => '?page=photos2-album-edit&amp;album='.$album, 'comment' => 'Album '.$current_album['caption'].' bearbeiten')
+		);
+		echo printInfoBox('Album: '.$current_album['caption'], $current_album['description'], $icons);
 	}
 	
 	/*** Links *******************************************/

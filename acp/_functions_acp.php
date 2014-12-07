@@ -235,6 +235,29 @@ function printBoxEnd() {
 	return 	"  </ol>\r\n  <p class=\"form-after\">&nbsp;</p>\r\n";
 }
 
+/**
+ * Erstellt eine Informationsbox.
+ * @param[in] title Titel der Informationsbox.
+ * @param[in] content Inhaltstext der Informationsbox.
+ * @param[in] icons Array mit den Icons. Jedes Icon besteht aus einem assoziativen Array mit den Schluesseln icon, url, comment.
+ */
+function printInfoBox($title, $comment = '', $icons = NULL) {
+	$html = '<div class="acp-infobox">
+  <h2>'.$title.'</h2>
+  '.$comment;
+
+	if (is_array($icons)) {
+		$html .= '<div class="icons">';
+		foreach ($icons as $i) {
+			$html .= ' <a href="'.$i['url'].'" onmouseover="Tip(\''.$i['comment'].'\')" onmouseout="UnTip()"><img src="'.$i['icon'].'" alt="" /></a>';
+		}
+		$html .= '</div>';
+	}
+	$html .= '</div>';
+
+	return $html;
+}
+
 
 /**
  * Sicherung der Datenbank in einen Outputstream.

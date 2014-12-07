@@ -56,23 +56,25 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 		OR FatalError(FATAL_ERROR_MYSQL);
 	$line = mysql_fetch_assoc($result);
 	if ($line && $ftp->fileExists($current_path.$line['file_name'])) {
-		/* Informationen über das Album und das Foto */
-		echo ActionReport(REPORT_INFO, 'Album: '.$current_album['caption'], $current_album['description'].'<br />'
-					.'<a href="?page=photos2-show&album='.$album.'" onmouseover="Tip(\'Zurück zur Albumübersicht\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/return.png" alt="" /></a>
-					&nbsp;
-					<a href="?page=photos2-album-edit&amp;album='.$album.'" onmouseover="Tip(\'Album '.$current_album['caption'].' bearbeiten\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/album_edit.png" alt="" /></a>');
 		
 		$access = getRecursiveAlbumAccess($current_album['id']);
 		if ($access['access'] > 0 || $access['locked']) {
 			/* Geschuetzte Bider ausgeben */
-			echo '<div class="photo"><img src="../download.php?path='.$current_path.MODULE_PHOTOS_THUMB.$line['file_name']
+			$image = '<div class="photo"><img src="../download.php?path='.$current_path.MODULE_PHOTOS_THUMB.$line['file_name']
 					.'&amp;inline" alt="'.$line['caption'].'" /></div>';
 		}
 		else {
 			/* Normale Bilderausgabe */
-			echo '<div class="photo"><img src="'.FILESYSTEM_DIR_V21.'/'.$current_path.MODULE_PHOTOS_THUMB
+			$image =  '<div class="photo"><img src="'.FILESYSTEM_DIR_V21.'/'.$current_path.MODULE_PHOTOS_THUMB
 					.$line['file_name'].'" alt="'.$line['caption'].'" /></div>';
 		}
+		
+		/* Informationen über das Album und das Foto */
+		$icons = array(
+				array('icon' => 'img/icons/plugins/photos/return.png', 'url' => '?page=photos2-show&album='.$album, 'comment' => 'Zurück zur Albumübersicht'),
+				array('icon' => 'img/icons/plugins/photos/album_edit.png', 'url' => '?page=photos2-album-edit&amp;album='.$album, 'comment' => 'Album '.$current_album['caption'].' bearbeiten')
+		);
+		echo printInfoBox('Album: '.$current_album['caption'], $current_album['description'].$image.'<p class="photo-clear"></p>', $icons);
 		
 		/* Formular */
 		$form = new formWizard('form', '?'.$_SERVER['QUERY_STRING'], 'post', 'form_acp_standard');

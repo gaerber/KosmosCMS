@@ -315,6 +315,23 @@ img {
 	background-color:#ffe;
 	/*background-image:url(/img/status/important.png);*/
 }
+#content div.acp-infobox {
+	margin:20px 0px;
+	padding-left:10px;
+	width:92%;
+	border-left:15px solid #e0ebf5;
+}
+#content div.acp-infobox div.icons {
+	margin:10px 0;
+	opacity:0;
+	transition: all 0.2s ease;
+}
+#content div.acp-infobox:hover div.icons {
+	opacity:1;
+}
+#content div.acp-infobox div.icons img {
+	margin-right:10px;
+}
 
 /*** Popupfenster Dateiupload ************************************************/
 div.popup {

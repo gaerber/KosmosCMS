@@ -84,19 +84,19 @@ if (isset($_GET['do'])) {
 					}
 					else {
 						/* Verzeichnis existiert bereits */
-						echo '<h2>Neues Verzeichnis anlegen</h2>';
+						echo printInfoBox('Neues Verzeichnis anlegen',
+								'<p>Im bestehenden Verzeichnis: <a href="?page=filesystem-public&folder='.$current_folder.'">'.FILESYSTEM_DIR.$current_folder.'</a></p>');
 						echo ActionReport(REPORT_EINGABE, 'Existiert bereits',
 								'Dieser Verzeichnisnamen existiert bereits!');
 						/* Ausgabe Formular */
-						echo '<p>Im bestehenden Verzeichnis: '.FILESYSTEM_DIR.$current_folder.'</p>';
 						echo $form->getForm();
 						$file_table_view = false;
 					}
 				}
 				else {
 					/* Ausgabe Formular */
-					echo '<h2>Neues Verzeichnis anlegen</h2>';
-					echo '<p>Im bestehenden Verzeichnis: '.FILESYSTEM_DIR.$current_folder.'</p>';
+					echo printInfoBox('Neues Verzeichnis anlegen',
+							'<p>Im bestehenden Verzeichnis: <a href="?page=filesystem-public&folder='.$current_folder.'">'.FILESYSTEM_DIR.$current_folder.'</a></p>');
 					echo $form->getForm();
 					$file_table_view = false;
 				}
@@ -139,31 +139,31 @@ if (isset($_GET['do'])) {
 							}
 							else {
 								/* Dateinamen existiert bereits */
-								echo '<h2>Datei hochladen</h2>';
+								echo printInfoBox('Datei hochladen',
+										'<p>Im bestehenden Verzeichnis: <a href="?page=filesystem-public&folder='.$current_folder.'">'.FILESYSTEM_DIR.$current_folder.'</a></p>');
 								echo ActionReport(REPORT_EINGABE, 'Dateinamen existiert bereits',
 										'Eine andere Datei mit gleichem Namen existiert bereits in diesem Verzeichnis!');
-								echo '<p>Im bestehenden Verzeichnis: '.FILESYSTEM_DIR.$current_folder.'</p>';
 								echo $form->getForm();
 								$file_table_view = false;
 							}
 						}
 						else {
 							/* Unerlaubter Dateityp */
-							echo '<h2>Datei hochladen</h2>';
+							echo printInfoBox('Datei hochladen',
+									'<p>Im bestehenden Verzeichnis: <a href="?page=filesystem-public&folder='.$current_folder.'">'.FILESYSTEM_DIR.$current_folder.'</a></p>');
 							$last = array_pop($FileSystem_AllowedDataTypes);
 							echo ActionReport(REPORT_EINGABE, 'Dateityp nicht erlaubt',
 									'Sie wollten einen nicht erlaupten Dateityp hochladen!
 									<br />Erlaubten Dateitypen: '
 									.implode(', ', $FileSystem_AllowedDataTypes).' und '.$last);
-							echo '<p>Im bestehenden Verzeichnis: '.FILESYSTEM_DIR.$current_folder.'</p>';
 							echo $form->getForm();
 							$file_table_view = false;
 						}
 					}
 					else {
 						/* Datei zu gross */
-						echo '<h2>Datei hochladen</h2>';
-						echo '<p>Im bestehenden Verzeichnis: '.FILESYSTEM_DIR.$current_folder.'</p>';
+						echo printInfoBox('Datei hochladen',
+								'<p>Im bestehenden Verzeichnis: <a href="?page=filesystem-public&folder='.$current_folder.'">'.FILESYSTEM_DIR.$current_folder.'</a></p>');
 						echo ActionReport(REPORT_EINGABE, 'Datei ist zu gross',
 								'Die ausgewählte Datei ist zu gross!
 									Die maximal erlaubte Dateigrösse ist '.BinaryMultiples(FILE_SIZE_LIMIT).'.');
@@ -173,8 +173,8 @@ if (isset($_GET['do'])) {
 				}
 				else {
 					/* Ausgabe Formular */
-					echo '<h2>Datei hochladen</h2>';
-					echo '<p>Im bestehenden Verzeichnis: '.FILESYSTEM_DIR.$current_folder.'</p>';
+					echo printInfoBox('Datei hochladen',
+							'<p>Im bestehenden Verzeichnis: <a href="?page=filesystem-public&folder='.$current_folder.'">'.FILESYSTEM_DIR.$current_folder.'</a></p>');
 					echo $form->getForm();
 					$file_table_view = false;
 				}
@@ -211,7 +211,9 @@ if (isset($_GET['do'])) {
 							}
 							else {
 								/* Verzeichnis existiert bereits */
-								echo '<h2>Verzeichniss umbenennen</h2>';
+								echo printInfoBox('Verzeichnis umbenennen',
+										'<p>Das Verzeichnis '.StdString($_GET['foldername']).' aus dem Verzeichnis
+										<a href="?page=filesystem-public&folder='.$current_folder.'">'.FILESYSTEM_DIR.$current_folder.'</a> umbenennen.</p>');
 								echo ActionReport(REPORT_EINGABE, 'Existiert bereits',
 										'Dieser Verzeichnisnamen existiert bereits in diesem Verzeichnis!');
 								/* Ausgabe Formular */
@@ -222,7 +224,9 @@ if (isset($_GET['do'])) {
 					}
 					else {
 						/* Ausgabe Formular */
-						echo '<h2>Verzeichniss umbenennen</h2>';
+						echo printInfoBox('Verzeichnis umbenennen',
+								'<p>Das Verzeichnis '.StdString($_GET['foldername']).' aus dem Verzeichnis
+								<a href="?page=filesystem-public&folder='.$current_folder.'">'.FILESYSTEM_DIR.$current_folder.'</a> umbenennen.</p>');
 						echo $form->getForm();
 						$file_table_view = false;
 					}
@@ -266,7 +270,9 @@ if (isset($_GET['do'])) {
 								}
 								else {
 									/* Verzeichnis existiert bereits */
-									echo '<h2>Datei umbenennen</h2>';
+									echo printInfoBox('Datei umbenennen',
+											'<p>Die Datei '.StdString($_GET['filename']).' aus dem Verzeichnis
+											<a href="?page=filesystem-public&folder='.$current_folder.'">'.FILESYSTEM_DIR.$current_folder.'</a> umbenennen.</p>');
 									echo ActionReport(REPORT_EINGABE, 'Existiert bereits',
 											'Dieser Dateinamen existiert bereits in diesem Verzeichnis!');
 									/* Ausgabe Formular */
@@ -277,7 +283,9 @@ if (isset($_GET['do'])) {
 						}
 						else {
 							/* Dateiendung nicht erlaubt */
-							echo '<h2>Datei umbenennen</h2>';
+							echo printInfoBox('Datei umbenennen',
+									'<p>Die Datei '.StdString($_GET['filename']).' aus dem Verzeichnis
+									<a href="?page=filesystem-public&folder='.$current_folder.'">'.FILESYSTEM_DIR.$current_folder.'</a> umbenennen.</p>');
 							$last = array_pop($FileSystem_AllowedDataTypes);
 							echo ActionReport(REPORT_EINGABE, 'Dateityp nicht erlaubt',
 									'Der eingegebene Dateitype ist nicht erlaubt!
@@ -289,7 +297,9 @@ if (isset($_GET['do'])) {
 					}
 					else {
 						/* Ausgabe Formular */
-						echo '<h2>Datei umbenennen</h2>';
+						echo printInfoBox('Datei umbenennen',
+								'<p>Die Datei '.StdString($_GET['filename']).' aus dem Verzeichnis
+								<a href="?page=filesystem-public&folder='.$current_folder.'">'.FILESYSTEM_DIR.$current_folder.'</a> umbenennen.</p>');
 						echo $form->getForm();
 						$file_table_view = false;
 					}

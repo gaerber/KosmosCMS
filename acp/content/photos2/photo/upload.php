@@ -53,8 +53,8 @@ else {
 /* Existiert dieses Album */
 if (($current_album = readAlbumConfig2($ftp, $current_path)) && $current_album['id'] > 0) {
 	/* Infos des aktuellen Albums anzeigen */
-	echo ActionReport(REPORT_INFO, 'Album: '.$current_album['caption'],
-			'Alle Fotos werden in das Album <a href="?page=photos2-show&amp;album='.$album.'">'.$current_album['caption'].'</a> hochgeladen.');
+	echo printInfoBox('Album: '.$current_album['caption'],
+			'<p>Alle Fotos werden in das Album <a href="?page=photos2-show&amp;album='.$album.'">'.$current_album['caption'].'</a> hochgeladen.</p>');
 
 	/* Formular */
 	$form = new formWizard('form', '?'.$_SERVER['QUERY_STRING'], 'post', 'form_acp_standard');
