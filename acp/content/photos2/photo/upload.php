@@ -57,14 +57,13 @@ if (($current_album = readAlbumConfig2($ftp, $current_path)) && $current_album['
 			'Alle Fotos werden in das Album <a href="?page=photos2-show&amp;album='.$album.'">'.$current_album['caption'].'</a> hochgeladen.');
 
 	/* Formular */
-	$form = new formWizard('form', '?'.str_replace('&', '&amp;', $_SERVER['QUERY_STRING']), 'post', 'form_acp_standard');
-	//$form = new formWizard('form', $_SERVER['QUERY_STRING'], 'post', 'form_acp_standard');
+	$form = new formWizard('form', '?'.$_SERVER['QUERY_STRING'], 'post', 'form_acp_standard');
 	if (ACP_MODULE_DRAG_AND_DROP) {
 		$file = $form->addElement('dropfiles', 'foto', 'Foto', NULL, true);
 		$file->setAcceptTypes('image/*');
 	}
 	else {
-		$file = $form->addElement('file', 'file', 'Foto', NULL, true);
+		$file = $form->addElement('file', 'foto', 'Foto', NULL, true);
 	}
 	$photocomment = $form->addElement('checkbox', 'photocomment', 'Fotokommentar übernehmen', '1');
 	$photocomment->setChecked(true);

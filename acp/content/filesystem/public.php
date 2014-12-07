@@ -106,7 +106,12 @@ if (isset($_GET['do'])) {
 			case 'upload':
 				/* Formular */
 				$form = new formWizard('form', '?'.$_SERVER['QUERY_STRING'], 'post', 'form_acp_standard');
-				$file = $form->addElement('file', 'file', 'Datei', NULL, true);
+				if (ACP_MODULE_DRAG_AND_DROP) {
+					$file = $form->addElement('dropfiles', 'file', 'Datei', NULL, true);
+				}
+				else {
+					$file = $form->addElement('file', 'file', 'Datei', NULL, true);
+				}
 				$overwrite = $form->addElement('checkbox', 'overwrite', 'Überschreibung erzwingen', '1');
 				$submit = $form->addElement('submit', 'button', NULL, 'Hochladen');
 				/* Auswertung */
