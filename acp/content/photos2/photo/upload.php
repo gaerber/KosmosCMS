@@ -92,7 +92,6 @@ if (($current_album = readAlbumConfig2($ftp, $current_path)) && $current_album['
 						if (!$ftp->folderExists($current_path.MODULE_PHOTOS_THUMB)) {
 							if (!$ftp->mkdir(MODULE_PHOTOS_THUMB))
 								FatalError(FATAL_ERROR_FILE);
-							$ftp->chmod(MODULE_PHOTOS_THUMB, 0777);	//Bugfix Thumb erstellen
 						}
 						
 						/* Thumbnail erstellen */

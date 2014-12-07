@@ -62,10 +62,11 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 					&nbsp;
 					<a href="?page=photos2-album-edit&amp;album='.$album.'" onmouseover="Tip(\'Album '.$current_album['caption'].' bearbeiten\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/album_edit.png" alt="" /></a>');
 		
-		if ($current_album['access'] > 0 || $current_album['locked']) {
+		$access = getRecursiveAlbumAccess($current_album['id']);
+		if ($access['access'] > 0 || $access['locked']) {
 			/* Geschuetzte Bider ausgeben */
-			echo '<div class="photo"><img src="../download.php?path='.$current_path.$line['file_name']
-					.'&amp;thumb&amp;inline" alt="'.$line['caption'].'" /></div>';
+			echo '<div class="photo"><img src="../download.php?path='.$current_path.MODULE_PHOTOS_THUMB.$line['file_name']
+					.'&amp;inline" alt="'.$line['caption'].'" /></div>';
 		}
 		else {
 			/* Normale Bilderausgabe */

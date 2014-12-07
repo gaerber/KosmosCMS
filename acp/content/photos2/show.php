@@ -14,6 +14,7 @@
  |Version | Datum      | Aenderung
  |--------|------------|--------------------
  |2.0     | 04.10.2014 | Program erstellt
+ |2.1     | 07.12.2014 | Bugfix Thumbnail Anzeige
  -----------------------------------------------------
  Beschreibung :
  Anzeige der Alben und Fotos eines bestimmten
@@ -130,10 +131,9 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 					if ($ftp->folderExists($current_path.$line_element['id_str'])) {
 						/* Alle Thumbnails werden gelöschen */
 						$ftp->ChangeDir($current_path.$line_element['id_str']);
-						if ((!$ftp->folderExists($current_path.$line_element['id_str'].'/'.MODULE_PHOTOS_THUMB) 
+						if ((!$ftp->folderExists(MODULE_PHOTOS_THUMB) 
 								|| $ftp->rmdir(MODULE_PHOTOS_THUMB))
-									&& $ftp->mkdir(MODULE_PHOTOS_THUMB)
-									&& $ftp->chmod(MODULE_PHOTOS_THUMB, 0777)) {
+									&& $ftp->mkdir(MODULE_PHOTOS_THUMB)) {
 							$ctr_thumb = 0;
 							$ctr_mysql = 0;
 							/* Verzeichnis das durchsucht werden soll, wird geoeffnet */
@@ -407,6 +407,9 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 				OR FatalError(FATAL_ERROR_MYSQL);
 				
 		if (mysql_num_rows($result) > 0) {
+			
+			/* Zugriffsrechte pruefen */
+			$access = getRecursiveAlbumAccess($current_album['id']);
 
 			while ($row = mysql_fetch_assoc($result)) {
 				/* Prüfen ob Datei existiert */
@@ -426,9 +429,9 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 					echo '<a href="?page=photos2-show&amp;album='.$album.'&amp;do=delete-photo&amp;id='.$row['id'].'"
 							onmouseover="Tip(\'Foto löschen\')" onmouseout="UnTip()">'
 							.'<img src="img/icons/plugins/photos/image_delete.png" alt="" /></a></p>';
-					if ($current_album['access'] > 0 || $current_album['locked']) {
+					if ($access['access'] > 0 || $access['locked']) {
 						/* Geschuetzte Bider ausgeben */
-						echo '<img src="../download.php?path='.$current_path.$row['file_name'].'&amp;thumb&amp;inline" 
+						echo '<img src="../download.php?path='.$current_path.MODULE_PHOTOS_THUMB.$row['file_name'].'&amp;inline" 
 								alt="'.$row['caption'].'" />';
 					}
 					else {

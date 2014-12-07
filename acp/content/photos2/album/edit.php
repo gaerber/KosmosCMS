@@ -155,8 +155,7 @@ if (($current_album = readAlbumConfig2($ftp, $current_path)) && !($current_album
 					if (!$ftp->ChangeDir($current_path)
 							|| !$ftp->mkdir($validate_id_str)
 							|| !$ftp->ChangeDir($current_path.$validate_id_str)
-							|| !$ftp->mkdir(MODULE_PHOTOS_THUMB)
-							|| !$ftp->chmod(MODULE_PHOTOS_THUMB, 0777)) {
+							|| !$ftp->mkdir(MODULE_PHOTOS_THUMB)) {
 						/* Konnte Ordner nicht umbenennen */
 						echo ActionReport(REPORT_ERROR, 'Fehler', 'Der Ordner konnte nicht erstellt werden.');
 						$error = true;
@@ -269,7 +268,8 @@ if (($current_album = readAlbumConfig2($ftp, $current_path)) && !($current_album
 						$config = array(
 								'module' => 'photos',
 								'album_id' => mysql_insert_id(DB_CMS),
-								'access' => $access
+								'access' => $access,
+								'locked' => (int) $locked->getValue()
 								);
 						if ($ftp->writeFolderConfig($current_path.$validate_id_str, $config)) {
 							echo ActionReport(REPORT_OK, 'Album erstellt', 'Das neue Album wurde erfolgreich erstellt.');
