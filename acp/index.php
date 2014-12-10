@@ -100,6 +100,7 @@ if (isset($_POST["acp_login_name"], $_POST['acp_login_password'])) {
 			if (isset($_GET['id']))		$query .= "id=".$_GET['id']."&";
 			if (isset($_GET['mode']))	$query .= "mode=".$_GET['mode']."&";
 			if (isset($_GET['folder']))	$query .= "folder=".$_GET['folder']."&";
+			if (isset($_GET['album']))	$query .= "album=".$_GET['album']."&";
 			$query = substr($query, 0, -1);
 			header("Location: index.php".$query);
 			die();
