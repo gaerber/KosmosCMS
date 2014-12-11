@@ -60,20 +60,20 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 		array_pop($a);array_pop($a);
 
 		$icons = array(
-				array('icon' => 'img/icons/plugins/photos/return.png', 'url' => '?page=photos2-show&album='.implode('/', $a), 'comment' => 'Übergeordnetes Fotoalbum'),
-				array('icon' => 'img/icons/plugins/photos/thumb.png', 'url' => '?page=photos2-show&amp;do=thumb-album&amp;album='.implode('/', $a).'&amp;id='.$current_album['id'], 'comment' => 'Thumbnails neu generieren'),
-				array('icon' => 'img/icons/plugins/photos/album_edit.png', 'url' => '?page=photos2-album-edit&amp;album='.$album, 'comment' => 'Album '.$current_album['caption'].' bearbeiten')
+				array('icon' => 'img/icons/plugins/photos/return.png', 'url' => '?page=photos-show&album='.implode('/', $a), 'comment' => 'Übergeordnetes Fotoalbum'),
+				array('icon' => 'img/icons/plugins/photos/thumb.png', 'url' => '?page=photos-show&amp;do=thumb-album&amp;album='.implode('/', $a).'&amp;id='.$current_album['id'], 'comment' => 'Thumbnails neu generieren'),
+				array('icon' => 'img/icons/plugins/photos/album_edit.png', 'url' => '?page=photos-album-edit&amp;album='.$album, 'comment' => 'Album '.$current_album['caption'].' bearbeiten')
 		);
 		echo printInfoBox('Album: '.$current_album['caption'], $current_album['description'], $icons);
 	}
 	
 	/*** Links *******************************************/
 	echo '<p><img src="img/icons/plugins/photos/album_add.png" alt="" />
-			<a href="?page=photos2-album-edit&amp;album='.$album.'&amp;new"">Neues Album</a>';
+			<a href="?page=photos-album-edit&amp;album='.$album.'&amp;new"">Neues Album</a>';
 	if ($current_album['id'] > 0) {
 		echo ' &nbsp; | &nbsp; ';
 		echo '<img src="img/icons/plugins/photos/image_add.png" alt="" />
-				<a href="?page=photos2-photo-upload&amp;album='.$album.'">Fotos hochladen</a></p>';
+				<a href="?page=photos-photo-upload&amp;album='.$album.'">Fotos hochladen</a></p>';
 	}
 	
 	/*** Aktionen ****************************************/
@@ -368,31 +368,31 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 				
 				/* Sortierung */
 				if ($line_ctr > 1)
-					echo '<td class="icon"><a href="?page=photos2-show&amp;do=up-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Ein Element nach oben\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/up.png" alt="" /></a></td>';
+					echo '<td class="icon"><a href="?page=photos-show&amp;do=up-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Ein Element nach oben\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/up.png" alt="" /></a></td>';
 				else
 					echo '<td class="icon"></td>';
 				if ($line_ctr < mysql_num_rows($result))
-					echo '<td class="icon"><a href="?page=photos2-show&amp;do=down-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Ein Element nach unten\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/down.png" alt="" /></a></td>';
+					echo '<td class="icon"><a href="?page=photos-show&amp;do=down-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Ein Element nach unten\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/down.png" alt="" /></a></td>';
 				else
 					echo '<td class="icon"></td>';
 
 				/* Albumnamen */
-				echo '<td><a href="?page=photos2-show&amp;album='.$album.$row['id_str'].'">'.$row['caption'].'</a></td>';
+				echo '<td><a href="?page=photos-show&amp;album='.$album.$row['id_str'].'">'.$row['caption'].'</a></td>';
 			
 				/* Anzahl Unteralben und Fotos */
 				echo '<td>'.$ctr_sub_albums.'</td>';
 				echo '<td>'.$ctr_sub_photos.'</td>';
 				
 				/* Icons */
-				echo '<td class="icon"><a href="?page=photos2-album-edit&amp;album='.$album.$row['id_str'].'" onmouseover="Tip(\'Album bearbeiten\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/album_edit.png" alt="" /></a></td>';
-				echo '<td class="icon"><a href="?page=photos2-show&amp;do=thumb-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Thumbnails neu generieren\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/thumb.png" alt="" /></a></td>';
+				echo '<td class="icon"><a href="?page=photos-album-edit&amp;album='.$album.$row['id_str'].'" onmouseover="Tip(\'Album bearbeiten\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/album_edit.png" alt="" /></a></td>';
+				echo '<td class="icon"><a href="?page=photos-show&amp;do=thumb-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Thumbnails neu generieren\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/thumb.png" alt="" /></a></td>';
 				/* Album Sperren */
 				if ($row['locked'])
-					echo '<td class="icon"><a href="?page=photos2-show&amp;do=unlock-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Album entsperren\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/locked.png" alt="" /></a></td>';
+					echo '<td class="icon"><a href="?page=photos-show&amp;do=unlock-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Album entsperren\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/locked.png" alt="" /></a></td>';
 				else
-					echo '<td class="icon"><a href="?page=photos2-show&amp;do=lock-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Album sperren\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/locked_not.png" alt="" /></a></td>';
+					echo '<td class="icon"><a href="?page=photos-show&amp;do=lock-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Album sperren\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/locked_not.png" alt="" /></a></td>';
 				/* Album loeschen */
-				echo '<td class="icon"><a href="javascript:loeschen(\'?page=photos2-show&amp;do=delete-album&amp;album='.$album.'&amp;id='.$row['id'].'\', \'Wollen Sie dieses Album mit sämtlichen Fotos und Unteralben wirklich unwiderruflich löschen?\')" onmouseover="Tip(\'Album löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/delete.png" alt="" /></a></td>';
+				echo '<td class="icon"><a href="javascript:loeschen(\'?page=photos-show&amp;do=delete-album&amp;album='.$album.'&amp;id='.$row['id'].'\', \'Wollen Sie dieses Album mit sämtlichen Fotos und Unteralben wirklich unwiderruflich löschen?\')" onmouseover="Tip(\'Album löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/delete.png" alt="" /></a></td>';
 					
 				echo "</tr>\r\n";
 			}
@@ -424,10 +424,10 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 					}
 					/* Jetzt darf es angezeigt werden */
 					echo '<div class="photo"><p>';
-					echo '<a href="?page=photos2-photo-edit&amp;album='.$album.'&amp;id='.$row['id'].'"
+					echo '<a href="?page=photos-photo-edit&amp;album='.$album.'&amp;id='.$row['id'].'"
 							onmouseover="Tip(\'Fotokommentar bearbeiten\')" onmouseout="UnTip()">'
 							.'<img src="img/icons/plugins/photos/image_edit.png" alt="" /></a> &nbsp; ';
-					echo '<a href="?page=photos2-show&amp;album='.$album.'&amp;do=delete-photo&amp;id='.$row['id'].'"
+					echo '<a href="?page=photos-show&amp;album='.$album.'&amp;do=delete-photo&amp;id='.$row['id'].'"
 							onmouseover="Tip(\'Foto löschen\')" onmouseout="UnTip()">'
 							.'<img src="img/icons/plugins/photos/image_delete.png" alt="" /></a></p>';
 					if ($access['access'] > 0 || $access['locked']) {
