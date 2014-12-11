@@ -26,6 +26,7 @@
  |2.0.10  | 19.11.2014 | Bugfix ImageResize()
  |2.0.11  | 30.11.2014 | ImageResizeFtp fertig!
  |2.0.12  | 07.12.2014 | getRecursiveAlbumAccess hinzu
+ |2.1     | 11.12.2014 | FTP Dateisystem
  -----------------------------------------------------
  Beschreibung :
  Alle Funktionen fuer die CMS Software
@@ -296,6 +297,9 @@ function ValidateFileSystem($string, $zusatz=false) {
 	return $validated;
 }
 
+
+/*** Utility und Benutzerfunktionen **********************/
+
 /**
  * Email Adressen verschluesseln
  * @param $emailString Die Emailadresse, welche verschluesselt
@@ -440,6 +444,8 @@ function getSmallUrlView($url) {
 		return $service.$url_parts[0];
 }
 
+
+/*** Textaufbereitung von Eingabefeldern *****************/
 
 /**
  * Eingegebene Zeichenkette vorbereiten
@@ -652,41 +658,6 @@ function moduleCallback($treffer) {
 /*** Funktionen fuer Modul: Photoalbum *******************/
 
 /**
- * Liest die Config Datei aus einem Album aus und prueft sie auf plausibilitaet.
- * @param $album_path Pfad zum Album
- * @return Rueckgabe in einem Assoziativen Array, fals im Fehlerfall
- */
-function readAlbumConfig($album_path) {
-	if (file_exists($album_path.'.config')) {
-		$s_config = implode('', file($album_path.'.config'));
-		$a_config = explode('|', $s_config);
-		/* Auf schematische Fehler pruefen */
-		if (sizeof($a_config) == 5 && is_numeric($a_config[0]) && is_numeric($a_config[3])
-				&& is_numeric($a_config[4]))
-			return array('sort' => $a_config[0], 'title' => $a_config[1],
-					'description' => $a_config[2], 'access' => (int)$a_config[3],
-					'locked' => (int)$a_config[4]);
-	}
-	return false;
-}
-function readAlbumConfigFtp($ftp, $album_path) {
-	if ($ftp->fileExists($album_path.'.config')) {
-		/* Config Datei einlesen */
-		$s_config = $ftp->FileContents($album_path.'.config');
-		
-		/* Parameter auftrennen */
-		$a_config = explode('|', $s_config);
-		/* Auf schematische Fehler pruefen */
-		if (sizeof($a_config) == 6 && is_numeric($a_config[2]) && is_numeric($a_config[0])
-				&& is_numeric($a_config[5]) && $a_config[1]=='photos')
-			return array('sort' => $a_config[2], 'title' => $a_config[3],
-					'description' => $a_config[4], 'access' => (int)$a_config[0],
-					'locked' => (int)$a_config[5]);
-	}
-	return false;
-}
-
-/**
  * Lesen der Album Informationen.
  * @param[in]	$ftp FTP Stream.
  * @param[in]	$album_path der komplete Pfad zum Album auf dem FTP Server.
@@ -760,106 +731,6 @@ function getRecursiveAlbumAccess($album_id) {
 	return $retval;
 }
 
-
-/**
- * Liste aller Unteralben und Fotos erstellen
- * @param $current_album Pfad zum Album
- * @param $a_albums Adresse auf Array, dort werden die gefundenen Alben gespeichert
- * @param $a_photos Adresse auf Array, dort werden die gefundenen Fotos gespeichert
- * @return Timestamp der neusten Datei/Ordner.
- */
-function readAlbumPhotos($current_album, &$a_albums, &$a_photos, $sort_lists=false) {
-	global $FileSystem_AllowedImageTypes;
-	
-	$data_handler = opendir($current_album);
-	if (!$data_handler)
-		return false;
-	
-	/* Default Wert fuer return */
-	$newest_data = 1;
-	
-	/* Albumsortierungs-Hilfe */
-	$a_album_sort = array();
-	
-	while($file = readdir($data_handler)) {
-		if($file != '.' && $file != '..') {
-			if (is_dir($current_album.$file)) {
-				if ($album_info = readAlbumConfig($current_album.$file.'/')) {
-					$a_albums[] = $file.'/';
-					$a_album_sort[] = $album_info['sort'];
-					if ($newest_data < filemtime($current_album.$file.'/'))
-						$newest_data = filemtime($current_album.$file.'/');
-				}
-			}
-			else {
-				$infos = pathinfo($current_album.$file);
-				if (isset($infos['extension']) 
-						&& in_array(strtolower($infos['extension']), $FileSystem_AllowedImageTypes)) {
-					$a_photos[] = $file;
-					if ($newest_data < filemtime($current_album.$file))
-						$newest_data = filemtime($current_album.$file);
-				}
-			}
-		}
-	}
-	closedir($data_handler);
-	
-	/* Listen sortieren */
-	if ($sort_lists) {
-		array_multisort($a_album_sort, SORT_DESC, SORT_NUMERIC, $a_albums, SORT_ASC, SORT_STRING);
-		array_multisort($a_photos, SORT_ASC, SORT_STRING);
-	}
-	
-	return $newest_data;
-}
-function readAlbumPhotosFtp($ftp, $current_album, &$a_albums, &$a_photos, $sort_lists=false) {
-	global $FileSystem_AllowedImageTypes;
-	
-	/* Verzeichnis das durchsucht werden soll, wird geoeffnet */
-	$folder_pointer = $ftp->openDir($current_album);
-	if (!$folder_pointer)
-		return false;
-	
-	/* Default Wert fuer return */
-	$newest_data = 1;
-	
-	/* Albumsortierungs-Hilfe */
-	$a_album_sort = array();
-	
-	while($file = $folder_pointer->readDir()) {
-		if ($folder_pointer->isDir($file)) {
-			/* Moegliches Album */
-			if ($album_info = readAlbumConfigFtp($ftp, $current_album.$file.'/')) {
-				$a_albums[] = $file.'/';
-				$a_album_sort[] = $album_info['sort'];
-				$time = $ftp->fileTime($current_album.$file.'/config.txt');
-				if ($newest_data < $time)
-					$newest_data = $time;
-			}
-		}
-		else {
-			/* Moegliches Bild */
-			if (in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)),
-					$FileSystem_AllowedImageTypes)) {
-				$a_photos[] = $file;
-				$time = $ftp->fileTime($current_album.$file);
-				if ($newest_data < $time)
-					$newest_data = $time;
-			}
-		}
-	}
-	
-	$ftp->closeDir($folder_pointer);
-	
-	/* Listen sortieren */
-	if ($sort_lists) {
-		array_multisort($a_album_sort, SORT_DESC, SORT_NUMERIC, $a_albums, SORT_ASC, SORT_STRING);
-		array_multisort($a_photos, SORT_ASC, SORT_STRING);
-	}
-	
-	return $newest_data;
-}
-
 /**
  * JPG Bilder Skalieren
  * @param $img_src Pfad zum Originalbild (lokal)
@@ -870,8 +741,6 @@ function readAlbumPhotosFtp($ftp, $current_album, &$a_albums, &$a_photos, $sort_
  * @return true falls das Thumbnail erstellt wurde, sonst false
  */
 function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional=true, $quality=80) {
-	//return ImageResize('../upload'.$img_src, '../upload'.$img_dest, $hight, $width, $proportional, $quality);
-	
 	if ($ftp->fileExists($img_src)) {
 		/* Daten in eine temporaere Datei packen (auf dem lokalen Server) */
 		$image_src_temp = tempnam(FILESYSTEM_TEMP, 'img');
@@ -993,127 +862,6 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
 	            }
 	            unlink($image_scaled_temp);
       		}
-
-            /* Bilder loeschen */
-            imagedestroy($img_src_data);
-            imagedestroy($img_thumb);
-            
-            /* Thumbnail sollte erstellt sein */
-            return $bool;
-        }
-        else {
-            imagedestroy($img_src_data);
-            return false;
-        }
-        
-    }
-    else {
-         return false;
-    }
-}
-function ImageResize($img_src, $img_dest, $hight, $width, $proportional=true, $quality=80) {
-	if (!file_exists($img_src)) {
-	    return false;
-    }
-        
-    /* Originalbildgroesse */
-    $size_src = getimagesize($img_src);
-
-    /* Erstellen des urspruenglichen Bildes */
-    switch($size_src[2]) {
-        /* GIF Grafik */
-        case 1:
-            $img_src_data = ImageCreateFromGIF($img_src);
-        	break;
-        /* JPG Grafik */
-        case 2:
-            $img_src_data = ImageCreateFromJPEG($img_src);
-        	break;
-        /* PNG Grafik */
-        case 3:
-            $img_src_data = ImageCreateFromPNG($img_src);
-        	break;
-        /* Keine Grafik */
-        default:
-            return false;
-    }
-    
-    if ($img_src_data) {
-    	/* Berechnung der Streckungsfaktoren */
-    	$factor_h = $size_src[1] / $hight;
-    	$factor_w = $size_src[0] / $width;
-    	
-    	/* Wie muss das Bild zugeschnitten werden */
-    	if ($factor_h > $factor_w) {
-    		/* Bild ist zu hoch -> Breite anpassen oder oben und unten abschneiden */
-    		if ($proportional) {
-    			$width = round($size_src[0] / $factor_h, 0);
-   			}
-   			else {
-            	$size_src_big_w = $size_src[0];
-            	$size_src_big_h = round($hight * $factor_w, 0);
-				$x_offset = 0;
-            	$y_offset = round(($size_src[1] - $size_src_big_h) / 2, 0);
-   			}
-    	}
-    	else {
-    		/* Bild ist zu breit -> Hoehe anpassen oder links und rechts abschneiden */
-    		if ($proportional) {
-    			$hight = round($size_src[0] / $factor_h, 0);
-   			}
-   			else {
-            	$size_src_big_h = $size_src[1];
-            	$size_src_big_w = round($width * $factor_h, 0);
-				$y_offset = 0;
-            	$x_offset = round(($size_src[0] - $size_src_big_w) / 2, 0);
-   			}
-    	}
-   		
-        /* Thumbnail anlegen */
-		$img_thumb = ImageCreateTrueColor($width, $hight);
-        
-        if ($img_thumb) {
-            /* Thumbnail skalieren */
-            if ($proportional) {
-            	$handler = imagecopyresized($img_thumb, $img_src_data, 0,0,0,0,
-						$width, $hight, $size_src[0], $size_src[1]);
-			}
-            else {
-            	$handler = imagecopyresized($img_thumb, $img_src_data, 0,0,$x_offset,$y_offset,
-						$width, $hight, $size_src_big_w, $size_src_big_h);
-            }
-            
-			if (!$handler) {
-                /* Bilder loeschen */
-                imagedestroy($img_src_data);
-                imagedestroy($img_thumb);
-                return false;
-            }
-            
-			/* Thumbnail abspeichern */
-			//$server_temp = 'temp/thumb.tmp';
-            switch($size_src[2]) {
-                /* GIF */
-                case 1:
-					$bool = ImageGIF($img_thumb, $img_dest);
-                	break;
-                /* JPG */
-                case 2:
-                    $bool = ImageJPEG($img_thumb, $img_dest, $quality);
-                	break;
-                /* PNG */
-                case 3:
-                    $bool = ImagePNG($img_thumb, $img_dest, $quality);
-                    break;
-            }
-            
-            /*if ($bool) {
-	            /* Test FTP Upload *
-	            $ftp = new ftp();
-				$ftp->ChangeDir('/');
-				$bool = $ftp->FilePut($img_dest, $server_temp);
-				$ftp->close();
-            }*/
 
             /* Bilder loeschen */
             imagedestroy($img_src_data);
