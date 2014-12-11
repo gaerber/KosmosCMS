@@ -39,7 +39,7 @@ echo '<h1 class="first">Fotoalbum</h1>';
 $ftp = new ftp();
 
 /* Album selektieren */
-$current_path = $FileSystem_ModulePahts['photos2'];
+$current_path = $FileSystem_ModulePahts['photos'];
 if (isset($_GET['album']) && $_GET['album'] != '') {
 	$album = ValidateFileSystem($_GET['album'], '/');
 	if (substr($album, strlen($album)-1, 1) != '/') {

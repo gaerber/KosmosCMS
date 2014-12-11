@@ -161,8 +161,7 @@ $FileSystem_AllowedDataTypes = array_merge($FileSystem_AllowedImageTypes,
  * Diese Ordner koennen im File System nicht bearbeitet werden
  */
 $FileSystem_ModulePahts = array(
-		'photos' => '/photos/',
-		'photos2' => '/photos2/',
+		'photos' => '/photos2/',
 		'user-system-images' => '/benutzer-bilder/',
 		'mysqlbackups' => '/private-mysql-backups/'
 );

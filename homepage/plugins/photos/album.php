@@ -38,7 +38,7 @@ if (ACP_MODULE_PHOTOS_EN) {
 	$ftp = new ftp();
 	
 	/* Album selektieren */
-	$current_path = $FileSystem_ModulePahts['photos2'];
+	$current_path = $FileSystem_ModulePahts['photos'];
 	if (isset($_GET[MODULE_PHOTOS_GETP_ALBUM]) && $_GET[MODULE_PHOTOS_GETP_ALBUM] != '') {
 		$album = str_replace('_', '/', $_GET[MODULE_PHOTOS_GETP_ALBUM]);
 		$album = ValidateFileSystem($album, '/');

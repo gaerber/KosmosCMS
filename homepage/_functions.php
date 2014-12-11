@@ -696,7 +696,7 @@ function readAlbumConfig2($ftp, $album_path) {
 	global $FileSystem_ModulePahts;
 	
 	/* Spezialbehandlung ROOT */
-	if ($album_path == $FileSystem_ModulePahts['photos2']) {
+	if ($album_path == $FileSystem_ModulePahts['photos']) {
 		return array('id' => 0, 'locked' => 0, 'access' => 0);
 	}
 	
