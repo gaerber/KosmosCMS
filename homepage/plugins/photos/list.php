@@ -32,34 +32,33 @@ if (!defined("SWISS_WEBDESIGN"))	die();
 ///////////////////////////////////////////////////////
 
 /* Rekursive Funktion */
-function generatePhotoList($ftp, $o_menuClass, $settings, $current_album) {
+function generatePhotoList($ftp, $o_menuClass, $current_path, $current_album_id) {
 	global $FileSystem_ModulePahts;
 	
-	$path = $FileSystem_ModulePahts['photos'];
 	$html_menu = "";
 	
-	/* Liste aller Unteralben und Fotos erstellen */
-	$a_albums = array();
-	$a_photos = array();
-	readAlbumPhotosFtp($ftp, $path.$current_album, $a_albums, $a_photos, true);
-	
-	$a_size = sizeof($a_albums);
-	
 	/* Liste aller Unteralben erstellen */
-	for ($ctr=0; $ctr<$a_size; $ctr++) {
-		if (($album_info_sub = readAlbumConfigFtp($ftp, $path.$current_album.$a_albums[$ctr]))
-				&& CheckAccess($album_info_sub['access'])
-				&& $album_info_sub['locked'] == 0) {
+	$result = mysql_query('SELECT id_str FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE menu_sub='.$current_album_id.' 
+			&& locked=0 && '.CheckSQLAccess().' ORDER BY menu_order ASC', DB_CMS)
+			OR FatalError(FATAL_ERROR_MYSQL);
+	
+	/* Fake Nummerierung */
+	$ctr = 0;
+	$a_size = mysql_num_rows($result);
+	
+	while ($row = mysql_fetch_assoc($result)) {
+		/* Erst prüfen ob es ein valides Album ist */
+		if ($album_info_sub = readAlbumConfig2($ftp, $FileSystem_ModulePahts['photos'].$current_path.$row['id_str'].'/')) {
 			/* Nach weiteren Unteralben suchen */
-			$settings['level']++;
-			$submenu = generatePhotoList($ftp, $o_menuClass, $settings, $current_album.$a_albums[$ctr]);	
-			$settings['level']--;
+			$o_menuClass->settings['level']++;
+			$submenu = generatePhotoList($ftp, $o_menuClass, $current_path.$album_info_sub['id_str'].'/', $album_info_sub['id']);	
+			$o_menuClass->settings['level']--;
 			
 			/* Ausgabe des Albums */
-			$replace = array('element' => 'page', 'level' => $settings['level'],
+			$replace = array('element' => 'page', 'level' => $o_menuClass->settings['level'],
 					'pos' => $o_menuClass->positionElements($ctr+1, $a_size), 'active' => '');
 		
-			$temp_template_folder = $settings['template_folder'];
+			$temp_template_folder = $o_menuClass->settings['template_folder'];
 			foreach ($replace as $key => $value) {
 				$temp_template_folder = str_replace("{".$key."}", $value,
 						$temp_template_folder);
@@ -69,21 +68,21 @@ function generatePhotoList($ftp, $o_menuClass, $settings, $current_album) {
 			$tpl = new tpl($temp_template_folder);
 			$tpl->assign($replace);
 			$tpl->assign('submenu', $submenu);
-			$tpl->assign('label', $album_info_sub['title']);
-			$tpl->assign("url", ROOT_WEBSITE.implode("/", $settings['path']).URL_ENDSTR_PAGE
+			$tpl->assign('label', $album_info_sub['caption']);
+			$tpl->assign("url", ROOT_WEBSITE.implode("/", $o_menuClass->settings['path']).URL_ENDSTR_PAGE
 					."/".MODULE_PHOTOS_GETP_ALBUM."/"
-					.str_replace('/', '_', $current_album).substr($a_albums[$ctr], 0, -1));
+					.str_replace('/', '_', $current_path).$album_info_sub['id_str']);
 		
 			$html_menu .= $tpl->get();
 		}
+		$ctr++;
 	}
-	
 	return $html_menu;
 }
 
 /* Funktion ausfuehren */
 $ftp = new ftp();
-$html_menu .= generatePhotoList($ftp, $this, $this->settings, '');
+$html_menu .= generatePhotoList($ftp, $this, '', 0);
 $ftp->close();
 
 ?>

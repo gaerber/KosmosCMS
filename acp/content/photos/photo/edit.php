@@ -37,7 +37,7 @@ echo "<h1 class=\"first\">Foto kommentieren</h1>";
 $ftp = new ftp();
 
 /* Album selektieren */
-$current_path = $FileSystem_ModulePahts['photos2'];
+$current_path = $FileSystem_ModulePahts['photos'];
 if (isset($_GET['album']) && $_GET['album'] != '') {
 	$album = ValidateFileSystem($_GET['album'], '/');
 	if (substr($album, strlen($album)-1, 1) != '/') {
@@ -71,8 +71,8 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 		
 		/* Informationen über das Album und das Foto */
 		$icons = array(
-				array('icon' => 'img/icons/plugins/photos/return.png', 'url' => '?page=photos2-show&album='.$album, 'comment' => 'Zurück zur Albumübersicht'),
-				array('icon' => 'img/icons/plugins/photos/album_edit.png', 'url' => '?page=photos2-album-edit&amp;album='.$album, 'comment' => 'Album '.$current_album['caption'].' bearbeiten')
+				array('icon' => 'img/icons/plugins/photos/return.png', 'url' => '?page=photos-show&album='.$album, 'comment' => 'Zurück zur Albumübersicht'),
+				array('icon' => 'img/icons/plugins/photos/album_edit.png', 'url' => '?page=photos-album-edit&amp;album='.$album, 'comment' => 'Album '.$current_album['caption'].' bearbeiten')
 		);
 		echo printInfoBox('Album: '.$current_album['caption'], $current_album['description'].$image.'<p class="photo-clear"></p>', $icons);
 		

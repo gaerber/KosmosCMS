@@ -13,8 +13,7 @@
  -----------------------------------------------------
  |Version | Datum      | Aenderung
  |--------|------------|--------------------
- |1.0     | 12.09.2012 | Program erstellt
- |2.0     | 13.12.2012 | FTP Dateisystem
+ |3.0     | 04.10.2014 | Program erstellt
  -----------------------------------------------------
  Beschreibung :
  Erstellen und bearbeiten von Alben.
@@ -32,276 +31,300 @@ ACP_AdminAccess(ACP_ACCESS_M_PHOTOS, true);
 $ACP_ApplicationInfo['categorie'] = 5;
 ///////////////////////////////////////////////////////
 
-/* Rekursive Funktion */
-function generatePhotoList(&$form_object, $default_folder, $current_album, $level=0) {
-	/* Liste aller Unteralben und Fotos erstellen */
-	$a_albums = array();
-	$a_photos = array();
-	readAlbumPhotos($default_folder.$current_album, $a_albums, $a_photos, true);
-	
-	$a_size = sizeof($a_albums);
-	/* Liste aller Unteralben erstellen */
-	for ($ctr=0; $ctr<$a_size; $ctr++) {
-		if ($album_info_sub = readAlbumConfig($default_folder.$current_album.$a_albums[$ctr])) {
-			/* Element der Liste hinzufuegen */
-			$form_object->addOption(str_repeat('&nbsp;', 4 * $level).$album_info_sub['title'],
-					$current_album.$a_albums[$ctr]);
-			
-			/* Nach weiteren Unteralben suchen */
-			$level++;
-			generatePhotoList($form_object, $default_folder, $current_album.$a_albums[$ctr], $level);
-			$level--;	
-		}
-	}
+/* Titel */
+if (isset($_GET['new'])) {
+	echo '<h1 class="first">Fotoalbum erstellen</h1>';
 }
-function PhotoAlbumCallback($folder_name, $level, $path) {
-	global $ftp;
-	global $folder_list;
-	global $FileSystem_ModulePahts;
-	
-	if ($album_info = readAlbumConfigFtp($ftp, $path.$folder_name.'/')) {
-		/* Element der Liste hinzufuegen */
-		$folder_list->addOption(str_repeat('&nbsp;', 4 * $level).$album_info['title'],
-				substr($path, strlen($FileSystem_ModulePahts['photos'])).$folder_name.'/');
-		return true;
-	}
-	
-	return false;
+else {
+	echo '<h1 class="first">Fotoalbum bearbeiten</h1>';
 }
-
-
-$error = false;
-$album_info = NULL;
 
 /* FTP Verbindung aufbauen */
 $ftp = new ftp();
 
-if (isset($_GET['folder'], $_GET['album'])) {
-	echo '<h1 class="first">Fotoalbum bearbeiten</h1>';
-	$album_info = readAlbumConfigFtp($ftp, $FileSystem_ModulePahts['photos'].$_GET['folder'].$_GET['album']);
-	if (!$album_info) {
-		/* Kein gueltiges Album */
-		echo ActionReport(REPORT_EINGABE, 'Album existiert nicht',
-				'Das zu bearbeitende Album existiert nicht mehr.');
-		$error = true;
+/* Album selektieren */
+$current_path = $FileSystem_ModulePahts['photos'];
+if (isset($_GET['album']) && $_GET['album'] != '') {
+	$album = ValidateFileSystem($_GET['album'], '/');
+	if (substr($album, strlen($album)-1, 1) != '/') {
+		$album .= '/';
 	}
+	$current_path .= $album;	
 }
 else {
-	echo '<h1 class="first">Neues Fotoalbum</h1>';
+	$album = '';
 }
 
-/* Formular */
-$form = new formWizard('form', '?'.$_SERVER['QUERY_STRING'], 'post', 'form_acp_standard');
-if (!$album_info) {
-	$folder_list = $form->addElement('select', 'folder', 'Unteralbum');
-	$folder_list->addOption('Kein Unteralbum', '');
-	$ftp->folderListCallback($FileSystem_ModulePahts['photos'], 'PhotoAlbumCallback', true);
-	echo 'Liste eins';
-}
-$caption = $form->addElement('text', 'caption', 'Titel', null, true);
-$description = $form->addElement('textarea', 'description', 'Beschreibung', NULL, true);
-$description->setRowsCols(4, 20);
 
-if (ACP_ACCESS_SYSTEM_EN) {
-	$access_all = $form->addElement('radio', 'access', 'Berechtigung', '0');
-	$access_log = $form->addElement('radio', 'access', NULL, '1');
-	$access_grp = $form->addElement('radio', 'access', NULL, '2');
-	$access_groups = $form->addElement('select', 'access_group', 'Gruppen');
-
-	$access_groups->setCssClass('select_groups');
-	$access_all->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
-	$access_log->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
-	$access_grp->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'block\';"');
-
-	$access_all->setSubLabel("Alle Besucher");
-	$access_log->setSubLabel("Nur angemeldete Besucher");
-	$access_grp->setSubLabel("Nur Besucher aus bestimmten Gruppen");
-
-	$access_groups->setMultiple(true);
-	$access_groups->setSize(7);
-}
-
-$locked = $form->addElement('checkbox', 'locked', 'Sperren', 1);
-$submit = $form->addElement('submit', 'btn', NULL, 'Speichern');
-
-/* Defaultwerte Setzen */
-if (!$form->checkSubmit() && $album_info) {
-	$caption->setValue($album_info['title']);
-	$description->setValue(StdContentEdit($album_info['description']));
-	if ($album_info['locked'])
-		$locked->setChecked(true);
-	/* Berechtigungen */
-	if (ACP_ACCESS_SYSTEM_EN) {
-		if ($album_info['access'] == 0)
-			$access_all->setChecked(true);
-		else if ($album_info['access'] == 1)
-			$access_log->setChecked(true);
-		else {
-			$access_grp->setChecked(true);
-		}
-		/* Gruppen */
-		$result = mysql_query('SELECT id, name FROM '.DB_TABLE_ROOT.'cms_access_group
-				ORDER BY name ASC', DB_CMS)
-				OR FatalError(FATAL_ERROR_MYSQL);
-		while ($row = mysql_fetch_array($result)) {
-			$access_groups->addOption($row['name'], 1<<$row['id'],
-					(bool)($album_info['access'] & (1<<$row['id'])));
-		}
+/* Existiert dieses Album */
+if (($current_album = readAlbumConfig2($ftp, $current_path)) && !($current_album['id'] == 0 && !isset($_GET['new']))) {
+	/* Falls in einem Subalbum -> Infos des aktuellen Albums anzeigen */
+	if ($current_album['id'] > 0 && isset($_GET['new'])) {
+		echo ActionReport(REPORT_INFO, 'Unteralbum',
+				'Das neue Album wird im besethenden Album <a href="?page=photos-show&album='.$album.'"><b>'.$current_album['caption'].'</b></a> angelegt.');
 	}
-}
-else {
-	/* Benutzer Gruppen */
+	
+	/* Formular */
+	$form = new formWizard('form', '?'.$_SERVER['QUERY_STRING'], 'post', 'form_acp_standard');
+	$caption = $form->addElement('text', 'caption', 'Titel', null, true);
+	$description = $form->addElement('textarea', 'description', 'Beschreibung');
+	$description->setRowsCols(4, 20);
+	
 	if (ACP_ACCESS_SYSTEM_EN) {
-		if (!$form->checkSubmit())
-			$access_all->setChecked(true);
-		$result = mysql_query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
-				ORDER BY name ASC", DB_CMS)
-				OR FatalError(FATAL_ERROR_MYSQL);
-		while ($row = mysql_fetch_array($result)) {
-			$access_groups->addOption($row['name'], 1<<$row['id']);
-		}
+		$access_all = $form->addElement('radio', 'access', 'Berechtigung', '0');
+		$access_log = $form->addElement('radio', 'access', NULL, '1');
+		$access_grp = $form->addElement('radio', 'access', NULL, '2');
+		$access_groups = $form->addElement('select', 'access_group', 'Gruppen');
+	
+		$access_groups->setCssClass('select_groups');
+		$access_all->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
+		$access_log->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
+		$access_grp->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'block\';"');
+	
+		$access_all->setSubLabel("Alle Besucher");
+		$access_log->setSubLabel("Nur angemeldete Besucher");
+		$access_grp->setSubLabel("Nur Besucher aus bestimmten Gruppen");
+	
+		$access_groups->setMultiple(true);
+		$access_groups->setSize(7);
 	}
-}
-
-/* Formular pruefen */
-if ($form->checkForm()) {
-	if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue() && !sizeof($access_groups->getValue())) {
-		/* Es muss nim. eine Gruppe ausgewaehlt werden */
-		$access_groups->setError(true);
-		$access_groups->setCssClass('select_groups_view');
-		/* Ausgabe des Formulars */
-		echo $form->getForm();
+	
+	$locked = $form->addElement('checkbox', 'locked', 'Sperren', 1);
+	$submit = $form->addElement('submit', 'btn', NULL, 'Speichern');
+	
+	/* Defaultwerte Setzen */
+	if (!$form->checkSubmit() && !isset($_GET['new'])) {
+		$caption->setValue($current_album['caption']);
+		$description->setValue(StdContentEdit($current_album['description']));
+		if ($current_album['locked'])
+			$locked->setChecked(true);
+		/* Berechtigungen */
+		if (ACP_ACCESS_SYSTEM_EN) {
+			if ($current_album['access'] == 0)
+				$access_all->setChecked(true);
+			else if ($current_album['access'] == 1)
+				$access_log->setChecked(true);
+			else {
+				$access_grp->setChecked(true);
+			}
+			/* Gruppen */
+			$result = mysql_query('SELECT id, name FROM '.DB_TABLE_ROOT.'cms_access_group
+					ORDER BY name ASC', DB_CMS)
+					OR FatalError(FATAL_ERROR_MYSQL);
+			while ($row = mysql_fetch_array($result)) {
+				$access_groups->addOption($row['name'], 1<<$row['id'],
+						(bool)($current_album['access'] & (1<<$row['id'])));
+			}
+		}
 	}
 	else {
-        /* ID Str ermitteln */
-		$validate_id_str = ValidateFileSystem($caption->getValue());
-		$validate_id_str = str_replace('_', '', $validate_id_str);
-		$validate_id_str .= '/';
-		
-		if (!$album_info) {
-			$folder = $folder_list->getValue();
-		}
-		else {
-			$folder = $_GET['folder'];
-		}
-		
-		
-		
-		/* Ordner bearbeiten */
-		if ($album_info && $_GET['album'] != $validate_id_str) {
-			if (!$ftp->folderExists($FileSystem_ModulePahts['photos']
-					.$folder.$validate_id_str)) {
-				/* Ordner umbenennen */
-				if (!$ftp->ChangeDir($FileSystem_ModulePahts['photos'].$folder)
-						|| !$ftp->Rename($_GET['album'], $validate_id_str)) {
-					/* Konnte Ordner nicht umbenennen */
-					echo ActionReport(REPORT_ERROR, 'Fehler', 'Der Ordner konnte nicht umbenannt werden.');
-					$error = true;
-				}
-			}
-			else {
-				/* Orndernamen existiert bereits */
-				echo ActionReport(REPORT_ERROR, 'Albumnamen existiert bereits',
-						'Der angegebene Albumnamen existiert bereits.');
-				$caption->setError(true);
-				if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
-					$access_groups->setCssClass('select_groups_view');
-				}
-				echo $form->getForm();
-				$error = true;
-			}
-		}
-		
-		/* Neuer Ordner */
-		if (!$album_info) {
-			if (!$ftp->folderExists($FileSystem_ModulePahts['photos'].$folder.$validate_id_str)) {
-				/* Ordner erstellen */
-				if (!$ftp->ChangeDir($FileSystem_ModulePahts['photos'].$folder)
-						|| !$ftp->mkdir($validate_id_str)
-						|| !$ftp->ChangeDir($FileSystem_ModulePahts['photos'].$folder.$validate_id_str)
-						|| !$ftp->mkdir(MODULE_PHOTOS_THUMB)
-						|| !$ftp->chmod(MODULE_PHOTOS_THUMB, 0777)) {
-					/* Konnte Ordner nicht umbenennen */
-					echo ActionReport(REPORT_ERROR, 'Fehler', 'Der Ordner konnte nicht erstellt werden.');
-					$error = true;
-				}
-			}
-			else {
-				/* Orndernamen existiert bereits */
-				echo ActionReport(REPORT_ERROR, 'Albumnamen existiert bereits',
-						'Der angegebene Albumnamen existiert bereits.');
-				$caption->setError(true);
-				if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
-					$access_groups->setCssClass('select_groups_view');
-				}
-				echo $form->getForm();
-				$error = true;
-			}
-		}
-		
+		/* Benutzer Gruppen */
 		if (ACP_ACCESS_SYSTEM_EN) {
-			/* Berechtigungen berechnen */
-			if ($access_grp->getValue()) {
-				$access = 0;
-				foreach ($access_groups->getValue() as $group) {
-					$access |= $group;
-				}
-			}
-			else if ($access_log->getValue())
-				$access = 1;
-			else
-				$access = 0;
-		}
-		else {
-			$access = 0;
-		}
-		
-		/* Aenderungen vorbereiten */
-		if (!is_array($album_info)) {
-			/* Sortierung ermitteln */
-			$a_albums = array();
-			$a_photos = array();
-			readAlbumPhotosFtp($ftp, $FileSystem_ModulePahts['photos']
-					.$folder, $a_albums, $a_photos, true);
-			if (sizeof($a_albums) > 0) {
-				$album_info = readAlbumConfigFtp($ftp, $FileSystem_ModulePahts['photos'].$folder.$a_albums[0]);
-				$album_info['sort']++;
-			}
-			else {
-				$album_info = array('sort' => 1);
-			}
-		}
-			
-		$album_info['title'] = str_replace('|', '', StdString($caption->getValue()));
-		$album_info['description'] = str_replace('|', '', StdContent($description->getValue()));
-		$album_info['access'] = $access;
-		$album_info['locked'] = (int)$locked->getValue();
-		
-		/* Aenderung abspeichern */
-		if ($error == false) {
-			/* Neue Configs abspeichern */
-			if (writeAlbumConfigFtp($ftp, $FileSystem_ModulePahts['photos'].$folder.$validate_id_str, $album_info)) {
-				if (isset($a_photos))
-					echo ActionReport(REPORT_OK, 'Album erstellt',
-							'Das neue Album wurde erfolgreich erstellt.');
-				else
-					echo ActionReport(REPORT_OK, 'Album bearbeitet',
-							'Die Änderungen wurden erfolgreich übernommen.');
-			}
-			else {
-				/* Nicht moeglich */
-				echo ActionReport(REPORT_ERROR,' Fehler', 'Die Änderung konnte nicht gespeichert werden.');
+			if (!$form->checkSubmit())
+				$access_all->setChecked(true);
+			$result = mysql_query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
+					ORDER BY name ASC", DB_CMS)
+					OR FatalError(FATAL_ERROR_MYSQL);
+			while ($row = mysql_fetch_array($result)) {
+				$access_groups->addOption($row['name'], 1<<$row['id']);
 			}
 		}
 	}
-}
-else {
-	/* Ausgabe des Formulars */
-	if ($error == false) {
+	
+	/* Formular pruefen */
+	if ($form->checkForm()) {
+		if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue() && !sizeof($access_groups->getValue())) {
+			/* Es muss nim. eine Gruppe ausgewaehlt werden */
+			$access_groups->setError(true);
+			$access_groups->setCssClass('select_groups_view');
+			/* Ausgabe des Formulars */
+			echo $form->getForm();
+		}
+		else {
+			$error = false;
+			
+	        /* ID Str ermitteln */
+			$validate_id_str = ValidateFileSystem($caption->getValue());
+			$validate_id_str = str_replace('_', '', $validate_id_str);
+
+			/* Anpassungen im Dateisystem */
+			if (isset($_GET['new'])) {
+				/* Erstellen eines neuen Albums */
+				if (!$ftp->folderExists($current_path.$validate_id_str)) {
+					/* Ordner erstellen */
+					if (!$ftp->ChangeDir($current_path)
+							|| !$ftp->mkdir($validate_id_str)
+							|| !$ftp->ChangeDir($current_path.$validate_id_str)
+							|| !$ftp->mkdir(MODULE_PHOTOS_THUMB)) {
+						/* Konnte Ordner nicht umbenennen */
+						echo ActionReport(REPORT_ERROR, 'Fehler', 'Der Ordner konnte nicht erstellt werden.');
+						$error = true;
+					}
+				}
+				else {
+					/* Orndernamen existiert bereits */
+					echo ActionReport(REPORT_ERROR, 'Albumnamen existiert bereits',
+							'Der angegebene Albumnamen existiert bereits.');
+					$caption->setError(true);
+					if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
+						$access_groups->setCssClass('select_groups_view');
+					}
+					echo $form->getForm();
+					$error = true;
+				}
+			}
+			else {
+				/* Bearbeiten eines Albums */
+				if ($validate_id_str != $current_album['id_str']) {
+					$upper_path = substr($current_path, 0, -1*(strlen($current_album['id_str'])+1));
+					/* Der Ordner im Dateisystem muss umbenennt werden */
+					if (!$ftp->folderExists($upper_path.$validate_id_str)) {
+						/* Ordner umbenennen */
+						if (!$ftp->ChangeDir($upper_path)
+								|| !$ftp->Rename($current_album['id_str'], $validate_id_str)) {
+							/* Konnte Ordner nicht umbenennen */
+							echo ActionReport(REPORT_ERROR, 'Fehler', 'Der Ordner konnte nicht umbenannt werden.');
+							$error = true;
+						}
+					}
+					else {
+						/* Orndernamen existiert bereits */
+						echo ActionReport(REPORT_ERROR, 'Albumnamen existiert bereits',
+								'Der angegebene Albumnamen existiert bereits.');
+						$caption->setError(true);
+						if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
+							$access_groups->setCssClass('select_groups_view');
+						}
+						echo $form->getForm();
+						$error = true;
+					}
+				}
+			}
+			
+			if ($error == false) {
+				/* Benutzerberechtigungen */
+				if (ACP_ACCESS_SYSTEM_EN) {
+					/* Berechtigungen berechnen */
+					if ($access_grp->getValue()) {
+						$access = 0;
+						foreach ($access_groups->getValue() as $group) {
+							$access |= $group;
+						}
+					}
+					else if ($access_log->getValue())
+						$access = 1;
+					else
+						$access = 0;
+				}
+				else {
+					$access = 0;
+				}
+				
+				/* Verzeichnisschutz */
+				if (isset($_GET['new'])) {
+					$ftp->ChangeDir($current_path.$validate_id_str);
+				}
+				else {
+					$upper_path = substr($current_path, 0, -1*(strlen($current_album['id_str'])+1));
+					$ftp->ChangeDir($upper_path.$validate_id_str);
+				}
+				if ((int)$locked->getValue() == 1 || $access != 0){
+					if ($ftemp_htaccess = tmpfile()) {
+						/* Verzeichnisschutz erstellen */
+						fwrite($ftemp_htaccess, "Order deny,allow\r\nDeny from all");
+						fseek($ftemp_htaccess, 0);
+						/* Hochladen */
+						$ftp->FilePut('.htaccess', $ftemp_htaccess);
+						fclose($ftemp_htaccess);
+					}
+					else {
+						echo ActionReport(REPORT_ERROR, 'Verzeichnisschutz nicht aktiv', 'Der Verzeichnisschutz des Albums konnte nicht erstellt werden. Alle Fotos sind öffentlich zugänglich.');
+					}
+				}
+				else if ($ftp->fileExists('.htaccess')) {
+					/* Verzeichnisschutz muss entfernt werden, sofern er vohanden ist */
+					$ftp->Delete('.htaccess');
+				}
+			
+				/* Abspeichern */
+				if (isset($_GET['new'])) {
+					/* Das neue Album wird hinten angehaengt (Sortierung) */
+					$result = mysql_query('SELECT menu_order FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE menu_sub='.$current_album['id'].'
+							ORDER BY menu_order DESC LIMIT 0,1', DB_CMS)
+							OR FatalError(FATAL_ERROR_MYSQL);
+					if ($line = mysql_fetch_assoc($result)) {
+						$menu_order = $line['menu_order'] + 1;
+					}
+					else {
+						$menu_order = 1;
+					}
+					
+					/* Datenbankeintrag erstellen */
+					if (mysql_query('INSERT INTO '.DB_TABLE_PLUGIN.'photoalbum(id_str, menu_sub, menu_order, caption, description, writer, timestamp, access, locked)
+							VALUES("'.$validate_id_str.'", "'.$current_album['id'].'", "'.$menu_order.'", "'.StdSqlSafety(StdString($caption->getValue())).'",
+							"'.StdSqlSafety(StdContent($description->getValue())).'", '.$_SESSION['admin_id'].', '.TIME_STAMP.', '.$access.', 
+							'.(int)$locked->getValue().')', DB_CMS)) {
+						/* Die Config Datei speichern */
+						$config = array(
+								'module' => 'photos',
+								'album_id' => mysql_insert_id(DB_CMS),
+								'access' => $access,
+								'locked' => (int) $locked->getValue()
+								);
+						if ($ftp->writeFolderConfig($current_path.$validate_id_str, $config)) {
+							echo ActionReport(REPORT_OK, 'Album erstellt', 'Das neue Album wurde erfolgreich erstellt.');
+						}
+						else {
+							echo ActionReport(REPORT_ERROR, 'Fehler', 'Die Konfigurationsdatei konnte nicht gespeichert werden.');
+						}
+					}
+					else {
+						echo ActionReport(REPORT_ERROR,' Fehler', 'Das neue Album konnte nicht gespeichert werden.');
+					}
+				}
+				else {
+					/* Datenbankeintrag aktualisieren */
+					if (mysql_query('UPDATE '.DB_TABLE_PLUGIN.'photoalbum SET id_str="'.$validate_id_str.'",
+							caption="'.StdSqlSafety(StdString($caption->getValue())).'",
+							description="'.StdSqlSafety(StdContent($description->getValue())).'",
+							writer='.$_SESSION['admin_id'].', timestamp='.TIME_STAMP.',
+							access='.$access.', locked='.(int)$locked->getValue().'
+							WHERE id='.$current_album['id'], DB_CMS)) {
+						/* Die Config Datei speichern */
+						$config = array(
+								'module' => 'photos',
+								'album_id' => $current_album['id'],
+								'access' => $access
+								);
+						$upper_path = substr($current_path, 0, -1*(strlen($current_album['id_str'])+1));
+						if ($ftp->writeFolderConfig($upper_path.$validate_id_str, $config)) {
+							echo ActionReport(REPORT_OK, 'Album bearbeitet', 'Die Änderungen wurden erfolgreich übernommen.');
+						}
+						else {
+							echo ActionReport(REPORT_ERROR, 'Fehler', 'Die Konfigurationsdatei konnte nicht gespeichert werden.');
+						}
+					}
+					else {
+						echo ActionReport(REPORT_ERROR,' Fehler', 'Die Änderung konnte nicht gespeichert werden.');
+					}
+				}
+			}
+		}
+	}
+	else {
+		/* Ausgabe des Formulars */
 		if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
 			$access_groups->setCssClass('select_groups_view');
 		}
 		echo $form->getForm();
+	}
+}
+else {
+	if (isset($_GET['new'])) {
+		echo ActionReport(REPORT_EINGABE, 'Fehler', 'Es wurde kein Sub-Album ausgewählt!');
+	}
+	else {
+		echo ActionReport(REPORT_EINGABE, 'Album existiert nicht', 'Das gewählte Album existiert nicht mehr!');
 	}
 }
 

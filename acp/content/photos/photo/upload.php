@@ -37,7 +37,7 @@ echo '<h1 class="first">Fotos hochladen</h1>';
 $ftp = new ftp();
 
 /* Album selektieren */
-$current_path = $FileSystem_ModulePahts['photos2'];
+$current_path = $FileSystem_ModulePahts['photos'];
 if (isset($_GET['album']) && $_GET['album'] != '') {
 	$album = ValidateFileSystem($_GET['album'], '/');
 	if (substr($album, strlen($album)-1, 1) != '/') {
@@ -54,7 +54,7 @@ else {
 if (($current_album = readAlbumConfig2($ftp, $current_path)) && $current_album['id'] > 0) {
 	/* Infos des aktuellen Albums anzeigen */
 	echo printInfoBox('Album: '.$current_album['caption'],
-			'<p>Alle Fotos werden in das Album <a href="?page=photos2-show&amp;album='.$album.'">'.$current_album['caption'].'</a> hochgeladen.</p>');
+			'<p>Alle Fotos werden in das Album <a href="?page=photos-show&amp;album='.$album.'">'.$current_album['caption'].'</a> hochgeladen.</p>');
 
 	/* Formular */
 	$form = new formWizard('form', '?'.$_SERVER['QUERY_STRING'], 'post', 'form_acp_standard');
