@@ -85,7 +85,7 @@ if (ACP_MODULE_PHOTOS_EN) {
 						}
 						
 						/* CSS Class first */
-						if ($element_ctr == 1) {
+						if ($element_ctr == 1 && $album_info_sub['menu_sub'] == 0) {
 							$album_info_sub['class_first'] = ' first';
 						}
 						else {

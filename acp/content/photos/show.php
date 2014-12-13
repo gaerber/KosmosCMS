@@ -423,12 +423,12 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 								$PluginPhotos_imagesSettings['proportional']);
 					}
 					/* Jetzt darf es angezeigt werden */
-					echo '<div class="photo"><p>';
-					echo '<a href="?page=photos-photo-edit&amp;album='.$album.'&amp;id='.$row['id'].'"
-							onmouseover="Tip(\'Fotokommentar bearbeiten\')" onmouseout="UnTip()">'
+					echo '<div class="photo">';
+					echo '<p><a href="?page=photos-photo-edit&amp;album='.$album.'&amp;id='.$row['id'].'"'
+							.'onmouseover="Tip(\'Fotokommentar bearbeiten\')" onmouseout="UnTip()">'
 							.'<img src="img/icons/plugins/photos/image_edit.png" alt="" /></a> &nbsp; ';
-					echo '<a href="?page=photos-show&amp;album='.$album.'&amp;do=delete-photo&amp;id='.$row['id'].'"
-							onmouseover="Tip(\'Foto löschen\')" onmouseout="UnTip()">'
+					echo '<a href="?page=photos-show&amp;album='.$album.'&amp;do=delete-photo&amp;id='.$row['id'].'"'
+							.'onmouseover="Tip(\'Foto löschen\')" onmouseout="UnTip()">'
 							.'<img src="img/icons/plugins/photos/image_delete.png" alt="" /></a></p>';
 					if ($access['access'] > 0 || $access['locked']) {
 						/* Geschuetzte Bider ausgeben */
