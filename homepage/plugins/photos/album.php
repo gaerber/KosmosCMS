@@ -73,7 +73,7 @@ if (ACP_MODULE_PHOTOS_EN) {
 				
 				/* Anzeige der Sub Alben */
 				$result = mysql_query('SELECT id_str FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE menu_sub='.$album_info['id'].' 
-						&& locked=0 && '.CheckSQLAccess().' ORDER BY menu_order ASC', DB_CMS)
+						&& locked=0 && '.CheckSQLAccess().' ORDER BY menu_order DESC', DB_CMS)
 						OR FatalError(FATAL_ERROR_MYSQL);
 						
 				while ($row = mysql_fetch_assoc($result)) {

@@ -39,7 +39,7 @@ function generatePhotoList($ftp, $o_menuClass, $current_path, $current_album_id)
 	
 	/* Liste aller Unteralben erstellen */
 	$result = mysql_query('SELECT id_str FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE menu_sub='.$current_album_id.' 
-			&& locked=0 && '.CheckSQLAccess().' ORDER BY menu_order ASC', DB_CMS)
+			&& locked=0 && '.CheckSQLAccess().' ORDER BY menu_order DESC', DB_CMS)
 			OR FatalError(FATAL_ERROR_MYSQL);
 	
 	/* Fake Nummerierung */

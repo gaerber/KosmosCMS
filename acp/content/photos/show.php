@@ -89,14 +89,14 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 					if ($_GET['do'] == 'up-album')
 						$res_change = mysql_query('SELECT id, menu_order FROM '.DB_TABLE_PLUGIN.'photoalbum
 								WHERE menu_sub='.$line_element['menu_sub'].'
-								&& menu_order<'.$line_element['menu_order'].'
-								ORDER BY menu_order DESC LIMIT 1', DB_CMS)
+								&& menu_order>'.$line_element['menu_order'].'
+								ORDER BY menu_order ASC LIMIT 1', DB_CMS)
 								OR FatalError(FATAL_ERROR_MYSQL);
 					else
 						$res_change = mysql_query('SELECT id, menu_order FROM '.DB_TABLE_PLUGIN.'photoalbum
 								WHERE menu_sub='.$line_element['menu_sub'].'
-								&& menu_order>'.$line_element['menu_order'].'
-								ORDER BY menu_order ASC LIMIT 1', DB_CMS)
+								&& menu_order<'.$line_element['menu_order'].'
+								ORDER BY menu_order DESC LIMIT 1', DB_CMS)
 								OR FatalError(FATAL_ERROR_MYSQL);
 					if ($line_change = mysql_fetch_assoc($res_change)) {
 						/* Tauschen von menu_order */
@@ -322,7 +322,7 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 	}
 	
 	/*** Anzeige der Sub Alben ***************************/
-	$result = mysql_query('SELECT * FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE menu_sub='.$current_album['id'].' ORDER BY menu_order ASC', DB_CMS)
+	$result = mysql_query('SELECT * FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE menu_sub='.$current_album['id'].' ORDER BY menu_order DESC', DB_CMS)
 			OR FatalError(FATAL_ERROR_MYSQL);
 			
 	$line_ctr = 0;
