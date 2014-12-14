@@ -3,11 +3,12 @@
 -- http://www.phpmyadmin.net
 --
 -- Host: localhost:3306
--- Erstellungszeit: 31. Januar 2014 um 19:16
--- Server Version: 5.5.30
--- PHP-Version: 5.2.6
+-- Erstellungszeit: 14. Dez 2014 um 13:00
+-- Server Version: 5.5.30-cll
+-- PHP-Version: 5.4.33
 
-SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
+SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET time_zone = "+00:00";
 
 
 /*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
@@ -16,7 +17,7 @@ SET SQL_MODE="NO_AUTO_VALUE_ON_ZERO";
 /*!40101 SET NAMES utf8 */;
 
 --
--- Datenbank: `cwitschi`
+-- Datenbank: `KosmosCMS`
 --
 
 -- --------------------------------------------------------
@@ -278,6 +279,53 @@ CREATE TABLE IF NOT EXISTS `cms_plugin_news_comment` (
 -- --------------------------------------------------------
 
 --
+-- Tabellenstruktur für Tabelle `cms_plugin_photoalbum`
+--
+
+CREATE TABLE IF NOT EXISTS `cms_plugin_photoalbum` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `id_str` varchar(255) NOT NULL,
+  `menu_sub` int(11) NOT NULL DEFAULT '0',
+  `menu_order` int(11) NOT NULL,
+  `caption` varchar(50) NOT NULL,
+  `description` text NOT NULL,
+  `writer` int(11) NOT NULL,
+  `timestamp` int(11) NOT NULL,
+  `access` bigint(20) NOT NULL DEFAULT '0',
+  `locked` tinyint(1) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+--
+-- Daten für Tabelle `cms_plugin_news_comment`
+--
+
+
+-- --------------------------------------------------------
+
+--
+-- Tabellenstruktur für Tabelle `cms_plugin_photoalbum_photo`
+--
+
+CREATE TABLE IF NOT EXISTS `cms_plugin_photoalbum_photo` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `album_id` int(11) NOT NULL,
+  `file_name` varchar(80) NOT NULL,
+  `file_timestamp` int(11) NOT NULL,
+  `caption` varchar(128) NOT NULL,
+  `writer` int(11) NOT NULL,
+  `timestamp` int(11) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
+
+--
+-- Daten für Tabelle `cms_plugin_news_comment`
+--
+
+
+-- --------------------------------------------------------
+
+--
 -- Tabellenstruktur für Tabelle `cms_plugin_spy`
 --
 
@@ -296,7 +344,7 @@ CREATE TABLE IF NOT EXISTS `cms_plugin_spy` (
   `session` mediumtext NOT NULL,
   `comment` mediumtext NOT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=7 ;
+) ENGINE=MyISAM  DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
 
 --
 -- Daten für Tabelle `cms_plugin_spy`
@@ -319,8 +367,6 @@ CREATE TABLE IF NOT EXISTS `cms_plugin_stats_day` (
 -- Daten für Tabelle `cms_plugin_stats_day`
 --
 
-INSERT INTO `cms_plugin_stats_day` (`day`, `visitors`, `views`) VALUES
-('2014-01-31', 0, 0);
 
 -- --------------------------------------------------------
 
@@ -357,8 +403,6 @@ CREATE TABLE IF NOT EXISTS `cms_plugin_stats_page` (
 -- Daten für Tabelle `cms_plugin_stats_page`
 --
 
-INSERT INTO `cms_plugin_stats_page` (`page_id`, `visitors`, `views`) VALUES
-(2, 0, 0);
 
 -- --------------------------------------------------------
 
