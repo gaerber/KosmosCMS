@@ -26,7 +26,7 @@ $(document).ready(function() {
 	}
 
 	// User can chaise the old version
-	$('#drop-files p').bind('click', function(e) {
+	$('#drop-files div.fallback').bind('click', function(e) {
 		e.stopPropagation();
 		$('#dropzone').removeClass('form_acp_fileupload');
 		$('#dropzone input.input_file').parent().css({'display' : 'block'});

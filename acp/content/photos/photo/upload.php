@@ -59,7 +59,7 @@ if (($current_album = readAlbumConfig2($ftp, $current_path)) && $current_album['
 	/* Formular */
 	$form = new formWizard('form', '?'.$_SERVER['QUERY_STRING'], 'post', 'form_acp_standard');
 	if (ACP_MODULE_DRAG_AND_DROP) {
-		$file = $form->addElement('dropfiles', 'foto', 'Foto', NULL, true);
+		$file = $form->addElement('dropfiles', 'foto', 'Fotos', NULL, true);
 		$file->setAcceptTypes('image/*');
 	}
 	else {

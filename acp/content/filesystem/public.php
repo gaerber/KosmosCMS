@@ -108,7 +108,7 @@ if (isset($_GET['do'])) {
 				/* Formular */
 				$form = new formWizard('form', '?'.$_SERVER['QUERY_STRING'], 'post', 'form_acp_standard');
 				if (ACP_MODULE_DRAG_AND_DROP) {
-					$file = $form->addElement('dropfiles', 'file', 'Datei', NULL, true);
+					$file = $form->addElement('dropfiles', 'file', 'Dateien', NULL, true);
 				}
 				else {
 					$file = $form->addElement('file', 'file', 'Datei', NULL, true);
