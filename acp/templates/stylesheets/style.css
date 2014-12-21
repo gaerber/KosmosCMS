@@ -367,6 +367,9 @@ div.popup img {
 	padding:7px;
 	border:1px solid #c9c5c1;
 }
+#content div.photo img {
+	display:block;
+}
 #content div.photo p {
 	opacity:0;
 	position:absolute;
@@ -379,6 +382,9 @@ div.popup img {
 }
 #content div.photo:hover p {
 	opacity:1;
+}
+#content div.photo p img {
+	display:inline;
 }
 #content div.photo div.caption {
 	position:absolute;
