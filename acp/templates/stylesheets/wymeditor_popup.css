@@ -51,29 +51,33 @@ form.form_standard label.line, form.form_standard label.line_hide {
 	width:22%;
 }
 
-div.box_ok, div.box_error, div.box_info, div.box_important {
-	border:2px solid #f1f1f1;
+/*** Informations-Felder (Boxen) *********************************************/
+div.box {
 	margin:10px 15px -5px 15px;
+	padding:5px;
+	width:92%;
+	border:2px solid white;
 	color:#615d5a;
 }
-div.box_ok h1, div.box_error h1, div.box_info h1, div.box_important h1 {
+div.box h1 {
 	display:none;
 }
-
-div.box_ok {
+div.box p {
+	margin:0;
+}
+div.ok {
 	border-color:#8eb830;
 	background-color:#f5f9ec;
 }
-div.box_error {
+div.error {
 	border-color:#c14e39;
 	background-color:#fbf3f1;
 }
-div.box_info {
+div.info {
 	border-color:#3ba2c3;
 	background-color:#edf7fa;
-
 }
-div.box_important {
+div.important {
 	border-color:#884;
 	background-color:#ffe;
 }
@@ -155,18 +159,24 @@ div.popup {
 	position:absolute;
 	top:50%;
 	left:50%;
-	width:320px;
+	margin:-32px 0 0 -172px;
+	padding:5px 5px 5px 60px;
+	width:275px;
 	height:50px;
-	margin-top:-25px;
-	margin-left:-160px;
-	padding:5px;
 	border:2px solid #555;
 	background-color:#f1f1f1;
 	color:#555;
+	box-shadow:5px 5px 10px #999;
 }
 div.popup h1 {
 	padding:0;
 	background-color:transparent;
 	color:#555;
-	font-size:1em;
+	font-size:10pt;
+}
+div.popup img {
+	display:block;
+	position:absolute;
+	top:14px;
+	left:14px;
 }

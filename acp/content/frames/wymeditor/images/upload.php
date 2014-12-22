@@ -99,8 +99,8 @@ if (ACP_FILE_SYSTEM_EN && ACP_AdminAccess(ACP_ACCESS_FILESYSTEM | ACP_ACCESS_FIL
 			else {
 				/* Datei zu gross */
 				echo ActionReport(REPORT_EINGABE, "Bild ist zu gross",
-						"Das ausgewählte Bild ist zu gross!
-							Die maximal erlaubte Dateigrösse ist ".BinaryMultiples(FILE_SIZE_LIMIT).".");
+						"Das ausgewÃ¤hlte Bild ist zu gross!
+							Die maximal erlaubte DateigrÃ¶sse ist ".BinaryMultiples(FILE_SIZE_LIMIT).".");
 				echo $form->getForm();
 			}
 		}
@@ -119,7 +119,7 @@ if (ACP_FILE_SYSTEM_EN && ACP_AdminAccess(ACP_ACCESS_FILESYSTEM | ACP_ACCESS_FIL
 	
 }
 else {
-	echo ActionReport(REPORT_EINGABE, 'Kein Dateisystem', 'Ihre CMS Installation unterstützt kein Dateisystem!');
+	echo ActionReport(REPORT_EINGABE, 'Kein Dateisystem', 'Ihre CMS Installation unterstÃ¼tzt kein Dateisystem!');
 }
 
 ?>
