@@ -217,8 +217,6 @@ $DefaultErrorPages = array('403' => 1,
 		'404' => 2,
 		'550' => 3);
 
-define('ROOT_IMAGES', 'img/website/');
-
 
 /*** Module Freigabe ********************************/
 /**
@@ -528,6 +526,5 @@ if (ACP_MODULE_PHOTOS_EN) {
 				'default' => 'default/acp.png'
 			);
 }
-
 
 ?>
