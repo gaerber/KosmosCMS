@@ -25,6 +25,8 @@
  |2.0.9   | 29.04.2013 | ImageResizeFtp()
  |2.0.10  | 19.11.2014 | Bugfix ImageResize()
  |2.0.11  | 30.11.2014 | ImageResizeFtp fertig!
+ |2.0.12  | 07.12.2014 | getRecursiveAlbumAccess hinzu
+ |2.1     | 11.12.2014 | FTP Dateisystem
  -----------------------------------------------------
  Beschreibung :
  Alle Funktionen fuer die CMS Software
@@ -84,17 +86,21 @@ function FatalError($error_nr) {
 /**
  * Erstellt eine MySQL Abfrage-Bedingung, damit nur Seiten herausgelesen
  * werden koennen, die fuer den Benutzer bestimmt sind.
- *
+ * @param[in] table Name der Tabelle. Verwendung bei komplexen Abfragen ueber mehrere Tabellen.
  * @return MySQL Query String fuer die WHERE Bedingung
  */
-function CheckSQLAccess() {
+function CheckSQLAccess($table = '') {
+	if ($table != '') {
+		$table .= '.';
+	}
+	
 	if (isset($_SESSION, $_SESSION['user_id'], $_SESSION['user_access'])) {
 		/* Benutzer ist angemeldet */
-		$sql = "((access = 0) || (access & ".$_SESSION["user_access"]."))";
+		$sql = '(('.$table.'access = 0) || ('.$table.'access & '.$_SESSION['user_access'].'))';
 	}
 	else {
 		/* Nicht angemeldeter Besucher */
-		$sql = "(access = 0)";
+		$sql = '('.$table.'access = 0)';
 	}
 
 	return $sql;
@@ -125,8 +131,8 @@ function CheckAccess($access) {
  * Informationen ueber einen Autor
  */
 function getWriterInfo($a_id, &$a_name, &$a_email) {
-	$result = mysql_query("SELECT name, email FROM ".DB_TABLE_ROOT."cms_admin
-			WHERE admin_id=".$a_id, DB_CMS)
+	$result = mysql_query('SELECT name, email FROM '.DB_TABLE_ROOT.'cms_admin
+			WHERE admin_id='.$a_id, DB_CMS)
 					OR FatalError(FATAL_ERROR_MYSQL);
 	if (mysql_num_rows($result)) {
 		$line = mysql_fetch_array($result);
@@ -152,11 +158,11 @@ function getUserInfo($field) {
 function printDate($timestamp) {
 	global $GlobalMonthsLAN;
 
-	$temp = str_replace("%m%", "$1", FORMAT_DATE);
+	$temp = str_replace('%m%', '$1', FORMAT_DATE);
 
 	$temp = date($temp, $timestamp);
 
-	return str_replace("$1", $GlobalMonthsLAN[date("n", $timestamp) - 1], $temp);
+	return str_replace('$1', $GlobalMonthsLAN[date('n', $timestamp) - 1], $temp);
 }
 
 
@@ -164,9 +170,9 @@ function printDate($timestamp) {
  * Datenbankeintraege zaehlen
  */
 function mysql_count($sql_from, $sql_where) {
-	if ($sql_where != "")
-		$sql_where = " WHERE ".$sql_where;
-	$result = mysql_query("SELECT count(*) FROM ".$sql_from.$sql_where, DB_CMS)
+	if ($sql_where != '')
+		$sql_where = ' WHERE '.$sql_where;
+	$result = mysql_query('SELECT count(*) FROM '.$sql_from.$sql_where, DB_CMS)
 			OR FatalError(FATAL_ERROR_MYSQL);
 	if ($line = mysql_fetch_array($result))
 		return $line[0];
@@ -181,20 +187,20 @@ function mysql_count($sql_from, $sql_where) {
  * @param $stringTitel ist der kurze Titel
  * @param $stringNachricht ist die ausfuehrliche Nachricht
  */
-define("REPORT_OK", 0);
-define("REPORT_EINGABE", 1);
-define("REPORT_WARNING", 2);
-define("REPORT_ERROR", 3);
-define("REPORT_SPAM", 4);
-define("REPORT_INFO", 5);
+define('REPORT_OK', 0);
+define('REPORT_EINGABE', 1);
+define('REPORT_WARNING', 2);
+define('REPORT_ERROR', 3);
+define('REPORT_SPAM', 4);
+define('REPORT_INFO', 5);
 function ActionReport($report, $stringTitel, $stringNachricht) {
 	switch ($report) {
-		case REPORT_OK: $code = "box ok"; break;
+		case REPORT_OK: $code = 'box ok'; break;
 		case REPORT_EINGABE:
 		case REPORT_WARNING:
 		case REPORT_ERROR:
-		case REPORT_SPAM: $code = "box error"; break;
-		case REPORT_INFO: $code = "box info"; break;
+		case REPORT_SPAM: $code = 'box error'; break;
+		case REPORT_INFO: $code = 'box info'; break;
 	}
 	$stringNachricht = preg_replace("/^<p>(.*)<\/p>$/", "$1", $stringNachricht);
 	return "      <div class=\"".$code."\">
@@ -290,6 +296,9 @@ function ValidateFileSystem($string, $zusatz=false) {
 	/* Rueckgabe */
 	return $validated;
 }
+
+
+/*** Utility und Benutzerfunktionen **********************/
 
 /**
  * Email Adressen verschluesseln
@@ -435,6 +444,8 @@ function getSmallUrlView($url) {
 		return $service.$url_parts[0];
 }
 
+
+/*** Textaufbereitung von Eingabefeldern *****************/
 
 /**
  * Eingegebene Zeichenkette vorbereiten
@@ -647,41 +658,6 @@ function moduleCallback($treffer) {
 /*** Funktionen fuer Modul: Photoalbum *******************/
 
 /**
- * Liest die Config Datei aus einem Album aus und prueft sie auf plausibilitaet.
- * @param $album_path Pfad zum Album
- * @return Rueckgabe in einem Assoziativen Array, fals im Fehlerfall
- */
-function readAlbumConfig($album_path) {
-	if (file_exists($album_path.'.config')) {
-		$s_config = implode('', file($album_path.'.config'));
-		$a_config = explode('|', $s_config);
-		/* Auf schematische Fehler pruefen */
-		if (sizeof($a_config) == 5 && is_numeric($a_config[0]) && is_numeric($a_config[3])
-				&& is_numeric($a_config[4]))
-			return array('sort' => $a_config[0], 'title' => $a_config[1],
-					'description' => $a_config[2], 'access' => (int)$a_config[3],
-					'locked' => (int)$a_config[4]);
-	}
-	return false;
-}
-function readAlbumConfigFtp($ftp, $album_path) {
-	if ($ftp->fileExists($album_path.'.config')) {
-		/* Config Datei einlesen */
-		$s_config = $ftp->FileContents($album_path.'.config');
-		
-		/* Parameter auftrennen */
-		$a_config = explode('|', $s_config);
-		/* Auf schematische Fehler pruefen */
-		if (sizeof($a_config) == 6 && is_numeric($a_config[2]) && is_numeric($a_config[0])
-				&& is_numeric($a_config[5]) && $a_config[1]=='photos')
-			return array('sort' => $a_config[2], 'title' => $a_config[3],
-					'description' => $a_config[4], 'access' => (int)$a_config[0],
-					'locked' => (int)$a_config[5]);
-	}
-	return false;
-}
-
-/**
  * Lesen der Album Informationen.
  * @param[in]	$ftp FTP Stream.
  * @param[in]	$album_path der komplete Pfad zum Album auf dem FTP Server.
@@ -691,7 +667,7 @@ function readAlbumConfig2($ftp, $album_path) {
 	global $FileSystem_ModulePahts;
 	
 	/* Spezialbehandlung ROOT */
-	if ($album_path == $FileSystem_ModulePahts['photos2']) {
+	if ($album_path == $FileSystem_ModulePahts['photos']) {
 		return array('id' => 0, 'locked' => 0, 'access' => 0);
 	}
 	
@@ -699,6 +675,7 @@ function readAlbumConfig2($ftp, $album_path) {
 	if ($config = $ftp->readFolderConfig($album_path)) {
 		if (is_numeric($config['album_id'])) {
 			$album_id = (int) $config['album_id'];
+			/* Abfrage des Datenbankaekuivalents */
 			$result = mysql_query('SELECT * FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE id='.$album_id, DB_CMS)
 					OR FatalError(FATAL_ERROR_MYSQL);
 			if ($line = mysql_fetch_assoc($result)) {
@@ -710,104 +687,48 @@ function readAlbumConfig2($ftp, $album_path) {
 	return false;
 }
 
-
 /**
- * Liste aller Unteralben und Fotos erstellen
- * @param $current_album Pfad zum Album
- * @param $a_albums Adresse auf Array, dort werden die gefundenen Alben gespeichert
- * @param $a_photos Adresse auf Array, dort werden die gefundenen Fotos gespeichert
- * @return Timestamp der neusten Datei/Ordner.
+ * Berechnet die vererbten Zugriffsrechte eunes Albums.
+ * Bei einem eingeschraenkten Zugriff koennen die Fotos nur ueber das Download-Modul angezeigt werden.
+ * @param[in] album_id Die ID des Albums.
+ * @return Assoziatives Array mit den Werten von access und locked.
  */
-function readAlbumPhotos($current_album, &$a_albums, &$a_photos, $sort_lists=false) {
-	global $FileSystem_AllowedImageTypes;
+function getRecursiveAlbumAccess($album_id) {
+	$retval = array('access' => 0, 'locked' => 0);
 	
-	$data_handler = opendir($current_album);
-	if (!$data_handler)
-		return false;
-	
-	/* Default Wert fuer return */
-	$newest_data = 1;
-	
-	/* Albumsortierungs-Hilfe */
-	$a_album_sort = array();
-	
-	while($file = readdir($data_handler)) {
-		if($file != '.' && $file != '..') {
-			if (is_dir($current_album.$file)) {
-				if ($album_info = readAlbumConfig($current_album.$file.'/')) {
-					$a_albums[] = $file.'/';
-					$a_album_sort[] = $album_info['sort'];
-					if ($newest_data < filemtime($current_album.$file.'/'))
-						$newest_data = filemtime($current_album.$file.'/');
-				}
-			}
-			else {
-				$infos = pathinfo($current_album.$file);
-				if (isset($infos['extension']) 
-						&& in_array(strtolower($infos['extension']), $FileSystem_AllowedImageTypes)) {
-					$a_photos[] = $file;
-					if ($newest_data < filemtime($current_album.$file))
-						$newest_data = filemtime($current_album.$file);
-				}
-			}
+	/* Rekursive Vererbung der Zurgiffsrechte 
+	 * Quelle: http://wiki.yaslaw.info/dokuwiki/doku.php/mysql/AdjacencyTree/index */
+	$sql = 'SELECT nav.access AS access, nav.locked AS locked
+	FROM
+	(
+		SELECT  
+			@cnt := @cnt + 1 AS cnt,
+			-- Die letzte ParentID als ID ausgeben
+			@id AS id,
+			-- Die nächste ParentID ermitteln
+			@id := IF(@id IS NOT NULL, (SELECT menu_sub FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE id = @id), NULL) AS parentID
+		FROM
+			'.DB_TABLE_PLUGIN.'photoalbum AS nav,
+			-- Die Variablen initialisieren
+			(SELECT @id := '.$album_id.', @cnt:= 0) AS vars
+		WHERE
+			@id IS NOT NULL
+	) AS dat
+	-- Das ganze mit der Navigationstabelle verlinken on den Titel 
+	-- und ggf. weitere Informationen auszulesen
+	 INNER JOIN '.DB_TABLE_PLUGIN.'photoalbum AS nav
+		ON dat.id = nav.id';
+		
+	$result = mysql_query($sql) OR FatalError(FATAL_ERROR_MYSQL);
+	while ($row = mysql_fetch_assoc($result)) {
+		/* Der selbe Mechanismus wie im Download-Modul */
+		if ($row['access'] != 0) {
+			$retval['access'] = ($retval['access'] != 0) ? $retval['access']&$row['access'] : $row['access'];
 		}
-	}
-	closedir($data_handler);
-	
-	/* Listen sortieren */
-	if ($sort_lists) {
-		array_multisort($a_album_sort, SORT_DESC, SORT_NUMERIC, $a_albums, SORT_ASC, SORT_STRING);
-		array_multisort($a_photos, SORT_ASC, SORT_STRING);
+		$retval['locked'] |= $row['locked'];
 	}
 	
-	return $newest_data;
-}
-function readAlbumPhotosFtp($ftp, $current_album, &$a_albums, &$a_photos, $sort_lists=false) {
-	global $FileSystem_AllowedImageTypes;
-	
-	/* Verzeichnis das durchsucht werden soll, wird geoeffnet */
-	$folder_pointer = $ftp->openDir($current_album);
-	if (!$folder_pointer)
-		return false;
-	
-	/* Default Wert fuer return */
-	$newest_data = 1;
-	
-	/* Albumsortierungs-Hilfe */
-	$a_album_sort = array();
-	
-	while($file = $folder_pointer->readDir()) {
-		if ($folder_pointer->isDir($file)) {
-			/* Moegliches Album */
-			if ($album_info = readAlbumConfigFtp($ftp, $current_album.$file.'/')) {
-				$a_albums[] = $file.'/';
-				$a_album_sort[] = $album_info['sort'];
-				$time = $ftp->fileTime($current_album.$file.'/config.txt');
-				if ($newest_data < $time)
-					$newest_data = $time;
-			}
-		}
-		else {
-			/* Moegliches Bild */
-			if (in_array(strtolower(pathinfo($file, PATHINFO_EXTENSION)),
-					$FileSystem_AllowedImageTypes)) {
-				$a_photos[] = $file;
-				$time = $ftp->fileTime($current_album.$file);
-				if ($newest_data < $time)
-					$newest_data = $time;
-			}
-		}
-	}
-	
-	$ftp->closeDir($folder_pointer);
-	
-	/* Listen sortieren */
-	if ($sort_lists) {
-		array_multisort($a_album_sort, SORT_DESC, SORT_NUMERIC, $a_albums, SORT_ASC, SORT_STRING);
-		array_multisort($a_photos, SORT_ASC, SORT_STRING);
-	}
-	
-	return $newest_data;
+	return $retval;
 }
 
 /**
@@ -820,10 +741,8 @@ function readAlbumPhotosFtp($ftp, $current_album, &$a_albums, &$a_photos, $sort_
  * @return true falls das Thumbnail erstellt wurde, sonst false
  */
 function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional=true, $quality=80) {
-	//return ImageResize('../upload'.$img_src, '../upload'.$img_dest, $hight, $width, $proportional, $quality);
-	
 	if ($ftp->fileExists($img_src)) {
-		/* Daten in Temporaere datei packen */
+		/* Daten in eine temporaere Datei packen (auf dem lokalen Server) */
 		$image_src_temp = tempnam(FILESYSTEM_TEMP, 'img');
 		$image_src_temp_resource = fopen($image_src_temp, 'rw+');
 		if (!$image_src_temp_resource || !$ftp->FileRead($img_src, $image_src_temp_resource)) {
@@ -919,6 +838,7 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
 			/* Temporaerer Speicherort auf Server */
 			$image_scaled_temp = tempnam(FILESYSTEM_TEMP, 'img');
 	
+			$bool = false;
 			if (file_exists($image_scaled_temp)) {
 	            switch($size_src[2]) {
 	                /* GIF */
@@ -931,7 +851,7 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
 	                	break;
 	                /* PNG */
 	                case 3:
-	                    $bool = ImagePNG($img_thumb, $image_scaled_temp, $quality);
+	                    $bool = ImagePNG($img_thumb, $image_scaled_temp, round($quality / 10, 0));
 	                    break;
 	            }
 	            
@@ -942,130 +862,6 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
 	            }
 	            unlink($image_scaled_temp);
       		}
-      		else {
-      			$bool = false;
-      		}
-
-            /* Bilder loeschen */
-            imagedestroy($img_src_data);
-            imagedestroy($img_thumb);
-            
-            /* Thumbnail sollte erstellt sein */
-            return $bool;
-        }
-        else {
-            imagedestroy($img_src_data);
-            return false;
-        }
-        
-    }
-    else {
-         return false;
-    }
-}
-function ImageResize($img_src, $img_dest, $hight, $width, $proportional=true, $quality=80) {
-	if (!file_exists($img_src)) {
-	    return false;
-    }
-        
-    /* Originalbildgroesse */
-    $size_src = getimagesize($img_src);
-
-    /* Erstellen des urspruenglichen Bildes */
-    switch($size_src[2]) {
-        /* GIF Grafik */
-        case 1:
-            $img_src_data = ImageCreateFromGIF($img_src);
-        	break;
-        /* JPG Grafik */
-        case 2:
-            $img_src_data = ImageCreateFromJPEG($img_src);
-        	break;
-        /* PNG Grafik */
-        case 3:
-            $img_src_data = ImageCreateFromPNG($img_src);
-        	break;
-        /* Keine Grafik */
-        default:
-            return false;
-    }
-    
-    if ($img_src_data) {
-    	/* Berechnung der Streckungsfaktoren */
-    	$factor_h = $size_src[1] / $hight;
-    	$factor_w = $size_src[0] / $width;
-    	
-    	/* Wie muss das Bild zugeschnitten werden */
-    	if ($factor_h > $factor_w) {
-    		/* Bild ist zu hoch -> Breite anpassen oder oben und unten abschneiden */
-    		if ($proportional) {
-    			$width = round($size_src[0] / $factor_h, 0);
-   			}
-   			else {
-            	$size_src_big_w = $size_src[0];
-            	$size_src_big_h = round($hight * $factor_w, 0);
-				$x_offset = 0;
-            	$y_offset = round(($size_src[1] - $size_src_big_h) / 2, 0);
-   			}
-    	}
-    	else {
-    		/* Bild ist zu breit -> Hoehe anpassen oder links und rechts abschneiden */
-    		if ($proportional) {
-    			$hight = round($size_src[0] / $factor_h, 0);
-   			}
-   			else {
-            	$size_src_big_h = $size_src[1];
-            	$size_src_big_w = round($width * $factor_h, 0);
-				$y_offset = 0;
-            	$x_offset = round(($size_src[0] - $size_src_big_w) / 2, 0);
-   			}
-    	}
-   		
-        /* Thumbnail anlegen */
-		$img_thumb = ImageCreateTrueColor($width, $hight);
-        
-        if ($img_thumb) {
-            /* Thumbnail skalieren */
-            if ($proportional) {
-            	$handler = imagecopyresized($img_thumb, $img_src_data, 0,0,0,0,
-						$width, $hight, $size_src[0], $size_src[1]);
-			}
-            else {
-            	$handler = imagecopyresized($img_thumb, $img_src_data, 0,0,$x_offset,$y_offset,
-						$width, $hight, $size_src_big_w, $size_src_big_h);
-            }
-            
-			if (!$handler) {
-                /* Bilder loeschen */
-                imagedestroy($img_src_data);
-                imagedestroy($img_thumb);
-                return false;
-            }
-            
-			/* Thumbnail abspeichern */
-			//$server_temp = 'temp/thumb.tmp';
-            switch($size_src[2]) {
-                /* GIF */
-                case 1:
-					$bool = ImageGIF($img_thumb, $img_dest);
-                	break;
-                /* JPG */
-                case 2:
-                    $bool = ImageJPEG($img_thumb, $img_dest, $quality);
-                	break;
-                /* PNG */
-                case 3:
-                    $bool = ImagePNG($img_thumb, $img_dest, $quality);
-                    break;
-            }
-            
-            /*if ($bool) {
-	            /* Test FTP Upload *
-	            $ftp = new ftp();
-				$ftp->ChangeDir('/');
-				$bool = $ftp->FilePut($img_dest, $server_temp);
-				$ftp->close();
-            }*/
 
             /* Bilder loeschen */
             imagedestroy($img_src_data);

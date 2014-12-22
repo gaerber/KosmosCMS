@@ -82,14 +82,14 @@ if (ACP_FILE_SYSTEM_EN) {
 		echo '</ol></div>';
 	}
 	else {
-		echo ActionReport(REPORT_EINGABE, 'Verzeichnis existiert nicht', 'Das gewünschte Verzeichnis existiert nicht!');
+		echo ActionReport(REPORT_EINGABE, 'Verzeichnis existiert nicht', 'Das gewÃ¼nschte Verzeichnis existiert nicht!');
 	}
 	
 	/* FTP Verbindung schliessen */
 	$ftp->close();
 }
 else {
-	echo ActionReport(REPORT_EINGABE, 'Kein Dateisystem', 'Ihre CMS Installation unterstützt kein Dateisystem!');
+	echo ActionReport(REPORT_EINGABE, 'Kein Dateisystem', 'Ihre CMS Installation unterstÃ¼tzt kein Dateisystem!');
 }
 
 ?>

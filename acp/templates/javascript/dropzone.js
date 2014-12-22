@@ -26,7 +26,7 @@ $(document).ready(function() {
 	}
 
 	// User can chaise the old version
-	$('#drop-files p').bind('click', function(e) {
+	$('#drop-files div.fallback').bind('click', function(e) {
 		e.stopPropagation();
 		$('#dropzone').removeClass('form_acp_fileupload');
 		$('#dropzone input.input_file').parent().css({'display' : 'block'});
@@ -47,6 +47,8 @@ $(document).ready(function() {
 	$('#dropzone input.input_file').bind('change', function(e) {
 		if ($('#showNewForm').val() == 1) {
 			transferFiles($('#dropzone input.input_file').get(0).files);
+			// Reset the file form
+			$('#dropzone input.input_file').replaceWith($('#dropzone input.input_file').clone(true));
 		}
 	});
 
@@ -55,7 +57,6 @@ $(document).ready(function() {
 		// Stop the default action, which is to redirect the page
 		// To the dropped file
 		e.preventDefault();
-
 		transferFiles(e.dataTransfer.files);
 	});
 
@@ -103,7 +104,14 @@ $(document).ready(function() {
 							$('#dropped-files').append('<div id="previewid_'+dropedFilesCtr+'" class="waiting"><div class="image" style="background:url('+this.result+');background-size:cover;"></div><div class="progress">'+BinaryMultiples(fileSize)+'</div><div class="filename">'+file.name+'</div></div>');
 						}
 						else {
-							$('#dropped-files').append('<div id="previewid_'+dropedFilesCtr+'" class="waiting"><div class="image">Other Type</div><div class="progress">'+BinaryMultiples(fileSize)+'</div><div class="filename">'+file.name+'</div></div>');
+							var preview_image = 'img/filetypes/' + file.name.split('.').pop().toLowerCase() + '.png';
+
+							$('<img/>').attr('src', preview_image).load({preview_id:dropedFilesCtr}, function(event) {
+								$('#previewid_'+event.data.preview_id+' div.image').css('background-image', 'url('+preview_image+')');
+								$(this).remove(); // prevent memory leaks
+							});
+
+							$('#dropped-files').append('<div id="previewid_'+dropedFilesCtr+'" class="waiting"><div class="image" style="background:url(\'img/filetypes/default.png\');background-size:contain;background-position:center;background-repeat:no-repeat;"></div><div class="progress">'+BinaryMultiples(fileSize)+'</div><div class="filename">'+file.name+'</div></div>');
 						}
 
 						// Push the file data into a queue

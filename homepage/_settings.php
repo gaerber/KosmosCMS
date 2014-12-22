@@ -162,7 +162,6 @@ $FileSystem_AllowedDataTypes = array_merge($FileSystem_AllowedImageTypes,
  */
 $FileSystem_ModulePahts = array(
 		'photos' => '/photos/',
-		'photos2' => '/photos2/',
 		'user-system-images' => '/benutzer-bilder/',
 		'mysqlbackups' => '/private-mysql-backups/'
 );
@@ -217,8 +216,6 @@ define('TEMPLATE_TYPE', '.htm');
 $DefaultErrorPages = array('403' => 1,
 		'404' => 2,
 		'550' => 3);
-
-define('ROOT_IMAGES', 'img/website/');
 
 
 /*** Module Freigabe ********************************/
@@ -394,13 +391,7 @@ define('DEFAULT_IMAGE_CATEGORIE', '');
 /*** Benutzerverwaltung *****************************/
 if (ACP_USER_SYSTEM_EN) {
 	/**
-	 * Anzuzeigende Gruppen
-	 * Default 0 -> Alle Gruppen anzeigen
-	 */
-	//define('PLUGIN_ACCESS_SHOW_GROUPS_ONLY', (1<<1));
-	
-	/**
-	 Benutzereigene Felder
+	 * Benutzerdefinierte Felder
 	 */
 	$UserSystem_customParameters = array(
 				array('user_description', 'text', 'Beschreibung')
@@ -535,6 +526,5 @@ if (ACP_MODULE_PHOTOS_EN) {
 				'default' => 'default/acp.png'
 			);
 }
-
 
 ?>

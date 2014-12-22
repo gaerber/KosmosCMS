@@ -28,6 +28,7 @@
  |3.1     | 21.04.2013 | class::ftpOpenDir mit RawList
  |3.1.1   | 29.04.2013 | class::ftp checkPath() hinzu
  |3.1.2   | 13.10.2014 | FTP CleanFolder fuer Dot-Files
+ |3.1.3   | 11.12.2014 | Bugfix ftp Hilfsklassen
  -----------------------------------------------------
  Beschreibung :
  Alle Klassen enthalten.
@@ -866,11 +867,11 @@ class pagination {
 
 		if($this->active_page > 1) {
 			/* Zurueck */
-			$content .= '[ <a href="'.$url.($this->active_page - 1).'">Zurück</a> ]';
+			$content .= ' <span class="preview"><a href="'.$url.($this->active_page - 1).'">Zurück</a></span> ';
 		}
 		/* Seiten Links */
 		if($this->num_page > 1) {
-			$content .= ' [ ';
+			$content .= ' ';
 
 			if($small > 0) {
 				$small_min = $this->active_page - $small;
@@ -896,28 +897,28 @@ class pagination {
 
 				for($i = $small_min; $i <= $small_max; $i++) {
 					if($this->active_page == $i) {
-						$content .= ' '.$i.' ';
+						$content .= ' <span class="current-page">'.$i.'</span> ';
 					}
 					else {
-						$content .= ' <a href="'.$url.$i.'">'.$i.'</a> ';
+						$content .= ' <span><a href="'.$url.$i.'">'.$i.'</a></span> ';
 					}
 				}
 			}
 			else {
 				for($i = 1; $i <= $this->num_page; $i++) {
 					if($this->active_page == $i) {
-						$content .= ' '.$i.' ';
+						$content .= ' <span class="current-page">'.$i.'</span> ';
 					}
 					else {
-						$content .= ' <a href="'.$url.$i.'">'.$i.'</a> ';
+						$content .= ' <span><a href="'.$url.$i.'">'.$i.'</a></span> ';
 					}
 				}
 			}
-			$content .= ' ] ';
+			$content .= ' ';
 		}
 		if($this->active_page < $this->num_page) {
 			/* Weiter */
-			$content .= '[ <a href="'.$url.($this->active_page + 1).'">Weiter</a> ]';
+			$content .= ' <span class="next"><a href="'.$url.($this->active_page + 1).'">Weiter</a></span> ';
 		}
 		return $content;
 	}
@@ -1289,18 +1290,18 @@ class ftp {
 /**
  * Generiert eine Liste mit allen Unterordnert.
  */
-class ftpFolderList extends ftp {
-	private $parent;
+class ftpFolderList {
+	private $ftp;
 	
 	private $level=1;
 	private $p_func_callback, $recursive;
 	
 	/**
 	 * Generiert eine Liste mit allen Unterordnert.
-	 * @param $parent Zeiger auf das Elternelement mit der geoeffneten FZTP Verbindung.
+	 * @param $ftp Zeiger auf das Elternelement mit der geoeffneten FZTP Verbindung.
 	 */
-	function __construct($parent) {
-		$this->parent = $parent;
+	function __construct($ftp) {
+		$this->ftp = $ftp;
 	}
 	
 	/**
@@ -1333,7 +1334,7 @@ class ftpFolderList extends ftp {
 	 */
 	private function readSubFolders($current_folder) {
 		/* Ordner einlesen */
-		if($folder_pointer = $this->parent->openDir($current_folder)) {
+		if($folder_pointer = $this->ftp->openDir($current_folder)) {
 			/* Funktionspointer funktionieren nur als Variablen */
 			$p_folder = $this->p_func_callback;
 			
@@ -1358,7 +1359,7 @@ class ftpFolderList extends ftp {
 				}
 			}
 			/* Ordner schliessen */
-			$this->parent->closeDir($folder_pointer);
+			$this->ftp->closeDir($folder_pointer);
 		}	
 	}
 }
@@ -1367,8 +1368,8 @@ class ftpFolderList extends ftp {
 /**
  * Oeffnen eines Ordners und alle Dateien und Verzeichnisse auslesen.
  */
-class ftpOpenDir extends ftp {
-	private $parent;
+class ftpOpenDir {
+	private $ftp;
 	private $data_list_ctr=-1;
 	private $raw_list;
 	private $data_list;
@@ -1378,11 +1379,11 @@ class ftpOpenDir extends ftp {
 	
 	/**
 	 * Verzeichnis oeffnen und alle Dateien und Verzeichnisse einlesen.
-	 * @param $parent Zeiger auf das Elternelement mit der geoeffneten FZTP Verbindung.
+	 * @param $ftp Zeiger auf das Elternelement mit der geoeffneten FZTP Verbindung.
 	 * @param $folder Phad zum Verzeichnis, das geoeffnet werden soll.
 	 */
-	function __construct($parent, $folder) {
-		$this->parent = $parent;
+	function __construct($ftp, $folder) {
+		$this->ftp = $ftp;
 		
 		/* Verzeichnisnamen speichern mit Abschliessendem / */
 		if (substr($folder, -1, 1) == '/')
@@ -1391,7 +1392,7 @@ class ftpOpenDir extends ftp {
 			$this->dir_path = $folder.'/';
 
 		/* Liste aller Dateinen im Verzeichnis erstellen */
-		$this->raw_list = ftp_rawlist($this->parent->stream, substr($this->dir_path, 0, -1));
+		$this->raw_list = ftp_rawlist($this->ftp->stream, substr($this->dir_path, 0, -1));
 		
 		print_r($this->data_list);
 		
@@ -1525,7 +1526,6 @@ class ftpOpenDir extends ftp {
 	 */
 	function isDir() {
 		return ($this->data_list[$this->data_list_ctr]['isdir'] == 1);
-		//return $this->parent->isDir($this->dir_path.$data);
 	}
 	
 	/**
@@ -1535,7 +1535,6 @@ class ftpOpenDir extends ftp {
 	 */
 	function fileSize() {
 		return $this->data_list[$this->data_list_ctr]['size'];
-		//return ftp_size($this->parent->stream, $this->dir_path.$data);
 	}
 }
 

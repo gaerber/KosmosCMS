@@ -51,9 +51,9 @@ function checkRelogin() {
  * Wartefenster bei Dateiupload
  */
 function fileuploadStart() {
-	popup = document.createElement("div");
-	popup.className = "popup";
-	popup.innerHTML = "<h1>Datei(en) werden Übertragen</h1>Dieser Vorgang kann einige Minuten in Anspruch nehmen.";
+	popup = document.createElement('div');
+	popup.className = 'popup';
+	popup.innerHTML = '<img src="img/loading.gif" alt="" /><h1>Datei wird Übertragen</h1>Dieser Vorgang kann einige Minuten in Anspruch nehmen.';
 	document.body.appendChild(popup);
 }
 

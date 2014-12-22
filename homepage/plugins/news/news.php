@@ -182,9 +182,9 @@ if (ACP_MODULE_NEWS_EN) {
 						
 						/* Seitenzahlen */
 						if ($classPagination->NumberOfPage() > 1) {
-							echo "<p class=\"pagination\">";
+							echo "<div class=\"pagination\">";
 							echo $classPagination->PaginationLinks("{module_path}/".PLUGIN_NEWS_GETP_COM."/".$line['id_str']."/".PLUGIN_NEWS_GETP_COM_PAGE."/", PAGINATION_NUM);
-							echo "</p>\r\n";
+							echo "</div>\r\n";
 						}
 						
 						/* Neuster Kommentar fuer Stand der Seite */
@@ -332,9 +332,9 @@ if (ACP_MODULE_NEWS_EN) {
 			
 			/* Seitenzahlen */
 			if (PLUGIN_NEWS_VIEW_ALL && $classPagination->NumberOfPage() > 1) {
-				echo "<p class=\"pagination\">";
+				echo "<div class=\"pagination\">";
 				echo $classPagination->PaginationLinks("{module_path}/".PLUGIN_NEWS_GETP_COM_PAGE."/", PAGINATION_NUM);
-				echo "</p>\r\n";
+				echo "</div>\r\n";
 			}
 			
 			/* Neuster Artikel fuer Stand der Seite */

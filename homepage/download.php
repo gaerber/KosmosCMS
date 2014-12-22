@@ -37,7 +37,7 @@ error_reporting(E_ALL);
 session_start();
 
 /* Programmkonstante */
-define('SWISS_WEBDESIGN', '2.1');
+define('SWISS_WEBDESIGN', '2.2');
 
 $mime = array(
 		'zip'  => 'application/zip',
@@ -151,26 +151,53 @@ $path_file = $file_info['basename'];
 ///////////////////////////////////////
 $ftp = new ftp();
 
-/* Konfigurtionsdatei muss im Verzeichnis liegen */
-if ($config = $ftp->readFolderConfig($path_folder)) {
-	/* Auf schematische Fehler pruefen */
-	if (!(isset($config['access']) && is_numeric($config['access']) && (!isset($config['module']) || array_key_exists($config['module'], $FileSystem_ModulePahts)))) {
-		/* Ungueltige Config Datei */
-		//header("HTTP/1.0 404 Not Found");
-		die('Invalide config');
+/* Verzeichnis und Datei muessen existieren */
+if (!$ftp->folderExists($path_folder) && $ftp->fileExists($path_folder.'/'.$path_file)) {
+	/* Verzeichnis oder Datei existiert nicht */
+	//header("HTTP/1.0 404 Not Found");
+	die('File not exists');
+}
+
+/* Die Konfigurationen werde rekursive vererbt */
+$access_merge = 0;
+$locked_merge = 0;
+
+for ($ap = explode('/', $path_folder); sizeof($ap) > 0; array_pop($ap)) {
+	$p = implode('/', $ap);
+	/* Im Root Verzeichniss duerfen keine Einschraenkungen sein */
+	if (($p != '') && ($c = $ftp->readFolderConfig($p))) {
+		if (!(isset($c['access'], $c['locked']) && is_numeric($c['access']) && is_numeric($c['locked']))) {
+			/* Ungueltige Config Datei */
+			header("HTTP/1.0 404 Not Found");
+			die('Invalide config');
+		}
+		if ($c['access'] != 0) {
+			$access_merge = ($access_merge != 0) ? $access_merge&$c['access'] : $c['access'];
+		}
+		$locked_merge |= $c['locked'];
+		
+		/* Letzte Konfiguration uebernehmen */
+		$config = $c;
 	}
 }
-else {
+
+/* Es muss mindestens einmal eine Konfigurationsdatei vorhanden sein */
+if (!isset($config)) {
 	/* Configdatei existiert nicht */
 	//header("HTTP/1.0 404 Not Found");
 	die('Config not exists');
 }
 
+/* Erstellen der aktuellen Konfiguration */
+$config['access'] = $access_merge;
+$config['locked'] = $locked_merge;
+
 
 ///////////////////////////////////////
 // Berechtigung pruefen              //
 ///////////////////////////////////////
-if (!($config['access'] > 0 && CheckAccess($config['access'])
+
+if (!($config['access'] > 0 && CheckAccess($config['access']) && $config['locked'] == 0
 		|| (isset($config['module']) && LoginSystem(DB_CMS) && $_SESSION['admin_time_lastaction'] >= TIME_STAMP - MAX_ACP_LOGIN_TIME && (
 				($config['module']=='photos' && ACP_AdminAccess(ACP_ACCESS_M_PHOTOS))
 				||($config['module']=='mysqlbackups' && ACP_AdminAccess(ACP_ACCESS_ADMIN))
@@ -186,32 +213,16 @@ if (!($config['access'] > 0 && CheckAccess($config['access'])
 // Dateioeffnen                      //
 ///////////////////////////////////////
 
-/* Manipulation bei Thumbs im Fotoalbum */
-if (isset($config['module'], $_GET['thumb']) && $config['module'] == 'photos') {
-	if (!($ftp->folderExists($path_folder.'/'.MODULE_PHOTOS_THUMB) 
-			&& $ftp->ChangeDir($path_folder.'/'.MODULE_PHOTOS_THUMB))) {
-		header("HTTP/1.0 404 Not Found");
-		die('Thumb folder not exists');
-	}
-}
+$content = $ftp->FileContents($path_folder.'/'.$path_file);
+/* HTTP //headers senden */
+header("HTTP/1.1 200 OK");
+header('Content-type: '.$mime[$file_info['extension']]);
+header("Content-Length: ".$ftp->fileSize($path_folder.'/'.$path_file));
+if (!(isset($_GET['inline'])))
+	header('Content-Disposition: attachment; filename="'.$path_file.'"');
+/* Ausgabe des Dateiinhaltes */
+echo $content;
 
-if ($ftp->fileExists($path_file)) {
-	/* Datei einlesen */
-	$content = $ftp->FileContents($path_file);
-	/* HTTP //headers senden */
-	header("HTTP/1.1 200 OK");
-	header('Content-type: '.$mime[$file_info['extension']]);
-	header("Content-Length: ".$ftp->fileSize($path_file));
-	if (!(isset($_GET['inline'])))
-		header('Content-Disposition: attachment; filename="'.$path_file.'"');
-	/* Ausgabe des Dateiinhaltes */
-	echo $content;
-}
-else {
-	/* Datei existiert nicht */
-	//header("HTTP/1.0 404 Not Found");
-	die('File not exists');
-}
 
 
 ///////////////////////////////////////

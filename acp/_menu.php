@@ -65,10 +65,10 @@ function HeaderMenu($active) {
 
 	if (ACP_MODULE_PHOTOS_EN && ACP_AdminAccess(ACP_ACCESS_M_PHOTOS)) {
 		if ($active == 5) {
-			$menu .= "<li><a href=\"?page=photos2-show\" class=\"active\">Fotoalbum</a></li>";
+			$menu .= "<li><a href=\"?page=photos-show\" class=\"active\">Fotoalbum</a></li>";
 		}
 		else {
-			$menu .= "<li><a href=\"?page=photos2-show\">Fotoalbum</a></li>";
+			$menu .= "<li><a href=\"?page=photos-show\">Fotoalbum</a></li>";
 		}
 	}
 	
@@ -166,7 +166,7 @@ function SecondMenu($active) {
 		case 5:
 			/* Fotoalbum */
 			if (ACP_MODULE_PHOTOS_EN && ACP_AdminAccess(ACP_ACCESS_M_PHOTOS)) {
-				$menu .= "<li class=\"first\"><a href=\"?page=photos2-show\">Alben</a></li>";
+				$menu .= "<li class=\"first\"><a href=\"?page=photos-show\">Alben</a></li>";
 			}
 			break;
 			

@@ -81,7 +81,6 @@ body {
 
 }
 #left ol {
-	/*margin-bottom:20px;*/
 	width:100%;
 	list-style-type:none;
 	background-color:#fff;
@@ -315,24 +314,70 @@ img {
 	background-color:#ffe;
 	/*background-image:url(/img/status/important.png);*/
 }
+#content div.acp-infobox {
+	margin:20px 0px;
+	padding-left:10px;
+	width:92%;
+	border-left:15px solid #e0ebf5;
+}
+#content div.acp-infobox div.icons {
+	margin:10px 0;
+	opacity:0;
+	transition: all 0.2s ease;
+}
+#content div.acp-infobox:hover div.icons {
+	opacity:1;
+}
+#content div.acp-infobox div.icons img {
+	margin-right:10px;
+}
+
+/*** Seitenzahlen ************************************************************/
+#content div.pagination {
+	margin-top:20px;
+	padding:0 13px;
+	width:90%;
+	text-align:center;
+}
+#content div.pagination span a, #content div.pagination span.current-page {
+	display:inline-block;
+	height:30px;
+	width:30px;
+	line-height:30px;
+	background-color:#f1f1f1;
+	text-decoration:none;
+	color:#615d5a;
+}
+#content div.pagination span.next a, #content div.pagination span.preview a {
+	width:65px;
+}
+#content div.pagination span a:hover, #content div.pagination span.current-page {
+	background-color:#c9c5c1;
+}
 
 /*** Popupfenster Dateiupload ************************************************/
 div.popup {
 	position:absolute;
 	top:50%;
 	left:50%;
-	width:320px;
+	margin:-32px 0 0 -172px;
+	padding:5px 5px 5px 60px;
+	width:275px;
 	height:50px;
-	margin-top:-25px;
-	margin-left:-160px;
-	padding:5px;
 	border:2px solid #555;
 	background-color:#f1f1f1;
 	color:#555;
+	box-shadow:5px 5px 10px #999;
 }
 div.popup h1 {
 	color:#555;
 	font-size:1em;
+}
+div.popup img {
+	display:block;
+	position:absolute;
+	top:14px;
+	left:14px;
 }
 
 /*** Fotoalbum Bilder ********************************************************/
@@ -343,6 +388,9 @@ div.popup h1 {
 	margin: 15px 15px 0 0;
 	padding:7px;
 	border:1px solid #c9c5c1;
+}
+#content div.photo img {
+	display:block;
 }
 #content div.photo p {
 	opacity:0;
@@ -356,6 +404,9 @@ div.popup h1 {
 }
 #content div.photo:hover p {
 	opacity:1;
+}
+#content div.photo p img {
+	display:inline;
 }
 #content div.photo div.caption {
 	position:absolute;
@@ -372,7 +423,7 @@ div.popup h1 {
 	font-size:0.9em;
 }
 #content div.photo:hover div.caption {
-	top:80px;
+	top:82px;
 	opacity:1;
 }
 #content p.photo-clear {

@@ -880,8 +880,8 @@ class formWizardFileDrop extends formWizardFile {
 		}
 		$html = '    <li class="input-hidden"><label class="line_hide"></label><input type="hidden" name="showNewForm" id="showNewForm" value="'.$show_new_form.'" /></li>';
 		$html .= '    <li id="drop-files" class="'.$this->css_class.'" ondragover="return false;">
-	  <p>Alte Version</p>
-	  Drop Images Here
+	  <div class="fallback">Alte Version</div>
+	  Drag &amp; Drop - '.$this->label.' hochladen
     </li>';
     	$html .= formWizardFile::renderHtml();
     	return $html;

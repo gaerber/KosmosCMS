@@ -110,9 +110,9 @@ if (ACP_MODULE_GUESTBOOK_EN) {
 		}
 		
 		/* Seitenzahlen */
-		echo "<p class=\"pagination\">";
+		echo "<div class=\"pagination\">";
 		echo $classPagination->PaginationLinks("{module_path}/".PLUGIN_GUESTBOOK_GETP_PAGE."/", PAGINATION_NUM);
-		echo "</p>\r\n";
+		echo "</div>\r\n";
 		
 		/* Neuster Eintrag fuer Stand der Seite */
 		$result = mysql_query('SELECT timestamp FROM '.DB_TABLE_PLUGIN.'guestbook

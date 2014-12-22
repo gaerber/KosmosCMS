@@ -151,13 +151,13 @@ if ($line[0] > 0) {
 	echo "  </table>";
 	
 	/* Seitenzahlen Links */
-	echo "<p class=\"center\">";
+	echo "<div class=\"pagination\">";
 	if (isset($_GET['group']))
 		echo $classPagination->PaginationLinks("?page=user-list&amp;group=".$_GET['group']
 				."&amp;".PAGE_POINTER."=", PAGINATION_NUM);
 	else
 		echo $classPagination->PaginationLinks("?page=user-list&amp;".PAGE_POINTER."=", PAGINATION_NUM);
-	echo "</p>\r\n";
+	echo "</div>\r\n";
 }
 else {
 	if (isset($_GET['group']) && is_numeric($_GET['group']))

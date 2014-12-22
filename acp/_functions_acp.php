@@ -15,6 +15,8 @@
  |--------|------------|--------------------
  |2.0     | 05.05.2011 | Uebernommen und geaendert
  |2.0.2   | 14.09.2012 | writeAlbumConfig() hinzu
+ |2.0.3   | 07.12.2014 | printInfoBox() hinzu
+ |2.1     | 11.12.2014 | FTP Dateisystem
  -----------------------------------------------------
  Beschreibung :
  Alle Funktionen fuer den ACP, ausgenommen PlugIns.
@@ -49,21 +51,11 @@ define("MAX_ACP_LOGIN_TIME", 600);
 // Allgemeine Funktionen             //
 ///////////////////////////////////////
 /**
- * SessionDelete()
  * Loeschen der Session
  */
 function SessionDelete() {
 	$_SESSION['admin_id'] = 0;
 	unset($_SESSION['admin_id'], $_SESSION['admin_password'], $_SESSION['admin_access']);
-	
-	// Sessions Daten loeschen
-	//$_SESSION = array();
-	// Session Cookie loeschen
-	//if (isset($_COOKIE[session_name()])) {
-    //	setcookie(session_name(), '', time()-42000, '/');
-	//}
-	// Session vom Server loeschen
-	//session_destroy();
 }
 
 /**
@@ -112,13 +104,6 @@ function LoginFormular($fehler) {
 function LoginSystem($db_cms) {
 	if (isset($_SESSION['admin_id'], $_SESSION['admin_login'], $_SESSION['admin_password'],
 			$_SESSION['admin_time_lastaction'])) {
-		/* Inaktive Session loeschen */
-//		if ($_SESSION['admin_time_lastaction'] < TIME_STAMP - MAX_ACP_LOGIN_TIME) {
-//			// TIME OUT -> Session loeschen
-//			SessionDelete();
-//			return false;
-//		}
-//		$_SESSION['admin_time_lastaction'] = TIME_STAMP;
 		/* Administrator pruefen */
 		$result = mysql_query("SELECT name, access FROM ".DB_TABLE_ROOT."cms_admin
 				WHERE admin_id=".$_SESSION['admin_id']." && login='".$_SESSION['admin_login']."'
@@ -235,148 +220,27 @@ function printBoxEnd() {
 	return 	"  </ol>\r\n  <p class=\"form-after\">&nbsp;</p>\r\n";
 }
 
-
 /**
- * Sicherung der Datenbank in einen Outputstream.
- * @param teble Array mit den Tabellen, die gesichert werden sollen. '*' fuer die komplete Datenbank.
+ * Erstellt eine Informationsbox.
+ * @param[in] title Titel der Informationsbox.
+ * @param[in] content Inhaltstext der Informationsbox.
+ * @param[in] icons Array mit den Icons. Jedes Icon besteht aus einem assoziativen Array mit den Schluesseln icon, url, comment.
  */
-function mysql_backup__DEL_($stream, $tables='*') {
-	$output = '';
-	$eol = "\r\n";
-	
-	if($tables == '*') {
-		/* Liste mit allen Tabellen erstellen */
-		$tables = array();
-		$result = mysql_query('SHOW TABLES', $stream);
-		while($row = mysql_fetch_row($result)) {
-			$tables[] = $row[0];
-		}
-	}
-	else {
-		$tables = is_array($tables) ? $tables : explode(',',$tables);
-	}
-	
-	/* Alle Tabellen einxeln Sichern */
-	foreach($tables as $table) {
-		$result = mysql_query('SELECT * FROM '.$table, $stream);
-		$num_fields = mysql_num_fields($result);
-		
-		/* Alte Tabelle loeschen */
-		//$output .= 'DROP TABLE '.$table.';'.$eol.$eol;
-		/* Tabele erstellen */
-		//$row2 = mysql_fetch_row(mysql_query('SHOW CREATE TABLE '.$table, $stream));
-		//$return.= $row2[1].';'.$eol.$eol;
-		
-		/* Alte Tabelle leeren */
-		$output .= 'TRUNCATE '.$table.';'.$eol.$eol;
-		
-		/* Alle Daten der Tabelle speichern */
-		//for ($i = 0; $i < $num_fields; $i++) 
-		//{
-			while($row = mysql_fetch_row($result)) {
-				$output .= 'INSERT INTO '.$table.' VALUES(';
-				for($j=0; $j<$num_fields; $j++) 
-				{
-					$row[$j] = addslashes($row[$j]);
-					$row[$j] = ereg_replace("\n","\\n",$row[$j]);
-					if (isset($row[$j])) { $output .= '"'.$row[$j].'"' ; } else { $output .= '""'; }
-					if ($j<($num_fields-1)) { $output .= ','; }
-				}
-				$output .= ');'.$eol;
-			}
-		//}
-		$output .= $eol.$eol;
-	}
-	
-	return $output;
-}
+function printInfoBox($title, $comment = '', $icons = NULL) {
+	$html = '<div class="acp-infobox">
+  <h2>'.$title.'</h2>
+  '.$comment;
 
-/**
- * Speichert eine Connfig Datei in einem Albumordner
- * @param $album_path Pfad zum Album
- * @param $info assoziatives Array mit allen Albumseigenschaften
- */
-function writeAlbumConfig($album_path, $info) {
-	/* Temproaere Datei erstellen */
-	$ftemp_config = tmpfile();
-	if (!$ftemp_config)
-		return false;
-	
-	/* Htaccess falls noetig */
-	if ($info['locked'] == 1 || $info['access']){
-		$ftemp_htaccess = tmpfile();
-		if (!$ftemp_htaccess) {
-			fclose($ftemp_config);
-			return false;
+	if (is_array($icons)) {
+		$html .= '<div class="icons">';
+		foreach ($icons as $i) {
+			$html .= ' <a href="'.$i['url'].'" onmouseover="Tip(\''.$i['comment'].'\')" onmouseout="UnTip()"><img src="'.$i['icon'].'" alt="" /></a>';
 		}
-		
-		/* Verzeichnisschutz erstellen */
-		fwrite($ftemp_htaccess, "Order deny,allow\r\nDeny from all");
-		fseek($ftemp_htaccess, 0);
+		$html .= '</div>';
 	}
-	
-	/* Config erstellen */
-	fwrite($ftemp_config, $info['sort'].'|'.$info['title'].'|'.$info['description']
-			.'|'.$info['access'].'|'.$info['locked']);
-	fseek($ftemp_config, 0);
-	
-	/* Config Datei mit FTP hochladen */
-	$ftp = new ftp();
-	$ftp->ChangeDir(substr($album_path, strlen('../'.FILESYSTEM_DIR)));
-	$ftp->FilePut('config.txt', $ftemp_config);
-	fclose($ftemp_config);
-	if ($info['locked'] == 1 || $info['access']){
-		$ftp->FilePut('.htaccess', $ftemp_htaccess);
-		fclose($ftemp_htaccess);
-	}
-	else if (file_exists($album_path.'.htaccess')) {
-		/* Verzeichnisschutz muss entfernt werden, sofern er vohanden ist */
-		$ftp->Delete('.htaccess');
-	}
-	$ftp->close();
-	
-	return true;
-}
-function writeAlbumConfigFtp($ftp, $album_path, $info) {
-	/* Temproaere Datei erstellen */
-	$ftemp_config = tmpfile();
-	if (!$ftemp_config)
-		return false;
-	
-	/* Htaccess falls noetig */
-	if ($info['locked'] == 1 || $info['access']){
-		$ftemp_htaccess = tmpfile();
-		if (!$ftemp_htaccess) {
-			fclose($ftemp_config);
-			return false;
-		}
-		
-		/* Verzeichnisschutz erstellen */
-		fwrite($ftemp_htaccess, "Order deny,allow\r\nDeny from all");
-		fseek($ftemp_htaccess, 0);
-	}
-	
-	/* Config erstellen */
-	fwrite($ftemp_config, $info['access'].'|photos|'.$info['sort'].'|'.$info['title'].'|'.$info['description']
-			.'|'.$info['locked']);
-	fseek($ftemp_config, 0);
-	
-	/* Config Datei mit FTP hochladen */
-	$ftp->ChangeDir($album_path);
-	$ftp->FilePut('.config', $ftemp_config);
-	fclose($ftemp_config);
-	
-	/* Verzeichnisschutz hochladen */
-	if ($info['locked'] == 1 || $info['access']){
-		$ftp->FilePut('.htaccess', $ftemp_htaccess);
-		fclose($ftemp_htaccess);
-	}
-	else if ($ftp->fileExists($album_path.'.htaccess')) {
-		/* Verzeichnisschutz muss entfernt werden, sofern er vohanden ist */
-		$ftp->Delete('.htaccess');
-	}
-	
-	return true;
+	$html .= '</div>';
+
+	return $html;
 }
 
 ?>
