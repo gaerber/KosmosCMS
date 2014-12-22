@@ -104,10 +104,10 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 			echo "</table>";
 
 			if ($c_pages->NumberOfPage()) {
-				echo "<p>&nbsp;</p><center>";
+				echo "<p>&nbsp;</p><div class=\"pagination\">";
 				echo $c_pages->PaginationLinks("?page=website-backups&amp;id=".$line['id']."&amp;subpage=",
 						PAGINATION_NUM);
-				echo "</center>";
+				echo "</div>";
 			}
 		}
 		else {

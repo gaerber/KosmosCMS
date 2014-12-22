@@ -125,10 +125,10 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 			echo printBoxEnd();
 			
 			/* Seitenzahlen */
-			echo "<p class=\"center\">";
+			echo "<div class=\"pagination\">";
 			echo $classPagination->PaginationLinks("?page=news-comment-list&amp;id=".$news_id.
 					"&amp;".PAGE_POINTER."=", PAGINATION_NUM);
-			echo "</p>\r\n";
+			echo "</div>\r\n";
 		}
 		else {
 			/* Keine Kommentare vorhanden */

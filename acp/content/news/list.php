@@ -137,13 +137,13 @@ if ($line[0] > 0) {
 	/* Ende der Ausgabe */
 	echo printBoxEnd();
 	
-	echo "<p class=\"center\">";
+	echo "<div class=\"pagination\">";
 	if (isset($_GET['categorie']))
-		echo $classPagination->PaginationLinks("?page=news-news&amp;categorie=".$_GET['categorie']
+		echo $classPagination->PaginationLinks("?page=news-list&amp;categorie=".$_GET['categorie']
 				."&amp;".PAGE_POINTER."=", PAGINATION_NUM);
 	else
-		echo $classPagination->PaginationLinks("?page=news-news&amp;".PAGE_POINTER."=", PAGINATION_NUM);
-	echo "</p>\r\n";
+		echo $classPagination->PaginationLinks("?page=news-list&amp;".PAGE_POINTER."=", PAGINATION_NUM);
+	echo "</div>\r\n";
 }
 else {
 	/* Keine Eintraege vorhanden */

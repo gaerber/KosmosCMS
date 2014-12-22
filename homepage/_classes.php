@@ -867,11 +867,11 @@ class pagination {
 
 		if($this->active_page > 1) {
 			/* Zurueck */
-			$content .= '[ <a href="'.$url.($this->active_page - 1).'">Zurück</a> ]';
+			$content .= ' <span class="preview"><a href="'.$url.($this->active_page - 1).'">Zurück</a></span> ';
 		}
 		/* Seiten Links */
 		if($this->num_page > 1) {
-			$content .= ' [ ';
+			$content .= ' ';
 
 			if($small > 0) {
 				$small_min = $this->active_page - $small;
@@ -897,28 +897,28 @@ class pagination {
 
 				for($i = $small_min; $i <= $small_max; $i++) {
 					if($this->active_page == $i) {
-						$content .= ' '.$i.' ';
+						$content .= ' <span class="current-page">'.$i.'</span> ';
 					}
 					else {
-						$content .= ' <a href="'.$url.$i.'">'.$i.'</a> ';
+						$content .= ' <span><a href="'.$url.$i.'">'.$i.'</a></span> ';
 					}
 				}
 			}
 			else {
 				for($i = 1; $i <= $this->num_page; $i++) {
 					if($this->active_page == $i) {
-						$content .= ' '.$i.' ';
+						$content .= ' <span class="current-page">'.$i.'</span> ';
 					}
 					else {
-						$content .= ' <a href="'.$url.$i.'">'.$i.'</a> ';
+						$content .= ' <span><a href="'.$url.$i.'">'.$i.'</a></span> ';
 					}
 				}
 			}
-			$content .= ' ] ';
+			$content .= ' ';
 		}
 		if($this->active_page < $this->num_page) {
 			/* Weiter */
-			$content .= '[ <a href="'.$url.($this->active_page + 1).'">Weiter</a> ]';
+			$content .= ' <span class="next"><a href="'.$url.($this->active_page + 1).'">Weiter</a></span> ';
 		}
 		return $content;
 	}

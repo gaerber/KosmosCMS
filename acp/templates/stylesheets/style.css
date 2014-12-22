@@ -81,7 +81,6 @@ body {
 
 }
 #left ol {
-	/*margin-bottom:20px;*/
 	width:100%;
 	list-style-type:none;
 	background-color:#fff;
@@ -331,6 +330,29 @@ img {
 }
 #content div.acp-infobox div.icons img {
 	margin-right:10px;
+}
+
+/*** Seitenzahlen ************************************************************/
+#content div.pagination {
+	margin-top:20px;
+	padding:0 13px;
+	width:90%;
+	text-align:center;
+}
+#content div.pagination span a, #content div.pagination span.current-page {
+	display:inline-block;
+	height:30px;
+	width:30px;
+	line-height:30px;
+	background-color:#f1f1f1;
+	text-decoration:none;
+	color:#615d5a;
+}
+#content div.pagination span.next a, #content div.pagination span.preview a {
+	width:65px;
+}
+#content div.pagination span a:hover, #content div.pagination span.current-page {
+	background-color:#c9c5c1;
 }
 
 /*** Popupfenster Dateiupload ************************************************/

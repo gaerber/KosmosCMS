@@ -89,9 +89,9 @@ if ($line[0] > 0) {
 	echo '</table>';
 	
 	/* Seitenzahlen */
-	echo '<p class="center">';
+	echo '<div class="pagination">';
 	echo $classPagination->PaginationLinks('?page=lawdb-list&amp;'.PAGE_POINTER.'=', PAGINATION_NUM);
-	echo '</p>';
+	echo '</div>';
 }
 else {
 	/* Es sind keine Gesetzesartikel vorhanden */

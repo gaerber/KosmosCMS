@@ -103,9 +103,9 @@ if ($line[0] > 0) {
 	/* Ende der Ausgabe */
 	echo printBoxEnd();
 	
-	echo "<p class=\"center\">";
-	echo $classPagination->PaginationLinks("?page=guestbook-guestbook&amp;".PAGE_POINTER."=", PAGINATION_NUM);
-	echo "</p>\r\n";
+	echo "<div class=\"pagination\">";
+	echo $classPagination->PaginationLinks("?page=guestbook-list&amp;".PAGE_POINTER."=", PAGINATION_NUM);
+	echo "</div>\r\n";
 }
 else {
 	/* Gaestebunch hat keine Eintraege */
