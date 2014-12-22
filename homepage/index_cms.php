@@ -34,7 +34,7 @@
 error_reporting(E_ALL);
 
 /* Programmkonstante */
-define("SWISS_WEBDESIGN", "2.1");
+define("SWISS_WEBDESIGN", "2.2");
 
 /* Check ob alle wichtigen Dateien vorhanden sind */
 if (!(file_exists("_settings.php")

@@ -110,7 +110,7 @@ if (ACP_MODULE_STATISTIC) {
 /* CMS Versionsinfos */
 echo printBox("CMS Informationen", "Swiss Webdesign<br />
 		Kosmos CMS<br />
-		Version 2.1 vom 22. Juli 2013<br />
+		Version 2.2 vom 22. Dezember 2014<br />
 		&lt;cms.development@swiss-webdesign.ch&gt;",
 		"<a href=\"#\" onclick=\"javascript:MyWindow=window.open('frame.php?page=cmssupport','cms_support','toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400'); return false;\" onmouseover=\"Tip('Support')\" onmouseout=\"UnTip()\"><img src=\"img/icons/support.png\" alt=\"\" /></a>
 		<a href=\"http://www.swiss-webdesign.ch/\" target=\"_blank\" onmouseover=\"Tip('Website von Swiss Webdesign')\" onmouseout=\"UnTip()\"><img src=\"img/icons/information.png\" alt=\"\" /></a>",

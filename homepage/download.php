@@ -37,7 +37,7 @@ error_reporting(E_ALL);
 session_start();
 
 /* Programmkonstante */
-define('SWISS_WEBDESIGN', '2.1');
+define('SWISS_WEBDESIGN', '2.2');
 
 $mime = array(
 		'zip'  => 'application/zip',
