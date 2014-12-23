@@ -200,7 +200,7 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 				
 			case 'lock-album':
 			case 'unlock-album':
-				$res_element = mysql_query('SELECT id, id_str
+				$res_element = mysql_query('SELECT id, id_str, access
 						FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE id='.StdSqlSafety($_GET['id']).' && menu_sub='.$current_album['id'], DB_CMS)
 						OR FatalError(FATAL_ERROR_MYSQL);
 							
@@ -230,6 +230,14 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 							/* Verzeichnisschutz muss entfernt werden, sofern er vohanden ist */
 							$ftp->Delete('.htaccess');
 						}
+						/* Die Config Datei speichern */
+						$config = array(
+								'module' => 'photos',
+								'album_id' => $line_element['id'],
+								'access' => $line_element['access'],
+								'locked' => $locking
+								);
+						$ftp->writeFolderConfig($current_path.$line_element['id_str'], $config);
 						
 						/* Abspeichern in der Datenbank */
 						if (!mysql_query('UPDATE '.DB_TABLE_PLUGIN.'photoalbum SET locked='.$locking.'
