@@ -61,7 +61,7 @@ if (isset($_GET['file'], $_GET['do'], $_GET['ref']) && $_GET['file']!='' && is_n
 						/* Aktualisierung mit JS und anschliessendes Schliessen */
 						$ACP_ApplicationInfo['body_onload'] = 'opener.document.'.
 								'getElementById(\'form_image_'.$_GET['ref'].'\').src=\''.
-								FILESYSTEM_DIR_V21.$FileSystem_ModulePahts['user-system-images'].
+								FILESYSTEM_DIR.$FileSystem_ModulePahts['user-system-images'].
 								$file_name.'?'.TIME_STAMP.'\';'.
 								'opener.document.getElementById(\'form_image_url_'.$_GET['ref'].'\').style.display=\'block\';'.
 								'window.close();';
@@ -104,7 +104,7 @@ if (isset($_GET['file'], $_GET['do'], $_GET['ref']) && $_GET['file']!='' && is_n
 				/* Aktualisierung mit JS und anschliessendes Schliessen */
 				$ACP_ApplicationInfo['body_onload'] = 'opener.document.'.
 						'getElementById(\'form_image_'.$_GET['ref'].'\').src=\''.
-						FILESYSTEM_DIR_V21.$FileSystem_ModulePahts['user-system-images'].
+						FILESYSTEM_DIR.$FileSystem_ModulePahts['user-system-images'].
 						$UserSystem_imagesSettings['default'].'\';'.
 						'opener.document.getElementById(\'form_image_url_'.$_GET['ref'].'\').style.display=\'none\';'.
 						'window.close();';

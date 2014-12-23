@@ -54,7 +54,7 @@ if (ACP_FILE_SYSTEM_EN) {
 	$folderList->setJavaScript('onchange="window.location.href=\'?page=wymeditor-links-file&amp;folder=\'+this.value";');
 	
 	/* Saemtliche Verzeichnise einlesen */
-	$folderList->addOption(FILESYSTEM_DIR, '/');
+	$folderList->addOption(preg_replace('/^\/+/', '', FILESYSTEM_DIR), '/');
 	$ftp->folderListCallback('/', 'FileSystemFolders', true);
 	
 	/* Ausgabe Formular */
@@ -75,7 +75,7 @@ if (ACP_FILE_SYSTEM_EN) {
 			/* Verzeichnisse werden nicht verarbeitet */
 			if (!$folder_pointer->isDir($file)) {
 				echo '<li><a href="#" onclick="parent.document.getElementById(\'wym_href\').value = \''
-				.FILESYSTEM_DIR_V21.$current_folder.$file
+				.FILESYSTEM_DIR.$current_folder.$file
 				.'\';parent.document.getElementById(\'wym_submit\').click();">'.$file.'</a></li>';
 			}
 		}

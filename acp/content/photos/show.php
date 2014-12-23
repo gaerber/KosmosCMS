@@ -437,7 +437,7 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 					}
 					else {
 						/* Normale Bilderausgabe */
-						echo '<img src="'.FILESYSTEM_DIR_V21.$current_path.MODULE_PHOTOS_THUMB
+						echo '<img src="'.FILESYSTEM_DIR.$current_path.MODULE_PHOTOS_THUMB
 								.$row['file_name'].'" alt="'.$row['caption'].'" />';
 					}
 					/* Fotokommentar */
