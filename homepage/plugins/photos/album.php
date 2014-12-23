@@ -142,9 +142,9 @@ if (ACP_MODULE_PHOTOS_EN) {
 									.$current_path.$arrayPreviewImg[$i]['folder'].$arrayPreviewImg[$i]['img'].'&amp;inline');
 							}
 							else {
-								$tpl->assign('img_preview_thumb', FILESYSTEM_DIR_V21.$current_path.$arrayPreviewImg[$i]['folder']
+								$tpl->assign('img_preview_thumb', FILESYSTEM_DIR.$current_path.$arrayPreviewImg[$i]['folder']
 										.MODULE_PHOTOS_THUMB.$arrayPreviewImg[$i]['img']);
-								$tpl->assign('img_preview', FILESYSTEM_DIR_V21.$current_path.$arrayPreviewImg[$i]['folder']
+								$tpl->assign('img_preview', FILESYSTEM_DIR.$current_path.$arrayPreviewImg[$i]['folder']
 										.$arrayPreviewImg[$i]['img']);
 							}
 							if ($i == sizeof($arrayPreviewImg)-1) {
@@ -217,8 +217,8 @@ if (ACP_MODULE_PHOTOS_EN) {
 						}
 						else {
 							/* Oeffentliche Bilder */
-							$tpl->assign('img_thumb', FILESYSTEM_DIR_V21.$current_path.MODULE_PHOTOS_THUMB.$row['file_name']);
-							$tpl->assign('img_big', FILESYSTEM_DIR_V21.$current_path.$row['file_name']);
+							$tpl->assign('img_thumb', FILESYSTEM_DIR.$current_path.MODULE_PHOTOS_THUMB.$row['file_name']);
+							$tpl->assign('img_big', FILESYSTEM_DIR.$current_path.$row['file_name']);
 						}
 						$tpl->out();
 					}

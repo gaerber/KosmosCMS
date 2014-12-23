@@ -128,8 +128,7 @@ define('FTP_DIR', '/');
 /**
  * Startverzeichnis der oeffentlichen Dateien
  */
-define('FILESYSTEM_DIR', 'upload');
-define('FILESYSTEM_DIR_V21', '/upload');
+define('FILESYSTEM_DIR', '/upload');
 
 /**
  * Temporaerer Ordner fuer bestimmte Funktionen.

@@ -944,7 +944,7 @@ class formWizardImage extends formWizardElement {
 	public function renderHtml() {
 		$image_exists = $this->imageExists();
 		
-		$html = '<div class="images"><div><img id="form_image_'.$this->id.'" src="'.FILESYSTEM_DIR_V21.$this->image_folder;
+		$html = '<div class="images"><div><img id="form_image_'.$this->id.'" src="'.FILESYSTEM_DIR.$this->image_folder;
 		if ($this->value != '' && $image_exists)
 			$html .= $this->value;
 		else

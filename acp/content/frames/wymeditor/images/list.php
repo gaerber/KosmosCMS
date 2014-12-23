@@ -53,7 +53,7 @@ if (ACP_FILE_SYSTEM_EN) {
 	$folderList->setJavaScript('onchange="window.location.href=\'?page=wymeditor-images-list&amp;folder=\'+this.value";');
 	
 	/* Saemtliche Verzeichnise einlesen */
-	$folderList->addOption(FILESYSTEM_DIR, '/');
+	$folderList->addOption(preg_replace('/^\/+/', '', FILESYSTEM_DIR), '/');
 	$ftp->folderListCallback('/', 'FileSystemFolders', true);
 	
 	/* Ausgabe Formular */
@@ -76,9 +76,9 @@ if (ACP_FILE_SYSTEM_EN) {
 				if (in_array(mb_strtolower(array_pop(explode(".", $file))),
 						$FileSystem_AllowedImageTypes)) {
 					echo '<a href="#" class="image" onclick="parent.document.getElementById(\'wym_src\').value = \''
-					.FILESYSTEM_DIR_V21.$current_folder.$file
+					.FILESYSTEM_DIR.$current_folder.$file
 					.'\';parent.document.getElementById(\'wym_submit\').click();"><img src="'
-					.FILESYSTEM_DIR_V21.$current_folder.$file.'" alt="" /></a>';
+					.FILESYSTEM_DIR.$current_folder.$file.'" alt="" /></a>';
 				}
 			}
 		}
