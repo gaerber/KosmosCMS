@@ -28,7 +28,10 @@
 if (!defined("SWISS_WEBDESIGN"))	die();
 ///////////////////////////////////////////////////////
 
-/* Alle Gruppen OR Verknuepft */
+/* Default Group */
+$plugin_access_groups = 0x01;
+
+/* Bestimmte Gruppe anzeigen */
 if (isset($_GET['group']) && $_GET['group'] != "") {
 	$result = mysql_query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_groups
 			WHERE id_str='".StdSqlSafety($_GET['group'])."'", DB_CMS)
@@ -37,13 +40,10 @@ if (isset($_GET['group']) && $_GET['group'] != "") {
 		$plugin_access_groups = 1 << $line['id'];
 	}
 }
-if (!isset($plugin_access_groups)) {
-	/* Default Group */
-	$plugin_access_groups = 0x01;
-}
 
-if (isset($moduleParameter['show_groups_only']))
+if (isset($moduleParameter['show_groups_only'])) {
 	$plugin_access_groups = (int) $moduleParameter['show_groups_only'];
+}
 
 /* Sortierung */
 if (isset($_GET['sort'])) {
