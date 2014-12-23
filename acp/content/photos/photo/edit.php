@@ -65,7 +65,7 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 		}
 		else {
 			/* Normale Bilderausgabe */
-			$image =  '<div class="photo"><img src="'.FILESYSTEM_DIR_V21.'/'.$current_path.MODULE_PHOTOS_THUMB
+			$image =  '<div class="photo"><img src="'.FILESYSTEM_DIR.'/'.$current_path.MODULE_PHOTOS_THUMB
 					.$line['file_name'].'" alt="'.$line['caption'].'" /></div>';
 		}
 		

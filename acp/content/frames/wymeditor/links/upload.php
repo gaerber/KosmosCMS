@@ -50,7 +50,7 @@ if (ACP_FILE_SYSTEM_EN && ACP_AdminAccess(ACP_ACCESS_FILESYSTEM | ACP_ACCESS_FIL
 	$submit = $form->addElement('submit', 'button', NULL, 'Hochladen');
 
 	/* Saemtliche Verzeichnise einlesen */
-	$folderList->addOption(FILESYSTEM_DIR, '/');
+	$folderList->addOption(preg_replace('/^\/+/', '', FILESYSTEM_DIR), '/');
 	$ftp->folderListCallback('/', 'FileSystemFolders', true);
 	
 	/* Auswertung */
@@ -72,8 +72,7 @@ if (ACP_FILE_SYSTEM_EN && ACP_AdminAccess(ACP_ACCESS_FILESYSTEM | ACP_ACCESS_FIL
 							echo ActionReport(REPORT_OK, 'Datei hochgeladen',
 									'Die Datei wurde erfolgreich hochgeladen!');
 							/* Javascript um originalfelder zu fuellen und Bild direkt einzufuegen */
-							$ACP_ApplicationInfo['body_onload'] = "parent.document.getElementById('wym_href').value = '".FILESYSTEM_DIR_V21.$folderList->getValue().$file_data['name']."';"
-									//."parent.document.getElementById('wym_alt').value = '".$alt_text->getValue()."';"
+							$ACP_ApplicationInfo['body_onload'] = "parent.document.getElementById('wym_href').value = '".FILESYSTEM_DIR.$folderList->getValue().$file_data['name']."';"
 									."parent.document.getElementById('wym_submit').click();";
 						}
 						else {
