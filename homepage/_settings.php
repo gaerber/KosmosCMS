@@ -138,10 +138,10 @@ define('FILESYSTEM_DIR', '/upload');
 define('FILESYSTEM_TEMP', sys_get_temp_dir().'/');
 
 /**
- * Maximale erlaubte Dateigroesse beim Upload
+ * Maximale erlaubte Dateigroesse beim Hochladen
  * in Bytes
  */
-define('FILE_SIZE_LIMIT', 3145728);
+define('FILE_SIZE_LIMIT', 5242880);
 
 /**
  * Alle erlaubten Bildertypen
