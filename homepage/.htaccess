@@ -1,0 +1,26 @@
+AddDefaultCharset utf-8
+AddHandler php5-fastcgi .php .php5
+
+RewriteEngine On
+RewriteCond %{HTTP_HOST} !^$
+RewriteCond %{HTTP_HOST} !^www\. [NC]
+RewriteCond %{HTTPS}s ^on(s)|
+RewriteRule ^ http%1://www.%{HTTP_HOST}%{REQUEST_URI} [R=301,L]
+
+RewriteCond %{REQUEST_URI} ^\/(upload|templates|img|acp)\/
+RewriteRule ^(.*)$ $1 [L]
+
+RewriteRule ^$ index_cms.php [QSA,L]
+RewriteRule ^([^/.]+)\/([^/.]+)\/([^/.]+)\/([^/.]+)$ index_cms.php?$1=$2&$3=$4 [QSA,L]
+RewriteRule ^([^/.]+)\/([^/.]+)$ index_cms.php?$1=$2 [QSA,L]
+RewriteRule ^index\.html$ index_cms.php [QSA,L]
+RewriteRule ^index\.html\/([^/.]+)\/([^/.]+)\/([^/.]+)\/([^/.]+)$ index_cms.php?$1=$2&$3=$4 [QSA,L]
+RewriteRule ^index\.html\/([^/.]+)\/([^/.]+)$ index_cms.php?$1=$2 [QSA,L]
+
+RewriteRule ^(.*)?\/index\.html\/([^/.]+)\/([^/.]+)\/([^/.]+)\/([^/.]+)$ index_cms.php?cms_seite=$1&is_categorie=1&$2=$3&$4=$5 [QSA,L]
+RewriteRule ^(.*)?\/index\.html\/([^/.]+)\/([^/.]+)$ index_cms.php?cms_seite=$1&is_categorie=1&$2=$3 [QSA,L]
+RewriteRule ^(.*)?\/index\.html$ index_cms.php?cms_seite=$1&is_categorie=1 [QSA,L]
+
+RewriteRule ^(.*)?\.html\/([^/.]+)\/([^/.]+)\/([^/.]+)\/([^/.]+)$ index_cms.php?cms_seite=$1&is_categorie=0&$2=$3&$4=$5 [QSA,L]
+RewriteRule ^(.*)?\.html\/([^/.]+)\/([^/.]+)$ index_cms.php?cms_seite=$1&is_categorie=0&$2=$3 [QSA,L]
+RewriteRule ^(.*)?\.html$ index_cms.php?cms_seite=$1&is_categorie=0 [QSA,L]
