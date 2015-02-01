@@ -278,11 +278,6 @@ define('ACP_MODULE_GUESTBOOK_EN', true);
  */
 define('ACP_MODULE_PHOTOS_EN', true);
 
-/**
- * Linkverzeichnis
- */
-define('ACP_MODULE_LAWDB_EN', false);
-
 
 /*** Plugin Seitenzahlen ****************************/
 /**
