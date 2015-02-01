@@ -409,7 +409,7 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 				else
 					echo '<td class="icon"><a href="?page=photos-show&amp;do=lock-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Album sperren\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/locked_not.png" alt="" /></a></td>';
 				/* Album loeschen */
-				echo '<td class="icon"><a href="javascript:loeschen(\'?page=photos-show&amp;do=delete-album&amp;album='.$album.'&amp;id='.$row['id'].'\', \'Wollen Sie dieses Album mit sämtlichen Fotos und Unteralben wirklich unwiderruflich löschen?\')" onmouseover="Tip(\'Album löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/delete.png" alt="" /></a></td>';
+				echo '<td class="icon"><a href="javascript:confirmDeletion(\'?page=photos-show&amp;do=delete-album&amp;album='.$album.'&amp;id='.$row['id'].'\', \'Wollen Sie dieses Album mit sämtlichen Fotos und Unteralben wirklich unwiderruflich löschen?\')" onmouseover="Tip(\'Album löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/delete.png" alt="" /></a></td>';
 					
 				echo "</tr>\r\n";
 			}

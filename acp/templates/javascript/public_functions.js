@@ -1,4 +1,4 @@
-function clip(id) {
+function __deprecated__clip(id) {
   if (document.getElementById(id).style.display == 'none') {
     document.getElementById(id).style.display = 'block';
   }
@@ -11,7 +11,7 @@ function clip(id) {
 /**
  * Bestaetigung vor dem loeschen
  */
-function loeschen(link, nachricht) {
+function confirmDeletion(link, nachricht) {
     var eingabe = confirm(nachricht)
     if(eingabe == true) {
         window.location.href = link;
@@ -23,10 +23,11 @@ function loeschen(link, nachricht) {
  * Popup Fenster oeffnen
  */
 function popup(url) {
-    fenster = window.open(url, "Popupfenster", "width=580,height=320,menubar=no,titlebar=no,toolbar=no,resizable=no");
-    if (fenster)
+    popupWindow = window.open(url, "Popupfenster", "width=580,height=320,menubar=no,titlebar=no,toolbar=no,resizable=no");
+    if (popupWindow) {
     	return true;
-    fenster.focus();
+   	}
+    popupWindow.focus();
     return false;
 }
 

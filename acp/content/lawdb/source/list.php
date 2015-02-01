@@ -66,7 +66,7 @@ if (mysql_num_rows($result)) {
 		/* Ausgabe */
 		echo'<td><a href="'.$row['url'].'" target="_blank" onmouseover="Tip(\'Quelle öffnen\')" onmouseout="UnTip()">'.$row['name'].'</a></td>'
 				.'<td class="icon"><a href="?page=lawdb-source-edit&amp;id='.$row['id'].'" onmouseover="Tip(\'Quelle bearbeiten\')" onmouseout="UnTip()"><img src="img/icons/plugins/lawdb/edit.png" alt="" /></a></td>'
-				.'<td class="icon"><a href="javascript:loeschen(\'?page=lawdb-source-list&amp;delete='.$row['id'].'\', \'Wollen Sie wirklich diese Quelle unwiderruflich löschen?\')" onmouseover="Tip(\'Quelle löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/lawdb/delete.png" alt="" /></a></td>'
+				.'<td class="icon"><a href="javascript:confirmDeletion(\'?page=lawdb-source-list&amp;delete='.$row['id'].'\', \'Wollen Sie wirklich diese Quelle unwiderruflich löschen?\')" onmouseover="Tip(\'Quelle löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/lawdb/delete.png" alt="" /></a></td>'
 				.'</tr>';
 	}
 	

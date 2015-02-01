@@ -85,7 +85,7 @@ while ($row = mysql_fetch_array($result)) {
 
 	echo "      <td class=\"icon\"><a href=\"?page=admin-edit&amp;id=".$row['admin_id']."\" onmouseover=\"Tip('Administrator bearbeiten')\" onmouseout=\"UnTip()\"><img src=\"img/icons/admin/user_edit.png\" alt=\"\" /></a></td>\r\n";
 	if ($_SESSION['admin_id'] != $row['admin_id'])
-		echo "      <td class=\"icon\"><a href=\"javascript:loeschen('?page=admin-list&amp;delete=".$row['admin_id']."', 'Wollen Sie wirklich diesen Administrator löschen?')\" onmouseover=\"Tip('Administrator löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/admin/user_delete.png\" alt=\"\" /></a></td>\r\n";
+		echo "      <td class=\"icon\"><a href=\"javascript:confirmDeletion('?page=admin-list&amp;delete=".$row['admin_id']."', 'Wollen Sie wirklich diesen Administrator löschen?')\" onmouseover=\"Tip('Administrator löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/admin/user_delete.png\" alt=\"\" /></a></td>\r\n";
 	else
 		echo "      <td class=\"icon\"></td>\r\n";
 

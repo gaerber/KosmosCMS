@@ -143,7 +143,7 @@ if ($line[0] > 0) {
 			echo "      <td class=\"icon\"><a href=\"?page=user-list&amp;".PAGE_POINTER."=".$classPagination->ActivePage()."&amp;locked=".$row['user_id']."\" onmouseover=\"Tip('Benutzer entsperren')\" onmouseout=\"UnTip()\"><img src=\"img/icons/user/locked.png\" alt=\"\" /></a></td>\r\n";
 		else
 			echo "      <td class=\"icon\"><a href=\"?page=user-list&amp;".PAGE_POINTER."=".$classPagination->ActivePage()."&amp;locked=".$row['user_id']."\" onmouseover=\"Tip('Benutzer sperren')\" onmouseout=\"UnTip()\"><img src=\"img/icons/user/locked_not.png\" alt=\"\" /></a></td>\r\n";
-		echo "      <td class=\"icon\"><a href=\"javascript:loeschen('?page=user-list&amp;delete=".$row['user_id']."', 'Wollen Sie wirklich diesen Benutzer löschen?')\" onmouseover=\"Tip('Benutzer löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/user/user_delete.png\" alt=\"\" /></a></td>\r\n";
+		echo "      <td class=\"icon\"><a href=\"javascript:confirmDeletion('?page=user-list&amp;delete=".$row['user_id']."', 'Wollen Sie wirklich diesen Benutzer löschen?')\" onmouseover=\"Tip('Benutzer löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/user/user_delete.png\" alt=\"\" /></a></td>\r\n";
 	
 		echo "    </tr>\r\n";
 	}

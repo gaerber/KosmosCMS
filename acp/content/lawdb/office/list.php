@@ -66,7 +66,7 @@ if (mysql_num_rows($result)) {
 		/* Ausgabe */
 		echo'<td>'.$row['name'].'</td>'
 				.'<td class="icon"><a href="?page=lawdb-office-edit&amp;id='.$row['id'].'" onmouseover="Tip(\'Unternehmensbereich bearbeiten\')" onmouseout="UnTip()"><img src="img/icons/plugins/lawdb/edit.png" alt="" /></a></td>'
-				.'<td class="icon"><a href="javascript:loeschen(\'?page=lawdb-office-list&amp;delete='.$row['id'].'\', \'Wollen Sie wirklich dieser Unternehmensbereich unwiderruflich löschen?\')" onmouseover="Tip(\'Unternehmensbereich löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/lawdb/delete.png" alt="" /></a></td>'
+				.'<td class="icon"><a href="javascript:confirmDeletion(\'?page=lawdb-office-list&amp;delete='.$row['id'].'\', \'Wollen Sie wirklich dieser Unternehmensbereich unwiderruflich löschen?\')" onmouseover="Tip(\'Unternehmensbereich löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/lawdb/delete.png" alt="" /></a></td>'
 				.'</tr>';
 	}
 	

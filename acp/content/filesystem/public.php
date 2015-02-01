@@ -422,7 +422,7 @@ if ($file_table_view) {
 					  		onmouseover="Tip(\'Verzeichnis umbenennen\')" onmouseout="UnTip()">
 					  		<img src="img/icons/ftp/folder_rename.png" alt="" /></a></td>
 					  <td class="icon">
-					  		<a href="javascript:loeschen(\''.PFS_FILE_PATH.$current_folder.'&amp;foldername='.$file.'&amp;do=rmdir\',
+					  		<a href="javascript:confirmDeletion(\''.PFS_FILE_PATH.$current_folder.'&amp;foldername='.$file.'&amp;do=rmdir\',
 							  \'Möchten Sie dieses Verzeichnis mit allen Inhalten wirklich löschen?\')" onmouseover="Tip(\'Verzeichnis löschen\')"
 							  onmouseout="UnTip()">
 					  		<img src="img/icons/ftp/folder_delete.png" alt="" /></a></td>
@@ -439,7 +439,7 @@ if ($file_table_view) {
 					  		onmouseover="Tip(\'Datei umbenennen\')" onmouseout="UnTip()">
 					  		<img src="img/icons/ftp/file_rename.png" alt="Umbenennen" /></a></td>
 					  <td class="icon">
-					  		<a href="javascript:loeschen(\''.PFS_FILE_PATH.$current_folder.'&amp;filename='.$file.'&amp;do=delete\',
+					  		<a href="javascript:confirmDeletion(\''.PFS_FILE_PATH.$current_folder.'&amp;filename='.$file.'&amp;do=delete\',
 							  \'Möchten Sie diese Datei wirklich löschen?\')"
 							  onmouseover="Tip(\'Datei löschen\')" onmouseout="UnTip()">
 					  		<img src="img/icons/ftp/file_delete.png" alt="" /></a></td>

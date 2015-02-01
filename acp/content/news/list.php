@@ -130,7 +130,7 @@ if ($line[0] > 0) {
 		/* Ausgabe */
 		echo printBox($row['caption'], $row['news_short'], 
 				"<a href=\"?page=news-edit&amp;id=".$row['id']."\" onmouseover=\"Tip('Neuigkeit bearbeiten')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/edit.png\" alt=\"\" /></a>
-				<a href=\"javascript:loeschen('?page=news-list&amp;delete=".$row['id']."', 'Wollen Sie diese Neuigkeit wirklich löschen?')\" onmouseover=\"Tip('Neuigkeit löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/delete.png\" alt=\"\" /></a>",
+				<a href=\"javascript:confirmDeletion('?page=news-list&amp;delete=".$row['id']."', 'Wollen Sie diese Neuigkeit wirklich löschen?')\" onmouseover=\"Tip('Neuigkeit löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/delete.png\" alt=\"\" /></a>",
 				$infos, NULL, $watchme);
 	}
 	

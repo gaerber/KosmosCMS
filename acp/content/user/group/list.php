@@ -98,7 +98,7 @@ if (mysql_num_rows($result)) {
 	
 		echo "      <td class=\"icon\"><a href=\"?page=user-group-edit&amp;id=".$row['id']."\" onmouseover=\"Tip('Gruppe bearbeiten')\" onmouseout=\"UnTip()\"><img src=\"img/icons/user/group_edit.png\" alt=\"\" /></a></td>\r\n";
 	
-		echo "      <td class=\"icon\"><a href=\"javascript:loeschen('?page=user-group-list&amp;delete=".$row['id']."', 'Wollen Sie wirklich diese Gruppe löschen?')\" onmouseover=\"Tip('Gruppe löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/user/group_delete.png\" alt=\"\" /></a></td>\r\n";
+		echo "      <td class=\"icon\"><a href=\"javascript:confirmDeletion('?page=user-group-list&amp;delete=".$row['id']."', 'Wollen Sie wirklich diese Gruppe löschen?')\" onmouseover=\"Tip('Gruppe löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/user/group_delete.png\" alt=\"\" /></a></td>\r\n";
 	
 		echo "    </tr>\r\n";
 	}

@@ -66,7 +66,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 		echo printBoxStart();
 		echo printBox($line['caption'], $line['news_short'], 
 				"<a href=\"?page=news-edit&amp;id=".$line['id']."\" onmouseover=\"Tip('Neuigkeit bearbeiten')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/edit.png\" alt=\"\" /></a>
-				<a href=\"javascript:loeschen('?page=news-news&amp;delete=".$line['id']."', 'Wollen Sie diese Neuigkeit wirklich löschen?')\" onmouseover=\"Tip('Neuigkeit löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/delete.png\" alt=\"\" /></a>",
+				<a href=\"javascript:confirmDeletion('?page=news-news&amp;delete=".$line['id']."', 'Wollen Sie diese Neuigkeit wirklich löschen?')\" onmouseover=\"Tip('Neuigkeit löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/delete.png\" alt=\"\" /></a>",
 				printDate($line['timestamp'])." - ".$admin_info_name);
 		echo printBoxEnd();
 		
@@ -118,7 +118,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 				/* Ausgabe */
 				echo printBox($row['writer_name'], $row['comment'], 
 						"<a href=\"?page=news-comment-edit&amp;id=".$row['id']."\" onmouseover=\"Tip('Kommentar bearbeiten')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/comment/edit.png\" alt=\"\" /></a>
-						<a href=\"javascript:loeschen('?page=news-comment-list&amp;id=".$news_id."&amp;delete=".$row['id']."', 'Wollen Sie diesen Kommentar wirklich löschen?')\" onmouseover=\"Tip('Kommentar löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/comment/delete.png\" alt=\"\" /></a>",
+						<a href=\"javascript:confirmDeletion('?page=news-comment-list&amp;id=".$news_id."&amp;delete=".$row['id']."', 'Wollen Sie diesen Kommentar wirklich löschen?')\" onmouseover=\"Tip('Kommentar löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/comment/delete.png\" alt=\"\" /></a>",
 						$user_infos, NULL, ($_SESSION['admin_lastlogin'] < $row['timestamp']));
 			}
 			

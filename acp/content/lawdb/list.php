@@ -81,7 +81,7 @@ if ($line[0] > 0) {
 		/* Ausgabe */
 		echo'<td><a href="'.$row['url'].'" target="_blank" onmouseover="Tip(\'Gesetzesartikel öffnen\')" onmouseout="UnTip()">'.$row['abbr'].'</a></td><td>'.$row['caption'].'</td>'
 				.'<td class="icon"><a href="?page=lawdb-edit&amp;id='.$row['id'].'" onmouseover="Tip(\'Gesetzesartikel bearbeiten\')" onmouseout="UnTip()"><img src="img/icons/plugins/lawdb/edit.png" alt="" /></a></td>'
-				.'<td class="icon"><a href="javascript:loeschen(\'?page=lawdb-list&amp;delete='.$row['id'].'\', \'Wollen Sie wirklich diesen Gesetzesartikel unwiderruflich löschen?\')" onmouseover="Tip(\'Gesetzesartikel löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/lawdb/delete.png" alt="" /></a></td>'
+				.'<td class="icon"><a href="javascript:confirmDeletion(\'?page=lawdb-list&amp;delete='.$row['id'].'\', \'Wollen Sie wirklich diesen Gesetzesartikel unwiderruflich löschen?\')" onmouseover="Tip(\'Gesetzesartikel löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/lawdb/delete.png" alt="" /></a></td>'
 				.'</tr>';
 	}
 	
