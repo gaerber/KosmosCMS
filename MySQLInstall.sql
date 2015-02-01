@@ -495,4 +495,4 @@ CREATE TABLE IF NOT EXISTS `cms_setting` (
 --
 
 INSERT INTO `cms_setting` (`id`, `company`, `header`, `description`, `admin_email`, `newsletter_sender`, `newsletter_email`, `online`, `offlinemessage`) VALUES
-(1, 'CMS 2.1 Kosmos', 'Content Management System von Swiss-Webdesign', '', 'cms@swiss-webdesign.ch', '', '', 1, '');
+(1, 'Kosmos CMS', 'Content Management System von Swiss-Webdesign', '', 'cms@swiss-webdesign.ch', '', '', 1, '');
