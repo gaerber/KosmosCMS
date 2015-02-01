@@ -93,7 +93,7 @@ CREATE TABLE IF NOT EXISTS `cms_admin` (
 --
 
 INSERT INTO `cms_admin` (`admin_id`, `login`, `password`, `access`, `name`, `email`, `last_login`, `ip_adress`, `locked`) VALUES
-(1, 'admin', '40bd001563085fc35165329ea1ff5c5ecbdbbeef', 32767, 'Initial Admin', 'cms@swiss-webdesign.ch', 0, '', 0);
+(1, 'admin', '40bd001563085fc35165329ea1ff5c5ecbdbbeef', 32767, 'Errichter', 'cms@swiss-webdesign.ch', 0, '', 0);
 
 -- --------------------------------------------------------
 
