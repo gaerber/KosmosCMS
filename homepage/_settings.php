@@ -153,7 +153,7 @@ $FileSystem_AllowedImageTypes = array('jpg', 'gif', 'png');
  */
 $FileSystem_AllowedDataTypes = array_merge($FileSystem_AllowedImageTypes,
 		array('zip', 'rar', 'tar', 'pdf', 'swf', 'doc', 'docx', 'dot', 'xls', 'xlsx', 'ppt', 'pps', 'pptx', 'ppsx',
-				'exe', 'txt', 'html', 'sql', 'bmp', 'jpeg', 'mpeg', 'mpg', 'mov', 'avi'));
+				'exe', 'txt', 'html', 'xml', 'sql', 'bmp', 'jpeg', 'mpeg', 'mpg', 'mov', 'avi'));
 
 /**
  * Ordnerpfade zu den Modulen (wird mit FTP_DIR zusammengesetzt)
