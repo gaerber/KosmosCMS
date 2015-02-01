@@ -27,6 +27,7 @@
  |2.0.11  | 30.11.2014 | ImageResizeFtp fertig!
  |2.0.12  | 07.12.2014 | getRecursiveAlbumAccess hinzu
  |2.1     | 11.12.2014 | FTP Dateisystem
+ |2.1.1   | 01.02.2015 | Bugfix / Rename
  -----------------------------------------------------
  Beschreibung :
  Alle Funktionen fuer die CMS Software
@@ -533,10 +534,10 @@ function StdWysiwymPrepare($string) {
 	$string = str_replace("&#160;", " ", $string);
 
 	/* Verwendung von relativen URLs */
-	$string = preg_replace("/(href=\"|src=\")http:\/\/".$_SERVER["HTTP_HOST"]."/s", "$1", $string);
+	$string = preg_replace("/(href=\"|src=\")http:\/\/".$_SERVER["HTTP_HOST"]."([^\"]+)/s", "$1$2", $string);
 
 	/* Bilder Validierung nach W3C */
-	$string = preg_replace_callback("/<img (.+) \/>/s", "callbackWysiwymImage", $string);
+	$string = preg_replace_callback("/<img ([^>]+) \/>/s", "callbackWysiwymImage", $string);
 	
 	/* Erste Ueberschrift */
 	$string = str_replace(' class="first"', '', $string);
