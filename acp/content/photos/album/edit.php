@@ -57,7 +57,7 @@ else {
 
 
 /* Existiert dieses Album */
-if (($current_album = readAlbumConfig2($ftp, $current_path)) && !($current_album['id'] == 0 && !isset($_GET['new']))) {
+if (($current_album = readAlbumConfig($ftp, $current_path)) && !($current_album['id'] == 0 && !isset($_GET['new']))) {
 	/* Falls in einem Subalbum -> Infos des aktuellen Albums anzeigen */
 	if ($current_album['id'] > 0 && isset($_GET['new'])) {
 		echo ActionReport(REPORT_INFO, 'Unteralbum',

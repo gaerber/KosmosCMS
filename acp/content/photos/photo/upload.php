@@ -52,7 +52,7 @@ else {
 
 
 /* Existiert dieses Album */
-if (($current_album = readAlbumConfig2($ftp, $current_path)) && $current_album['id'] > 0) {
+if (($current_album = readAlbumConfig($ftp, $current_path)) && $current_album['id'] > 0) {
 	/* Infos des aktuellen Albums anzeigen */
 	echo printInfoBox('Album: '.$current_album['caption'],
 			'<p>Alle Fotos werden in das Album <a href="?page=photos-show&amp;album='.$album.'">'.$current_album['caption'].'</a> hochgeladen.</p>');

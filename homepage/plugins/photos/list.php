@@ -48,7 +48,7 @@ function generatePhotoList($ftp, $o_menuClass, $current_path, $current_album_id)
 	
 	while ($row = mysql_fetch_assoc($result)) {
 		/* Erst prüfen ob es ein valides Album ist */
-		if ($album_info_sub = readAlbumConfig2($ftp, $FileSystem_ModulePahts['photos'].$current_path.$row['id_str'].'/')) {
+		if ($album_info_sub = readAlbumConfig($ftp, $FileSystem_ModulePahts['photos'].$current_path.$row['id_str'].'/')) {
 			/* Nach weiteren Unteralben suchen */
 			$o_menuClass->settings['level']++;
 			$submenu = generatePhotoList($ftp, $o_menuClass, $current_path.$album_info_sub['id_str'].'/', $album_info_sub['id']);	

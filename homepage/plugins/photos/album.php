@@ -52,7 +52,7 @@ if (ACP_MODULE_PHOTOS_EN) {
 	}
 	
 	/* Existiert dieses Album -> Album Informationen einlesen */
-	if ($album_info = readAlbumConfig2($ftp, $current_path)) {
+	if ($album_info = readAlbumConfig($ftp, $current_path)) {
 		/* Zugriffsrechte pruefen (rekursive) */
 		$access = getRecursiveAlbumAccess($album_info['id']);
 		if ($access['locked'] == 0) {
@@ -78,7 +78,7 @@ if (ACP_MODULE_PHOTOS_EN) {
 						
 				while ($row = mysql_fetch_assoc($result)) {
 					/* Erst prüfen ob es ein valides Album ist */
-					if ($album_info_sub = readAlbumConfig2($ftp, $current_path.$row['id_str'].'/')) {
+					if ($album_info_sub = readAlbumConfig($ftp, $current_path.$row['id_str'].'/')) {
 						$element_ctr++;
 						if ($release_time < $album_info_sub['timestamp']) {
 							$release_time = $album_info_sub['timestamp'];

@@ -663,7 +663,7 @@ function moduleCallback($treffer) {
  * @param[in]	$album_path der komplete Pfad zum Album auf dem FTP Server.
  * @return		Assoziatives Array mit allen Informationen des Albums.
  */
-function readAlbumConfig2($ftp, $album_path) {
+function readAlbumConfig($ftp, $album_path) {
 	global $FileSystem_ModulePahts;
 	
 	/* Spezialbehandlung ROOT */

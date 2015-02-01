@@ -50,7 +50,7 @@ else {
 }
 
 /* Existiert dieses Album */
-if ($current_album = readAlbumConfig2($ftp, $current_path)) {
+if ($current_album = readAlbumConfig($ftp, $current_path)) {
 	/* Existiert das Foto in der Datenbank und im Filesystem? */
 	$result = mysql_query('SELECT * FROM '.DB_TABLE_PLUGIN.'photoalbum_photo WHERE album_id='.$current_album['id'].' AND id='.StdSqlSafety($_GET['id']), DB_CMS)
 		OR FatalError(FATAL_ERROR_MYSQL);

@@ -54,7 +54,7 @@ else {
 
 
 /* Existiert dieses Album */
-if ($current_album = readAlbumConfig2($ftp, $current_path)) {
+if ($current_album = readAlbumConfig($ftp, $current_path)) {
 	/*** Informationen des aktuellen Albums **************/
 	if ($current_album['id'] > 0) {
 		$a = explode('/', $album);
@@ -356,7 +356,7 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 			
 		while ($row = mysql_fetch_assoc($result)) {
 			/* Erst prüfen ob es ein valides Album ist */
-			if (readAlbumConfig2($ftp, $current_path.$row['id_str'].'/')) {
+			if (readAlbumConfig($ftp, $current_path.$row['id_str'].'/')) {
 				/* Anzahl Sub-Subalben ermitteln */
 				$res = mysql_query('SELECT count(*) FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE menu_sub='.$row['id'], DB_CMS)
 					OR FatalError(FATAL_ERROR_MYSQL);
