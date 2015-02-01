@@ -51,6 +51,11 @@ function checkRelogin() {
 /**
  * Wartefenster bei Dateiupload
  */
+$(document).ready(function() {
+	var loadingImage = new Image();
+	loadingImage.src = 'img/loading.gif';
+});
+
 function fileuploadStart() {
 	popup = document.createElement('div');
 	popup.className = 'popup';
