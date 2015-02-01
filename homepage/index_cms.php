@@ -169,17 +169,10 @@ else {
 }
 
 /*** PlugIn System AllPage **************************/
-$Verzeichniszeiger = opendir(ROOT_PLUGIN_ALLPAGE);
-while($Datei = readdir($Verzeichniszeiger)) {
-	if($Datei != "." && $Datei != "..") {
-		$infos = pathinfo(ROOT_PLUGIN_ALLPAGE.$Datei);
-		if ($infos['extension'] == "php") {
-			/* Gefundenes Plugin ausfuehren */
-			include(ROOT_PLUGIN_ALLPAGE.$Datei);
-		}
-	}
+foreach(glob(ROOT_PLUGIN_ALLPAGE.'*.php') as $filename) {
+    /* Es werden alle PHP Dateien alphabetisch dem Dateinamen sortiert und ausgefuehrt */
+	include($filename);
 }
-closedir($Verzeichniszeiger);
 
 
 /*** Seiten Inhalt **********************************/
