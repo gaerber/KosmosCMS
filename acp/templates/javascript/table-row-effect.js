@@ -1,47 +1,32 @@
-function tableRowEffectHover()
-{
-    // is the element already selected?
-    if (this.className.indexOf("tre-select") == -1) {
-        // no? then show the hover effect
-        this.className += " tre-hover";
-    }
-}
-
-function tableRowEffectUnhover()
-{
-    // remove the hover effect
-    this.className = this.className.replace(/\b(tre-hover)\b/, "");
-}
-
-function tableRowEffectSelect()
-{
-    // is the element already selected?
-    if (this.className.indexOf("tre-select") != -1) {
-        // then remove the selection (toggle click)
-        this.className = this.className.replace(/\b(tre-select)\b/, "");
-    } else {
-        // othervise show the selection effect
-        // remove the hover effect
-        this.className = this.className.replace(/\b(tre-hover)\b/, "");
-        this.className += " tre-select";
-    }
-}
-
-initTableRowEffect = function()
-{
-    var tableObjects = document.getElementsByTagName('TABLE');
-    for (var t = 0; t < tableObjects.length; t++) {
-        //if (tableObjects[t].className.indexOf("table_hide") != -1) {
-            var tableRowObjects = tableObjects[t].getElementsByTagName('TR');
-            for (var tr = 0; tr < tableRowObjects.length; tr++) {
-                if (tableRowObjects[tr].className.indexOf("table_title") == -1) {
-                    tableRowObjects[tr].onmouseover = tableRowEffectHover;
-                    tableRowObjects[tr].onmouseout  = tableRowEffectUnhover;
-                    //tableRowObjects[tr].onclick     = tableRowEffectSelect;
-                }
-            }
-        //}
-    }
-}
-
-window.onload = initTableRowEffect;
+/**
+ * Table Row Effect (JQuery version)
+ * Date 01.02.2015
+ * By swiss-webdesign
+ */
+$(document).ready(function() {
+	/* Add mouse click event of all table rows */
+	$('table tr').mousedown(function() {
+		if (!$(this).hasClass('table_title')) {
+			if ($(this).hasClass('tre-select')) {
+				$(this).removeClass('tre-select');
+			}
+			else {
+				$(this).addClass('tre-select');
+			}
+		}
+	});
+	
+	/* Add mouse over event of all table rows */
+	$('table tr').mouseover(function() {
+		if (!$(this).hasClass('table_title')) {
+			$(this).addClass('tre-hover');
+		}
+	});
+	
+	/* Add mouse out event of all table rows */
+	$('table tr').mouseout(function() {
+		if (!$(this).hasClass('table_title')) {
+			$(this).removeClass('tre-hover');
+		}
+	});
+});
