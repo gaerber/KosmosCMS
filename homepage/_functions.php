@@ -28,6 +28,7 @@
  |2.0.12  | 07.12.2014 | getRecursiveAlbumAccess hinzu
  |2.1     | 11.12.2014 | FTP Dateisystem
  |2.1.1   | 01.02.2015 | Bugfix / Rename
+ |2.1.2   | 08.03.2015 | ValidateFileSystem() mehrere Zusatzzeichen
  -----------------------------------------------------
  Beschreibung :
  Alle Funktionen fuer die CMS Software
@@ -279,7 +280,7 @@ function ValidateFileSystem($string, $zusatz=false) {
 			'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z',
 			'1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '_', '-');
 	if ($zusatz) {
-		$Zeichen[] = $zusatz;
+		$Zeichen = array_merge($Zeichen, str_split($zusatz));
 	}
 	$anzZeichen = strlen($string);
 	for ($i=0; $i<$anzZeichen; $i++) {
