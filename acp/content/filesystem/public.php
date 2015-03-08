@@ -19,6 +19,7 @@
  |1.2     | 14.02.2012 | Modul: Ordner sperre
  |2.0     | 05.12.2012 | Vollstaendig FTP abgetrennt
  |2.0.1   | 07.12.2014 | Infoboxen
+ |2.0.2   | 08.03.2015 | Ermittlung des Zielordners
  -----------------------------------------------------
  Beschreibung :
  Verwaltung der oeffentlichen Dateien und
@@ -47,14 +48,30 @@ $file_table_view = true;
 /* FTP Verbindung erstellen */
 $ftp = new ftp();
 
-/* Oeffentliches Filesystem */
-if (isset($_GET['folder']) && $ftp->folderExists($_GET['folder'])) {
-	$current_folder = $_GET['folder'];
+/* Ermittlung des Zielordners */
+if (isset($_GET['folder'])) {
+	if (preg_match("/(^|\/)[.]{1,2}\//", $_GET['folder']) == 0) {
+		if ($_GET['folder'] == '/'
+				|| (substr($_GET['folder'], 0, 1) == '/' && substr($_GET['folder'], -1, 1) == '/' && $ftp->folderExists($_GET['folder']))) {
+			$current_folder = $_GET['folder'];
+		}
+		else {
+			$file_table_view = false;
+			unset($_GET['do']);
+			echo ActionReport(REPORT_EINGABE, 'Verzeichnis existiert nicht', 'Das gewünschte Verzeichnis existiert nicht!');
+		}
+	}
+	else {
+		$file_table_view = false;
+		unset($_GET['do']);
+		echo ActionReport(REPORT_EINGABE, 'Eingabe nicht erlaubt', 'Es sind keine relativen Pfade erlaubt!');
+	}
 }
 else {
 	$current_folder = '/';
 }
 
+/* Benutzer-Aktionen im Dateisystem */
 if (isset($_GET['do'])) {
 	if (!in_array($current_folder, $FileSystem_ModulePahts)) {
 		switch($_GET['do']) {
@@ -69,9 +86,8 @@ if (isset($_GET['do'])) {
 					/* Neues Verzeichnis anlegen */
 					$new_folder = ValidateFileSystem($folder->getValue());
 					if (!$ftp->folderExists($current_folder.$new_folder)) {
-						/* Vorbereiten um Ordner anzulegen */
-						$ftp->ChangeDir($current_folder);
-						if ($ftp->mkdir($new_folder)) {
+						/* Ordner anlegen */
+						if ($ftp->mkdir($current_folder.$new_folder)) {
 							echo ActionReport(REPORT_OK, 'Verzeichnis erstellt',
 									'Das neue Verzeichnis wurde erfolgreich erstellt!');
 							/* Ins neue Verzeichnis wechseln */
@@ -127,8 +143,7 @@ if (isset($_GET['do'])) {
 							/* Existiert dieser Dateinamen bereits */
 							if ($overwrite->getValue() || !$ftp->fileExists($current_folder.$file_data['name'])) {
 								/* Datei auf FPT Server kopieren */
-								$ftp->ChangeDir($current_folder);
-								if ($ftp->FilePut($file_data['name'], $file_data['tmp_name'])) {
+								if ($ftp->FilePut($current_folder.$file_data['name'], $file_data['tmp_name'])) {
 									echo ActionReport(REPORT_OK, 'Datei hochgeladen',
 											'Die Datei wurde erfolgreich hochgeladen!');
 								}
@@ -194,8 +209,7 @@ if (isset($_GET['do'])) {
 						$new_folder = ValidateFileSystem($folder->getValue());
 						if (!$ftp->folderExists($current_folder.$new_folder)) {
 							/* Vorbereiten um Ordner anzulegen */
-							$ftp->ChangeDir($current_folder);
-							if ($ftp->Rename($_GET['foldername'], $new_folder)) {
+							if ($ftp->Rename($current_folder.$_GET['foldername'], $new_folder)) {
 								echo ActionReport(REPORT_OK, 'Verzeichnis umbenennt',
 										'Das Verzeichnis wurde erfolgreich umbenennt!');
 							}
@@ -253,8 +267,7 @@ if (isset($_GET['do'])) {
 						if (in_array(array_pop(explode('.', $new_file)), $FileSystem_AllowedDataTypes)) {
 							if (!$ftp->fileExists($current_folder.$new_file)) {
 								/* Vorbereiten um Ordner anzulegen */
-								$ftp->ChangeDir($current_folder);
-								if ($ftp->Rename($_GET['filename'], $new_file)) {
+								if ($ftp->Rename($current_folder.$_GET['filename'], $new_file)) {
 									echo ActionReport(REPORT_OK, 'Datei umbenennt',
 											'Die Datei wurde erfolgreich umbenennt!');
 								}
@@ -315,8 +328,7 @@ if (isset($_GET['do'])) {
 			case 'rmdir':
 				if (isset($_GET['foldername']) && $ftp->folderExists($current_folder.$_GET['foldername'])) {
 					if (!in_array($current_folder.$_GET['foldername'], $FileSystem_ModulePahts)) {
-						$ftp->ChangeDir($current_folder);
-						if ($ftp->rmdir($_GET['foldername'])) {
+						if ($ftp->rmdir($current_folder.$_GET['foldername'])) {
 							echo ActionReport(REPORT_OK, 'Verzeichnis gelöscht',
 									'Das Verzeichnis wurde mit allen Inhalten erfolgreich gelöscht!');
 						}
@@ -343,8 +355,7 @@ if (isset($_GET['do'])) {
 			/* Datei loeschen */
 			case 'delete':
 				if (isset($_GET['filename']) && $ftp->fileExists($current_folder.$_GET['filename'])) {
-					$ftp->ChangeDir($current_folder);
-					if ($ftp->Delete($_GET['filename'])) {
+					if ($ftp->Delete($current_folder.$_GET['filename'])) {
 						echo ActionReport(REPORT_OK, 'Datei gelöscht', 'Die Datei wurde erfolgreich gelöscht!');
 					}
 					else {
@@ -374,7 +385,7 @@ if ($file_table_view) {
 	if ($folder_pointer = $ftp->openDir($current_folder)) {
 		
 		/* Verzeichnisse und Dateien sortieren */
-		$folder_pointer->sortList('name') OR die('error');
+		$folder_pointer->sortList('name');
 		
 		/* Upload Menue */
 		echo '<p><img src="img/icons/ftp/file_upload.png" alt="" />
@@ -451,7 +462,7 @@ if ($file_table_view) {
 		echo "</table>";
 	}
 	else {
-		echo ActionReport(REPORT_EINGABE, 'Verzeichnis existiert nicht', 'Das gewünschte Verzeichnis existiert nicht!');
+		echo ActionReport(REPORT_ERROR, 'Verzeichnis existiert nicht', 'Das gewünschte Verzeichnis existiert nicht!');
 	}
 }
 
