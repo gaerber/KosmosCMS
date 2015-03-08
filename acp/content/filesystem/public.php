@@ -87,7 +87,7 @@ if (isset($_GET['do'])) {
 					$new_folder = ValidateFileSystem($folder->getValue());
 					if (!$ftp->folderExists($current_folder.$new_folder)) {
 						/* Ordner anlegen */
-						if ($ftp->mkdir($current_folder.$new_folder)) {
+						if ($new_folder != '' && $ftp->mkdir($current_folder.$new_folder)) {
 							echo ActionReport(REPORT_OK, 'Verzeichnis erstellt',
 									'Das neue Verzeichnis wurde erfolgreich erstellt!');
 							/* Ins neue Verzeichnis wechseln */
