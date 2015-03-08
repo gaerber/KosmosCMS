@@ -29,6 +29,7 @@
  |3.1.1   | 29.04.2013 | class::ftp checkPath() hinzu
  |3.1.2   | 13.10.2014 | FTP CleanFolder fuer Dot-Files
  |3.1.3   | 11.12.2014 | Bugfix ftp Hilfsklassen
+ |3.1.4   | 08.03.2015 | Bugfix versteckte Dateien
  -----------------------------------------------------
  Beschreibung :
  Alle Klassen enthalten.
@@ -1394,8 +1395,6 @@ class ftpOpenDir {
 		/* Liste aller Dateinen im Verzeichnis erstellen */
 		$this->raw_list = ftp_rawlist($this->ftp->stream, substr($this->dir_path, 0, -1));
 		
-		print_r($this->data_list);
-		
 		$this->data_list = $this->parseRawList($this->raw_list);
 
 		/* Klasse erfolgreich erstellt und Daten gelesen */
@@ -1413,7 +1412,7 @@ class ftpOpenDir {
 		if ($Win) {
 			foreach ($rawList as $Current) {
 				ereg('([0-9]{2})-([0-9]{2})-([0-9]{2}) +([0-9]{2}):([0-9]{2})(AM|PM) +([0-9]+|) +(.+)', $Current, $Split);
-				if (is_array($Split)) {
+				if (is_array($Split) && substr($Split[8], 0, 1) != '.') {
 					if ($Split[3] < 70) {
 						$Split[3] += 2000;
 					}
@@ -1434,7 +1433,7 @@ class ftpOpenDir {
 		else {
 			foreach ($rawList as $Current) {
 				$Split = preg_split('[ ]', $Current, 9, PREG_SPLIT_NO_EMPTY);
- 				if ($Split[0] != 'total') {
+ 				if ($Split[0] != 'total' && substr($Split[8], 0, 1) != '.') {
 					$Output[$i]['isdir']     = ($Split[0] {0} === 'd') ? 1 : 0;
 					$Output[$i]['perms']     = $Split[0];
 					$Output[$i]['number']    = $Split[1];
