@@ -15,6 +15,7 @@
  |--------|------------|--------------------
  |1.0     | 07.07.2011 | Programm erstellt.
  |1.0.1   | 11.07.2011 | UTF-8 Kodierung
+ |1.0.2   | 14.03.2015 | Debugausgabe Projektabhaengig
  -----------------------------------------------------
  Beschreibung :
  Sicherheitsstufen von Frames. Frames werden b.B. beim
@@ -24,18 +25,9 @@
  =====================================================
  */
 
-///////////////////////////////////////
-// Session Starten                   //
-///////////////////////////////////////
-error_reporting(E_ALL);
-session_start();
-mb_internal_encoding("UTF-8");
-header("Content-Type: text/html; charset=utf-8");
+/* Programmkonstante */
+define('SWISS_WEBDESIGN', '2.2');
 
-
-///////////////////////////////////////
-// Functions                         //
-///////////////////////////////////////
 /* Check ob alle wichtigen dateien vorhanden sind */
 if (!(file_exists("../_settings.php")
 		&& file_exists("../_classes.php")
@@ -47,6 +39,20 @@ if (!(file_exists("../_settings.php")
 
 /* Einstellungen holen */
 include("../_settings.php");
+
+/* Ausgabe aller Fehler fuer Debug */
+if (EN_DEBUG) {
+	error_reporting(E_ALL);
+}
+else {
+	error_reporting(0);
+}
+
+/* Sessionen Starten */
+session_start();
+
+/* UTF-8 Ausgabe */
+mb_internal_encoding('UTF-8');
 
 /* Initialisieren der Klassen & Funktionen */
 include("../_classes.php");
@@ -135,8 +141,14 @@ if (isset($ACP_ApplicationInfo['body_css_class']))
 else
 	$tpl->assign("body_css_class", "wym_dialog_insert");
 
-//$tpl->compress_gzip();
-$tpl->out();
+header("Content-Type: text/html; charset=utf-8");
+if (EN_DEBUG) {
+	$tpl->out();
+}
+else {
+	$tpl->compress_gzip();
+}
+
 
 ///////////////////////////////////////
 // Datenbankverbindung beenden       //

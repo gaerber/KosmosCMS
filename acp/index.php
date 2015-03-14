@@ -207,10 +207,10 @@ else {
 
 header('Content-Type: text/html; charset=utf-8');
 if (EN_DEBUG) {
-	$print->out();
+	$design->out();
 }
 else {
-	$print->compress_gzip();
+	$design->compress_gzip();
 }
 
 ///////////////////////////////////////
