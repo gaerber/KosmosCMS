@@ -91,8 +91,12 @@ if ((!($line = mysql_fetch_array($result)))
 	$tpl->assign('cms_version', SWISS_WEBDESIGN);
 	$tpl->assign($line);
 	/* Ausgabe */
-	//$tpl->compress_gzip();
-	$tpl->out();
+	if (EN_DEBUG) {
+		$tpl->out();
+	}
+	else {
+		$tpl->compress_gzip();
+	}
 	/* Datenbankverbindung schliessen */
 	mysql_close(DB_CMS);
 	/* Der Rest nicht mehr ausfuehren */
