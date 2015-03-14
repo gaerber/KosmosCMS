@@ -34,21 +34,21 @@
 error_reporting(E_ALL);
 
 /* Programmkonstante */
-define("SWISS_WEBDESIGN", "2.2");
+define('SWISS_WEBDESIGN', '2.2');
 
 /* Check ob alle wichtigen Dateien vorhanden sind */
-if (!(file_exists("_settings.php")
-		&& file_exists("_classes.php")
-		&& file_exists("_functions.php"))) {
+if (!(file_exists('_settings.php')
+		&& file_exists('_classes.php')
+		&& file_exists('_functions.php'))) {
 	header('HTTP/1.1 503 Service Unavailable');
-	die("Loading Error");
+	die('Loading Error');
 }
 
 /* Sessionen Starten */
 @session_start();
 
 /* UTF-8 Ausgabe */
-mb_internal_encoding("UTF-8");
+mb_internal_encoding('UTF-8');
 
 /* Globale Template Variablen */
 $HomepageContent = array();
@@ -56,17 +56,17 @@ $PluginContent = array();
 $MenuOutput = array();
 
 /* Einstellungen holen */
-include("_settings.php");
+include('_settings.php');
 
 /* Initialisieren der Klassen & Funktionen */
-include("_classes.php");
-include("_functions.php");
+include('_classes.php');
+include('_functions.php');
 
 /* Messung der Generierungszeit starten */
 $Anfangszeit = getMicrotime();
 
 /* Datenbankverbindung herstellen */
-define("DB_CMS", DatabaseConnect());
+define('DB_CMS', DatabaseConnect());
 
 
 /*** Homepage offline schalten **********************/
@@ -77,7 +77,7 @@ if ((!($line = mysql_fetch_array($result)))
 		|| ($line['online'] == 0)) {
 	/* Homepage ist offline */
 	header('HTTP/1.1 503 Service Unavailable');
-	$tpl = new tpl("offline");
+	$tpl = new tpl('offline');
 	/* Root Verzeichnis der Website */
 	$tpl->assign('root_website', ROOT_WEBSITE);
 	/* Versionsnummer */
@@ -95,10 +95,10 @@ if ((!($line = mysql_fetch_array($result)))
 
 /*** Security System ********************************/
 if (ACP_ACCESS_SYSTEM_EN) {
-	include(ROOT_PLUGIN."access/main/autologin.php");
-	include(ROOT_PLUGIN."access/main/login.php");
-	include(ROOT_PLUGIN."access/main/logout.php");
-	include(ROOT_PLUGIN."access/main/check.php");
+	include(ROOT_PLUGIN.'access/main/autologin.php');
+	include(ROOT_PLUGIN.'access/main/login.php');
+	include(ROOT_PLUGIN.'access/main/logout.php');
+	include(ROOT_PLUGIN.'access/main/check.php');
 }
 else {
 	$_SESSION['user_id'] = 0;
@@ -146,8 +146,8 @@ if (!$o_activePage->getUserAccess()) {
 
 
 /*** Seite aus Datenbank holen **********************/
-$result = mysql_query("SELECT * FROM ".DB_TABLE_ROOT."cms_menu
-		WHERE id=".$o_activePage->getActivePage()." LIMIT 1", DB_CMS)
+$result = mysql_query('SELECT * FROM '.DB_TABLE_ROOT.'cms_menu
+		WHERE id='.$o_activePage->getActivePage().' LIMIT 1', DB_CMS)
 				OR FatalError(FATAL_ERROR_MYSQL);
 /* Existiert diese Seite? */
 if (!($HomepageContent = mysql_fetch_array($result))) {
@@ -157,9 +157,9 @@ if (!($HomepageContent = mysql_fetch_array($result))) {
 
 
 /*** Inhalt der Seite auslesen **********************/
-$result = mysql_query("SELECT html FROM ".DB_TABLE_ROOT."cms_content
-		WHERE page_id=".$HomepageContent["id"]."
-		ORDER BY timestamp DESC LIMIT 1", DB_CMS)
+$result = mysql_query('SELECT html FROM '.DB_TABLE_ROOT.'cms_content
+		WHERE page_id='.$HomepageContent['id'].'
+		ORDER BY timestamp DESC LIMIT 1', DB_CMS)
 		OR FatalError(FATAL_ERROR_MYSQL);
 if ($line = mysql_fetch_array($result)) {
 	$HomepageContent['html'] = $line['html'];
@@ -177,8 +177,8 @@ foreach(glob(ROOT_PLUGIN_ALLPAGE.'*.php') as $filename) {
 
 /*** Seiten Inhalt **********************************/
 /* Autor Informationen */
-$HomepageContent['writer_name'] = "";
-$HomepageContent['writer_email'] = "";
+$HomepageContent['writer_name'] = '';
+$HomepageContent['writer_email'] = '';
 getWriterInfo($HomepageContent['writer'],
 		$HomepageContent['writer_name'], $HomepageContent['writer_email']);
 
@@ -188,21 +188,21 @@ $HomepageContent['date'] = printDate($HomepageContent['timestamp']);
 /* Module */
 if ($HomepageContent['plugin'] > 0) {
 	/* Plugin */
-	$result = mysql_query("SELECT path FROM ".DB_TABLE_ROOT."cms_plugin
-			WHERE id=".$HomepageContent["plugin"]." && locked = 0", DB_CMS)
+	$result = mysql_query('SELECT path FROM '.DB_TABLE_ROOT.'cms_plugin
+			WHERE id='.$HomepageContent['plugin'].' && locked = 0', DB_CMS)
 					OR FatalError(FATAL_ERROR_MYSQL);
 	if (mysql_num_rows($result) == 0) {
-		die("Module could not found!");
+		die('Module could not found!');
 	}
 	$line = mysql_fetch_array($result);
 	if (!file_exists(ROOT_PLUGIN.$line['path'])) {
-		die("Module ".$line['path']." could not load!");
+		die('Module '.$line['path'].' could not load!');
 	}
 	
 	/* Parameter */
 	$moduleParameter = array();
-	$HomepageContent['html'] = preg_replace_callback("/\{MODUL([^\}]+)\}/i",
-			"moduleCallback", $HomepageContent['html']);
+	$HomepageContent['html'] = preg_replace_callback('/\{MODUL([^\}]+)\}/i',
+			'moduleCallback', $HomepageContent['html']);
 	
 	/* Plugin ausfuehren */
 	ob_start();										// Buffer starten
@@ -211,13 +211,13 @@ if ($HomepageContent['plugin'] > 0) {
 	ob_end_clean();									// Buffer wird geloescht
 	
 	/* PlugIn Ausgabe in Content schreiben */
-	$HomepageContent['html'] = str_replace("<p>{MODUL}</p>", $plugin_content, $HomepageContent['html']);
-	$HomepageContent['html'] = str_replace("{MODUL}", $plugin_content, $HomepageContent['html']);
+	$HomepageContent['html'] = str_replace('<p>{MODUL}</p>', $plugin_content, $HomepageContent['html']);
+	$HomepageContent['html'] = str_replace('{MODUL}', $plugin_content, $HomepageContent['html']);
 }
 
 /* Plugins (Small) */
-$HomepageContent['html'] = preg_replace_callback("/{Abstract: (PHP|FUNC) (.*?)\((.*?)\)}/i",
-		"pluginCallback", $HomepageContent['html']);
+$HomepageContent['html'] = preg_replace_callback('/{Abstract: (PHP|FUNC) (.*?)\((.*?)\)}/i',
+		'pluginCallback', $HomepageContent['html']);
 
 
 /*** Menue generieren *******************************/
@@ -241,7 +241,7 @@ foreach ($array_MenuConfigurations AS $name => $settings) {
 
 
 /*** Ausgabe Template vorbereiten *******************/
-$print = new tpl("website");
+$print = new tpl('website');
 
 /* Plugin Inhalt */
 $print->assign($PluginContent);
@@ -267,35 +267,35 @@ if (isset($_SESSION)) {
 
 /* Pfad-Angaben */
 /* Root Verzeichnis der Website */
-$print->assign("root_website", ROOT_WEBSITE);
+$print->assign('root_website', ROOT_WEBSITE);
 if ($o_activePage->isUrlCategorie())
-	$print->assign("module_path", ROOT_WEBSITE.implode("/", $o_activePage->getActuelPath())
+	$print->assign('module_path', ROOT_WEBSITE.implode('/', $o_activePage->getActuelPath())
 			.URL_ENDSTR_CATEGORIE);
 else
-	$print->assign("module_path", ROOT_WEBSITE.implode("/", $o_activePage->getActuelPath()).URL_ENDSTR_PAGE);
+	$print->assign('module_path', ROOT_WEBSITE.implode('/', $o_activePage->getActuelPath()).URL_ENDSTR_PAGE);
 
 /* Versionsnummer */
-$print->assign("cms_version", SWISS_WEBDESIGN);
+$print->assign('cms_version', SWISS_WEBDESIGN);
 
 /* Einstellungen */
-$result = mysql_query("SELECT company, header, description, admin_email
-		FROM ".DB_TABLE_ROOT."cms_setting ORDER BY id DESC LIMIT 1", DB_CMS)
+$result = mysql_query('SELECT company, header, description, admin_email
+		FROM '.DB_TABLE_ROOT.'cms_setting ORDER BY id DESC LIMIT 1', DB_CMS)
 		OR FatalError(FATAL_ERROR_MYSQL);
 if (mysql_num_rows($result)) {
 	$print->assign(mysql_fetch_array($result));
 }
 
 /* Generierungszeit */
-$print->assign("runtime", number_format(getMicrotime()-$Anfangszeit, 4, ",", "."));
+$print->assign('runtime', number_format(getMicrotime()-$Anfangszeit, 4, ',', '.'));
 
 /*** Ausgabe ****************************************/
 if ($o_activePage->getActivePage() == $DefaultErrorPages['404']) {
-	header("HTTP/1.1 404 NOT FOUND");
+	header('HTTP/1.1 404 NOT FOUND');
 }
-header("Cache-Control: post-check=0, pre-check=0");
-header("Pragma: no-cache");
-header("Last-Modified: ".date(DATE_RFC822, $HomepageContent['timestamp']));
-header("Content-Type: text/html; charset=utf-8");
+header('Cache-Control: post-check=0, pre-check=0');
+header('Pragma: no-cache');
+header('Last-Modified: '.date(DATE_RFC822, $HomepageContent['timestamp']));
+header('Content-Type: text/html; charset=utf-8');
 //$print->compress_gzip();
 $print->out();
 
