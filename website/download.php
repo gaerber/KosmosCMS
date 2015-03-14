@@ -32,7 +32,8 @@
  */
 
 /* Programmkonstante */
-define('SWISS_WEBDESIGN', '2.2');
+$f = @file('.version', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ) OR die('Missing Version');
+define('SWISS_WEBDESIGN', $f[0]);
 
 $mime = array(
 		'zip'  => 'application/zip',

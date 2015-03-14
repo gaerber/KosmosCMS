@@ -109,9 +109,12 @@ if (ACP_MODULE_STATISTIC) {
 }
 
 /* CMS Versionsinfos */
+$cms_version = SWISS_WEBDESIGN;
+$f = file('../.version', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES);
+if (sizeof($f) == 2) $cms_version .= ' vom '.$f[1];
 echo printBox('CMS Informationen', 'Swiss Webdesign<br />
 		Kosmos CMS<br />
-		Version '.SWISS_WEBDESIGN.'<br />
+		Version '.$cms_version.'<br />
 		&lt;cms.development@swiss-webdesign.ch&gt;',
 		'<a href="#" onclick="javascript:MyWindow=window.open(\'frame.php?page=cmssupport\',\'cms_support\',\'toolbar=no,location=no,directories=no,status=no,menubar=no,scrollbars=yes,resizable=yes,width=600,height=400\'); return false;" onmouseover="Tip(\'Support\')" onmouseout="UnTip()"><img src="img/icons/support.png" alt="" /></a>
 		<a href="http://www.swiss-webdesign.ch/" target="_blank" onmouseover="Tip(\'Website von swiss-webdesign\')" onmouseout="UnTip()"><img src="img/icons/information.png" alt="" /></a>',

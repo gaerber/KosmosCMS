@@ -32,7 +32,8 @@
  */
 
 /* Programmkonstante */
-define('SWISS_WEBDESIGN', '2.2');
+$f = @file('.version', FILE_IGNORE_NEW_LINES | FILE_SKIP_EMPTY_LINES ) OR die('Missing Version');
+define('SWISS_WEBDESIGN', $f[0]);
 
 /* Check ob alle wichtigen Dateien vorhanden sind */
 if (!(file_exists('_settings.php')
