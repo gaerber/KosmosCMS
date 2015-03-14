@@ -16,6 +16,7 @@
  |1.0     | 11.07.2008 | Programm erstellt
  |2.0     | 29.01.2011 | Uebernahme
  |2.0.1   | 11.07.2011 | UTF-8 Kodierung
+ |2.0.2   | 14.03.2015 | Debugausgabe Projektabhaengig
  -----------------------------------------------------
  Beschreibung :
  Verwaltung des gesamten ACPs.
@@ -24,17 +25,9 @@
  =====================================================
  */
 
-///////////////////////////////////////
-// Session Starten                   //
-///////////////////////////////////////
-error_reporting(E_ALL);
-session_start();
-mb_internal_encoding('UTF-8');
-header('Content-Type: text/html; charset=utf-8');
+/* Programmkonstante */
+define('SWISS_WEBDESIGN', '2.2');
 
-///////////////////////////////////////
-// Functions & Menues                //
-///////////////////////////////////////
 /* Check ob alle wichtigen dateien vorhanden sind */
 if (!(file_exists('../_settings.php')
 		&& file_exists('../_classes.php')
@@ -46,6 +39,20 @@ if (!(file_exists('../_settings.php')
 
 /* Einstellungen holen */
 include('../_settings.php');
+
+/* Ausgabe aller Fehler fuer Debug */
+if (EN_DEBUG) {
+	error_reporting(E_ALL);
+}
+else {
+	error_reporting(0);
+}
+
+/* Sessionen Starten */
+session_start();
+
+/* UTF-8 Ausgabe */
+mb_internal_encoding('UTF-8');
 
 /* Initialisieren der Klassen & Funktionen */
 include('../_classes.php');
@@ -198,9 +205,13 @@ else {
 	$design->assign('head', '');
 }
 
-// Ausgabe GZip komprimiert
-//$design->compress_gzip();
-$design->out();
+header('Content-Type: text/html; charset=utf-8');
+if (EN_DEBUG) {
+	$print->out();
+}
+else {
+	$print->compress_gzip();
+}
 
 ///////////////////////////////////////
 // Datenbankverbindung beenden       //

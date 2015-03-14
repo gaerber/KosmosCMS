@@ -22,6 +22,7 @@
  |2.4.3   | 19.11.2012 | Wochentage fuer Statistik
  |2.4.4   | 31.03.2013 | Ordner mysqlbackups hinzu
  |2.4.5   | 25.11.2014 | FILE_SYSTEM_CONFIGFILE hinzu
+ |2.4.6   | 14.03.2015 | EN_DEBUG hinzu
  -----------------------------------------------------
  Beschreibung :
  Einstellungen fuer die CMS Software
@@ -29,6 +30,11 @@
  (c) by Kevin Gerber
  =====================================================
  */
+
+/**
+ * Debugausgaben Einschalten
+ */
+define('EN_DEBUG', 1);
 
 /**
  * Unix Zeitstempel (int)

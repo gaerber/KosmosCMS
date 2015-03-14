@@ -16,6 +16,7 @@
  |1.0     | 19.07.2013 | Programm erstellt.
  |1.1     | 08.08.2013 | Modul Erweiterung (Fotoalbum)
  |2.0     | 24.11.2014 | Config in JSON
+ |2.0.1   | 14.03.2015 | Debugausgabe Projektabhaengig
  -----------------------------------------------------
  Beschreibung :
  Downloader fuer interne Dateien.
@@ -29,12 +30,6 @@
  (c) by Kevin Gerber
  =====================================================
  */
-
-///////////////////////////////////////
-// Session Starten                   //
-///////////////////////////////////////
-error_reporting(E_ALL);
-session_start();
 
 /* Programmkonstante */
 define('SWISS_WEBDESIGN', '2.2');
@@ -82,7 +77,7 @@ $mime = array(
 // Parameter pruefen                 //
 ///////////////////////////////////////
 if (!isset($_GET['path']) || $_GET['path'] == '') {
-	//header("HTTP/1.1 404 NOT FOUND");
+	header("HTTP/1.1 404 NOT FOUND");
 	die("No Path found.");
 }
 
@@ -96,12 +91,23 @@ if (!(file_exists('_settings.php')
 		&& file_exists('_functions.php')
 		&& file_exists('acp/_functions_acp.php')
 		)) {
-	//header('HTTP/1.1 503 Service Unavailable');
+	header('HTTP/1.1 503 Service Unavailable');
 	die('Loading Error.');
 }
 
 /* Einstellungen holen */
 include('_settings.php');
+
+/* Ausgabe aller Fehler fuer Debug */
+if (EN_DEBUG) {
+	error_reporting(E_ALL);
+}
+else {
+	error_reporting(0);
+}
+
+/* Session starten */
+session_start();
 
 /* Initialisieren der Klassen & Funktionen */
 include('_classes.php');
@@ -135,7 +141,7 @@ $file_info = pathinfo($path);
 /* Erleubter Dateitypen */
 if (!isset($file_info['extension']) || !in_array($file_info['extension'], $FileSystem_AllowedDataTypes)) {
 	/* Solche Dateien duerfen nicht runtergeladen werden */
-	//header('HTTP/1.1 403 Forbidden');
+	header('HTTP/1.1 403 Forbidden');
 	die('Filetype not allowed');
 }
 
@@ -154,7 +160,7 @@ $ftp = new ftp();
 /* Verzeichnis und Datei muessen existieren */
 if (!$ftp->folderExists($path_folder) && $ftp->fileExists($path_folder.'/'.$path_file)) {
 	/* Verzeichnis oder Datei existiert nicht */
-	//header("HTTP/1.0 404 Not Found");
+	header("HTTP/1.0 404 Not Found");
 	die('File not exists');
 }
 
@@ -184,7 +190,7 @@ for ($ap = explode('/', $path_folder); sizeof($ap) > 0; array_pop($ap)) {
 /* Es muss mindestens einmal eine Konfigurationsdatei vorhanden sein */
 if (!isset($config)) {
 	/* Configdatei existiert nicht */
-	//header("HTTP/1.0 404 Not Found");
+	header("HTTP/1.0 404 Not Found");
 	die('Config not exists');
 }
 
@@ -204,7 +210,7 @@ if (!($config['access'] > 0 && CheckAccess($config['access']) && $config['locked
 			))
 		)) {
 	/* Kein Zugriff */
-	//header('HTTP/1.1 403 Forbidden');
+	header('HTTP/1.1 403 Forbidden');
 	die('Access denied');
 }
 
@@ -214,12 +220,13 @@ if (!($config['access'] > 0 && CheckAccess($config['access']) && $config['locked
 ///////////////////////////////////////
 
 $content = $ftp->FileContents($path_folder.'/'.$path_file);
-/* HTTP //headers senden */
+/* HTTP headers senden */
 header("HTTP/1.1 200 OK");
 header('Content-type: '.$mime[$file_info['extension']]);
 header("Content-Length: ".$ftp->fileSize($path_folder.'/'.$path_file));
-if (!(isset($_GET['inline'])))
+if (!isset($_GET['inline'])) {
 	header('Content-Disposition: attachment; filename="'.$path_file.'"');
+}
 /* Ausgabe des Dateiinhaltes */
 echo $content;
 

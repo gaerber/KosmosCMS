@@ -22,6 +22,7 @@
  |2.0.5.1 | 13.02.2012 | Startseitenbug fix
  |2.0.5.2 | 29.08.2012 | Offlinenachricht mit HTTP E.
  |2.0.5.3 | 16.09.2012 | Bugfix {module_path}
+ |2.0.5.4 | 14.03.2015 | Debugausgabe Projektabhaengig
  -----------------------------------------------------
  Beschreibung :
  CMS Software fuer die Seiteninhalte.
@@ -29,9 +30,6 @@
  (c) by Kevin Gerber
  =====================================================
  */
-
-/* Ausgabe aller Fehler fuer Debug */
-error_reporting(E_ALL);
 
 /* Programmkonstante */
 define('SWISS_WEBDESIGN', '2.2');
@@ -44,19 +42,22 @@ if (!(file_exists('_settings.php')
 	die('Loading Error');
 }
 
+/* Einstellungen holen */
+include('_settings.php');
+
+/* Ausgabe aller Fehler fuer Debug */
+if (EN_DEBUG) {
+	error_reporting(E_ALL);
+}
+else {
+	error_reporting(0);
+}
+
 /* Sessionen Starten */
-@session_start();
+session_start();
 
 /* UTF-8 Ausgabe */
 mb_internal_encoding('UTF-8');
-
-/* Globale Template Variablen */
-$HomepageContent = array();
-$PluginContent = array();
-$MenuOutput = array();
-
-/* Einstellungen holen */
-include('_settings.php');
 
 /* Initialisieren der Klassen & Funktionen */
 include('_classes.php');
@@ -67,6 +68,11 @@ $Anfangszeit = getMicrotime();
 
 /* Datenbankverbindung herstellen */
 define('DB_CMS', DatabaseConnect());
+
+/* Globale Template Variablen */
+$HomepageContent = array();
+$PluginContent = array();
+$MenuOutput = array();
 
 
 /*** Homepage offline schalten **********************/
@@ -296,8 +302,12 @@ header('Cache-Control: post-check=0, pre-check=0');
 header('Pragma: no-cache');
 header('Last-Modified: '.date(DATE_RFC822, $HomepageContent['timestamp']));
 header('Content-Type: text/html; charset=utf-8');
-//$print->compress_gzip();
-$print->out();
+if (EN_DEBUG) {
+	$print->out();
+}
+else {
+	$print->compress_gzip();
+}
 
 
 /*** Datenbankverbindung trennen ********************/
