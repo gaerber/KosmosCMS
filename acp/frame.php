@@ -29,16 +29,16 @@
 define('SWISS_WEBDESIGN', '2.2');
 
 /* Check ob alle wichtigen dateien vorhanden sind */
-if (!(file_exists("../_settings.php")
-		&& file_exists("../_classes.php")
-		&& file_exists("../_functions.php")
-		&& file_exists("_functions_acp.php")
+if (!(file_exists('../_settings.php')
+		&& file_exists('../_classes.php')
+		&& file_exists('../_functions.php')
+		&& file_exists('_functions_acp.php')
 		)) {
-	die("Loading Error");
+	die('Loading Error');
 }
 
 /* Einstellungen holen */
-include("../_settings.php");
+include('../_settings.php');
 
 /* Ausgabe aller Fehler fuer Debug */
 if (EN_DEBUG) {
@@ -55,12 +55,12 @@ session_start();
 mb_internal_encoding('UTF-8');
 
 /* Initialisieren der Klassen & Funktionen */
-include("../_classes.php");
-include("../_functions.php");
-include("_functions_acp.php");
+include('../_classes.php');
+include('../_functions.php');
+include('_functions_acp.php');
 
 /* Datenbankverbindung herstellen */
-define("DB_CMS", DatabaseConnect());
+define('DB_CMS', DatabaseConnect());
 
 /* Informationen aus den Applikationen */
 $ACP_ApplicationInfo = array();
@@ -70,11 +70,11 @@ $ACP_ApplicationInfo = array();
 // Login-System                      //
 ///////////////////////////////////////
 if (!LoginSystem(DB_CMS)) {
-	echo ActionReport(REPORT_ERROR, "Keine berechtigung", "Sie müssen sich anmelden um diese Seite zu sehen!");
+	echo ActionReport(REPORT_ERROR, 'Keine berechtigung', 'Sie müssen sich anmelden um diese Seite zu sehen!');
 	die();
 }
 else {
-	define("ACP_CHECK_SUM", 707);
+	define('ACP_CHECK_SUM', 707);
 }
 
 
@@ -84,8 +84,8 @@ else {
 if ($_SESSION['admin_time_lastaction'] < TIME_STAMP - MAX_ACP_LOGIN_TIME) {
 	// TIME OUT -> Session loeschen
 	SessionDelete();
-	echo ActionReport(REPORT_ERROR, "Keine berechtigung",
-			"Aufgrund längerer inaktivität wurden Sie automatisch abgemeldet.");
+	echo ActionReport(REPORT_ERROR, 'Keine berechtigung',
+			'Aufgrund längerer inaktivität wurden Sie automatisch abgemeldet.');
 	die();
 }
 $_SESSION['admin_time_lastaction'] = TIME_STAMP;
@@ -96,16 +96,16 @@ $_SESSION['admin_time_lastaction'] = TIME_STAMP;
 ///////////////////////////////////////
 if(isset($_GET['page'])) {
 	$datei = mb_strtolower($_GET['page']);		// Alles in Kleinbuchstaben
-	$datei = str_replace("-", "/", $datei); 	// Datei in einem Unterordner
+	$datei = str_replace('-', '/', $datei); 	// Datei in einem Unterordner
 }
 else {
-	$datei = "none";
+	$datei = 'none';
 }
 
 // Existiert diese Datei ueberhaubt?
-if(!file_exists("content/frames/".$datei.".php")) {
+if(!file_exists('content/frames/'.$datei.'.php')) {
 	// Datei existiert nicht!
-	$datei = "none";
+	$datei = 'none';
 }
 
 
@@ -113,7 +113,7 @@ if(!file_exists("content/frames/".$datei.".php")) {
 // Der Buffer muss den Inhalt holen  //
 ///////////////////////////////////////
 ob_start();										// Buffer starten
-include("content/frames/".$datei.".php");		// datei wird in Buffer geladen
+include('content/frames/'.$datei.'.php');		// datei wird in Buffer geladen
 $content = ob_get_contents();					// Buffer wird in $content geschrieben
 ob_end_clean();									// Buffer loeschen
 
@@ -121,27 +121,27 @@ ob_end_clean();									// Buffer loeschen
 ///////////////////////////////////////
 // Die Ausgabe der HP im Template    //
 ///////////////////////////////////////
-$tpl = new tpl("frame");
-$tpl->assign("title", $ACP_ApplicationInfo['title']);
-$tpl->assign("content", $content);
+$tpl = new tpl('frame');
+$tpl->assign('title', $ACP_ApplicationInfo['title']);
+$tpl->assign('content', $content);
 
 if (isset($ACP_ApplicationInfo['javascript']))
-	$tpl->assign("javascript", "  <script type=\"text/javascript\">\r\n    "
-			.$ACP_ApplicationInfo['javascript']."\r\n  </script>");
+	$tpl->assign('javascript', '  <script type="text/javascript">\r\n    '
+			.$ACP_ApplicationInfo['javascript'].'\r\n  </script>');
 else
-	$tpl->assign("javascript", "");
+	$tpl->assign('javascript', '');
 
 if (isset($ACP_ApplicationInfo['body_onload']))
-	$tpl->assign("body_onload", " onload=\"".$ACP_ApplicationInfo['body_onload']."\"");
+	$tpl->assign('body_onload', ' onload="'.$ACP_ApplicationInfo['body_onload'].'"');
 else
-	$tpl->assign("body_onload", "");
+	$tpl->assign('body_onload', '');
 
 if (isset($ACP_ApplicationInfo['body_css_class']))
-	$tpl->assign("body_css_class", $ACP_ApplicationInfo['body_css_class']);
+	$tpl->assign('body_css_class', $ACP_ApplicationInfo['body_css_class']);
 else
-	$tpl->assign("body_css_class", "wym_dialog_insert");
+	$tpl->assign('body_css_class', 'wym_dialog_insert');
 
-header("Content-Type: text/html; charset=utf-8");
+header('Content-Type: text/html; charset=utf-8');
 if (EN_DEBUG) {
 	$tpl->out();
 }
