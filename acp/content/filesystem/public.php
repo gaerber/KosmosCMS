@@ -443,7 +443,7 @@ if ($file_table_view) {
 					/* Eine Datei */
 					echo '<tr class="table_'.$table_hover.'">
 					  <td class="icon"><img src="img/icons/ftp/file.png" alt="" /></td>
-					  <td><a href="'.FILESYSTEM_DIR.$current_folder.$file.'" target="_blank">'.$file.'</a></td>
+					  <td><a href="'.FILESYSTEM_DIR.$current_folder.$file.'" download>'.$file.'</a></td>
 	  				  <td>'.$folder_pointer->fileTime('str').'</td>
 					  <td>'.BinaryMultiples($folder_pointer->fileSize()).'</td>
 					  <td class="icon"><a href="'.PFS_FILE_PATH.$current_folder.'&amp;filename='.$file.'&amp;do=rename_file"
