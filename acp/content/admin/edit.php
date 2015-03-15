@@ -89,10 +89,6 @@ if (ACP_MODULE_PHOTOS_EN) {
 	$access[$access_ctr] = $form->addElement('checkbox', 'access', NULL, ACP_ACCESS_M_PHOTOS);
 	$access[$access_ctr++]->setSubLabel("Verwalten des Fotoalbums");
 }
-if (ACP_MODULE_LAWDB_EN) {
-	$access[$access_ctr] = $form->addElement('checkbox', 'access', NULL, ACP_ACCESS_M_LAWDB);
-	$access[$access_ctr++]->setSubLabel("Linkverzeichnis");
-}
 
 $submit = $form->addElement('submit', 'btn', NULL, 'Speichern');
 

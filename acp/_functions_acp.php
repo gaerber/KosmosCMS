@@ -42,7 +42,6 @@ define("ACP_ACCESS_M_NEWS_CAT", 1<<8);
 define("ACP_ACCESS_M_POLL", 1<<9);
 define("ACP_ACCESS_M_GUESTBOOK", 1<<10);
 define("ACP_ACCESS_M_PHOTOS", 1<<11);
-define("ACP_ACCESS_M_LAWDB", 1<<13);
 
 /* Max Zeit 10min */
 define("MAX_ACP_LOGIN_TIME", 600);

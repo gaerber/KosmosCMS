@@ -96,7 +96,7 @@ if ($line[0] > 0) {
 		echo printBox($row['writer_name'], $row['comment'], 
 				"<a href=\"?page=guestbook-comment&amp;id=".$row['id']."\" onmouseover=\"Tip('Kommentieren')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/guestbook/comment.png\" alt=\"\" /></a>
 				<a href=\"?page=guestbook-edit&amp;id=".$row['id']."\" onmouseover=\"Tip('Eintrag bearbeiten')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/guestbook/edit.png\" alt=\"\" /></a>
-				<a href=\"javascript:loeschen('?page=guestbook-list&amp;delete=".$row['id']."', 'Wollen Sie diesen Eintrag wirklich löschen?')\" onmouseover=\"Tip('Eintrag löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/guestbook/delete.png\" alt=\"\" /></a>",
+				<a href=\"javascript:confirmDeletion('?page=guestbook-list&amp;delete=".$row['id']."', 'Wollen Sie diesen Eintrag wirklich löschen?')\" onmouseover=\"Tip('Eintrag löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/guestbook/delete.png\" alt=\"\" /></a>",
 				$user_infos, $row['admin_comment'], ($_SESSION['admin_lastlogin'] < $row['timestamp']));
 	}
 	

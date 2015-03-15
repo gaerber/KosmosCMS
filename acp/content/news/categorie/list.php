@@ -103,7 +103,7 @@ while ($row = mysql_fetch_array($result)) {
 	
 	/* Kategorie loeschen */
 	if ($num_news == 0)
-		echo "      <td class=\"icon\"><a href=\"javascript:loeschen('?page=news-categorie-list&amp;delete=".$row['id']."', 'Wollen Sie wirklich diese Kategorie löschen?')\" onmouseover=\"Tip('Kategorie löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/categorie/delete.png\" alt=\"\" /></a></td>\r\n";
+		echo "      <td class=\"icon\"><a href=\"javascript:confirmDeletion('?page=news-categorie-list&amp;delete=".$row['id']."', 'Wollen Sie wirklich diese Kategorie löschen?')\" onmouseover=\"Tip('Kategorie löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/categorie/delete.png\" alt=\"\" /></a></td>\r\n";
 	else
 		echo "      <td></td>\r\n";
 

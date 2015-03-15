@@ -91,7 +91,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 			echo printBoxStart();
 			echo printBox($line['writer_name'], $line['comment'], 
 					"<a href=\"?page=guestbook-edit&amp;id=".$line['id']."\" onmouseover=\"Tip('Eintrag bearbeiten')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/guestbook/edit.png\" alt=\"\" /></a>
-					<a href=\"javascript:loeschen('?page=guestbook-guestbook&amp;delete=".$line['id']."', 'Wollen Sie diesen Eintrag wirklich löschen?')\" onmouseover=\"Tip('Eintrag löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/guestbook/delete.png\" alt=\"\" /></a>",
+					<a href=\"javascript:confirmDeletion('?page=guestbook-guestbook&amp;delete=".$line['id']."', 'Wollen Sie diesen Eintrag wirklich löschen?')\" onmouseover=\"Tip('Eintrag löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/guestbook/delete.png\" alt=\"\" /></a>",
 					$user_infos);
 			echo printBoxEnd();
 			

@@ -15,6 +15,7 @@
  |--------|------------|--------------------
  |2.0     | 04.10.2014 | Program erstellt
  |2.1     | 07.12.2014 | Bugfix Thumbnail Anzeige
+ |2.1.1   | 07.01.2015 | Bugfix Fotokommentar
  -----------------------------------------------------
  Beschreibung :
  Anzeige der Alben und Fotos eines bestimmten
@@ -53,7 +54,7 @@ else {
 
 
 /* Existiert dieses Album */
-if ($current_album = readAlbumConfig2($ftp, $current_path)) {
+if ($current_album = readAlbumConfig($ftp, $current_path)) {
 	/*** Informationen des aktuellen Albums **************/
 	if ($current_album['id'] > 0) {
 		$a = explode('/', $album);
@@ -158,13 +159,21 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 										$comment = '';
 										$filetime = 0;
 										/* Bild-Titel auslesen (Nur JPG moeglich!) */
-										$image_header = @exif_read_data('../upload'.$current_path.$file);
-										if ($image_header && isset($image_header['ImageDescription'])) {
-											$comment = $image_header['ImageDescription'];
-										}
-										if ($image_header && isset($image_header['FileDateTime'])) {
+										/* Daten in eine temporaere Datei packen (auf dem lokalen Server) */
+										$image_temp = tempnam(FILESYSTEM_TEMP, 'img');
+										$image_temp_resource = fopen($image_temp, 'rw+');
+										if ($image_temp_resource 
+												&& $ftp->FileRead($current_path.$line_element['id_str'].'/'.$file, $image_temp_resource)) {
+											fclose($image_temp_resource);
+											$image_header = @exif_read_data($image_temp);
+											if ($image_header && isset($image_header['ImageDescription'])) {
+												$comment = preg_replace("/^ +(.*) +$/", "$1", $image_header['ImageDescription']);
+											}
+											if ($image_header && isset($image_header['FileDateTime'])) {
 											$filetime = $image_header['FileDateTime'];
+											}
 										}
+
 										/* Bild in Datenbank aufnehmen */
 										if (mysql_query('INSERT INTO '.DB_TABLE_PLUGIN.'photoalbum_photo(file_name, album_id, file_timestamp, caption, writer, timestamp)
 												VALUES("'.$file.'", "'.$line_element['id'].'", '.$filetime.', "'.StdSqlSafety($comment).'", 
@@ -200,7 +209,7 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 				
 			case 'lock-album':
 			case 'unlock-album':
-				$res_element = mysql_query('SELECT id, id_str
+				$res_element = mysql_query('SELECT id, id_str, access
 						FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE id='.StdSqlSafety($_GET['id']).' && menu_sub='.$current_album['id'], DB_CMS)
 						OR FatalError(FATAL_ERROR_MYSQL);
 							
@@ -230,6 +239,14 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 							/* Verzeichnisschutz muss entfernt werden, sofern er vohanden ist */
 							$ftp->Delete('.htaccess');
 						}
+						/* Die Config Datei speichern */
+						$config = array(
+								'module' => 'photos',
+								'album_id' => $line_element['id'],
+								'access' => $line_element['access'],
+								'locked' => $locking
+								);
+						$ftp->writeFolderConfig($current_path.$line_element['id_str'], $config);
 						
 						/* Abspeichern in der Datenbank */
 						if (!mysql_query('UPDATE '.DB_TABLE_PLUGIN.'photoalbum SET locked='.$locking.'
@@ -339,7 +356,7 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 			
 		while ($row = mysql_fetch_assoc($result)) {
 			/* Erst prüfen ob es ein valides Album ist */
-			if (readAlbumConfig2($ftp, $current_path.$row['id_str'].'/')) {
+			if (readAlbumConfig($ftp, $current_path.$row['id_str'].'/')) {
 				/* Anzahl Sub-Subalben ermitteln */
 				$res = mysql_query('SELECT count(*) FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE menu_sub='.$row['id'], DB_CMS)
 					OR FatalError(FATAL_ERROR_MYSQL);
@@ -392,7 +409,7 @@ if ($current_album = readAlbumConfig2($ftp, $current_path)) {
 				else
 					echo '<td class="icon"><a href="?page=photos-show&amp;do=lock-album&amp;album='.$album.'&amp;id='.$row['id'].'" onmouseover="Tip(\'Album sperren\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/locked_not.png" alt="" /></a></td>';
 				/* Album loeschen */
-				echo '<td class="icon"><a href="javascript:loeschen(\'?page=photos-show&amp;do=delete-album&amp;album='.$album.'&amp;id='.$row['id'].'\', \'Wollen Sie dieses Album mit sämtlichen Fotos und Unteralben wirklich unwiderruflich löschen?\')" onmouseover="Tip(\'Album löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/delete.png" alt="" /></a></td>';
+				echo '<td class="icon"><a href="javascript:confirmDeletion(\'?page=photos-show&amp;do=delete-album&amp;album='.$album.'&amp;id='.$row['id'].'\', \'Wollen Sie dieses Album mit sämtlichen Fotos und Unteralben wirklich unwiderruflich löschen?\')" onmouseover="Tip(\'Album löschen\')" onmouseout="UnTip()"><img src="img/icons/plugins/photos/delete.png" alt="" /></a></td>';
 					
 				echo "</tr>\r\n";
 			}

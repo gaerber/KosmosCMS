@@ -14,6 +14,7 @@
  |Version | Datum      | Aenderung
  |--------|------------|--------------------
  |2.0     | 13.10.2014 | Program erstellt
+ |2.0.1   | 07.01.2015 | Bugfix Fotokommentar
  -----------------------------------------------------
  Beschreibung :
  Hochladen eines Fotos.
@@ -51,7 +52,7 @@ else {
 
 
 /* Existiert dieses Album */
-if (($current_album = readAlbumConfig2($ftp, $current_path)) && $current_album['id'] > 0) {
+if (($current_album = readAlbumConfig($ftp, $current_path)) && $current_album['id'] > 0) {
 	/* Infos des aktuellen Albums anzeigen */
 	echo printInfoBox('Album: '.$current_album['caption'],
 			'<p>Alle Fotos werden in das Album <a href="?page=photos-show&amp;album='.$album.'">'.$current_album['caption'].'</a> hochgeladen.</p>');
@@ -102,9 +103,9 @@ if (($current_album = readAlbumConfig2($ftp, $current_path)) && $current_album['
 							$comment = '';
 							$filetime = 0;
 							/* Bild-Titel auslesen (Nur JPG moeglich!) */
-							$image_header = @exif_read_data('../upload'.$current_path.$file_data['name']);
+							$image_header = @exif_read_data($file_data['tmp_name']); // Aus dem Originalbild lesen im lokalen Temp Verzeichnis
 							if ($photocomment->getValue() && $image_header && isset($image_header['ImageDescription'])) {
-								$comment = $image_header['ImageDescription'];
+								$comment = preg_replace("/^ +(.*) +$/", "$1", $image_header['ImageDescription']);
 							}
 							if ($image_header && isset($image_header['FileDateTime'])) {
 								$filetime = $image_header['FileDateTime'];

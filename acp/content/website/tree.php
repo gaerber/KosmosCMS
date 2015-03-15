@@ -381,9 +381,9 @@ for ($i=0; $i < sizeof($a_options); $i++) {
 		/* Loeschen */
 		if (!in_array($line['id'], $DefaultErrorPages)) {
 			if ($line['menu_is_categorie'])
-				$html .= "      <td class=\"icon\"><a href=\"javascript:loeschen('?page=website-tree&amp;delete=".$line['id']."', 'Wollen Sie wirklich diese Kategorie unwiderruflich löschen?')\" onmouseover=\"Tip('Kategorie löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/menu/delete.png\" alt=\"\" /></a></td>\r\n";
+				$html .= "      <td class=\"icon\"><a href=\"javascript:confirmDeletion('?page=website-tree&amp;delete=".$line['id']."', 'Wollen Sie wirklich diese Kategorie unwiderruflich löschen?')\" onmouseover=\"Tip('Kategorie löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/menu/delete.png\" alt=\"\" /></a></td>\r\n";
 			else
-				$html .= "      <td class=\"icon\"><a href=\"javascript:loeschen('?page=website-tree&amp;delete=".$line['id']."', 'Wollen Sie diese Seite wirklich unwiderruflich löschen?')\" onmouseover=\"Tip('Seite löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/menu/delete.png\" alt=\"\" /></a></td>\r\n";
+				$html .= "      <td class=\"icon\"><a href=\"javascript:confirmDeletion('?page=website-tree&amp;delete=".$line['id']."', 'Wollen Sie diese Seite wirklich unwiderruflich löschen?')\" onmouseover=\"Tip('Seite löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/menu/delete.png\" alt=\"\" /></a></td>\r\n";
 		}
 		else {
 			$html .= "      <td class=\"icon\"></td>\r\n";

@@ -57,7 +57,7 @@ else {
 
 
 /* Existiert dieses Album */
-if (($current_album = readAlbumConfig2($ftp, $current_path)) && !($current_album['id'] == 0 && !isset($_GET['new']))) {
+if (($current_album = readAlbumConfig($ftp, $current_path)) && !($current_album['id'] == 0 && !isset($_GET['new']))) {
 	/* Falls in einem Subalbum -> Infos des aktuellen Albums anzeigen */
 	if ($current_album['id'] > 0 && isset($_GET['new'])) {
 		echo ActionReport(REPORT_INFO, 'Unteralbum',
@@ -294,7 +294,8 @@ if (($current_album = readAlbumConfig2($ftp, $current_path)) && !($current_album
 						$config = array(
 								'module' => 'photos',
 								'album_id' => $current_album['id'],
-								'access' => $access
+								'access' => $access,
+								'locked' => (int) $locked->getValue()
 								);
 						$upper_path = substr($current_path, 0, -1*(strlen($current_album['id_str'])+1));
 						if ($ftp->writeFolderConfig($upper_path.$validate_id_str, $config)) {

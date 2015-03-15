@@ -71,15 +71,6 @@ function HeaderMenu($active) {
 			$menu .= "<li><a href=\"?page=photos-show\">Fotoalbum</a></li>";
 		}
 	}
-	
-	if (ACP_MODULE_LAWDB_EN && ACP_AdminAccess(ACP_ACCESS_M_LAWDB)) {
-		if ($active == 20) {
-			$menu .= "<li><a href=\"?page=lawdb-list\" class=\"active\">Linkverzeichnis</a></li>";
-		}
-		else {
-			$menu .= "<li><a href=\"?page=lawdb-list\">Linkverzeichnis</a></li>";
-		}
-	}
 
 	return $menu;
 }
@@ -167,20 +158,6 @@ function SecondMenu($active) {
 			/* Fotoalbum */
 			if (ACP_MODULE_PHOTOS_EN && ACP_AdminAccess(ACP_ACCESS_M_PHOTOS)) {
 				$menu .= "<li class=\"first\"><a href=\"?page=photos-show\">Alben</a></li>";
-			}
-			break;
-			
-		case 20:
-			/* Linkverzeichnis */
-			if (ACP_MODULE_LAWDB_EN && ACP_AdminAccess(ACP_ACCESS_M_LAWDB)) {
-				$menu .= "<li class=\"first\"><a href=\"?page=lawdb-list\">Linkverzeichnis</a>";
-				$menu .= "  <ol class=\"submenu\" style=\"display:none\" id=\"secondmenu_lawdb\">";
-				$menu .= "    <li><a href=\"?page=lawdb-edit\">Neuer Artikel</a></li>";
-				$menu .= "    <li><a href=\"?page=lawdb-filter\">Filter</a></li>";
-				$menu .= "  </ol></li>";
-				$menu .= "<li><a href=\"?page=lawdb-categorie-list\">Kategorien</a></li>";
-				$menu .= "<li><a href=\"?page=lawdb-office-list\">Unternehmensbereiche</a></li>";
-				$menu .= "<li><a href=\"?page=lawdb-source-list\">Quellen</a></li>";
 			}
 			break;
 
