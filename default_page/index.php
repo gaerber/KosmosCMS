@@ -14,7 +14,7 @@
  |Version | Datum      | Aenderung
  |--------|------------|--------------------
  |1.0     | 30.08.2012 | Erstellt
- |1.0     | 25.03.2015 | Umstellung auf HTML5
+ |1.1     | 25.03.2015 | Umstellung auf HTML5
  -----------------------------------------------------
  Beschreibung :
  Standartseite alle Projekte, wenn das CMS noch nicht
@@ -79,7 +79,7 @@ $tpl['offlinemessage'] = 'Hier entsteht der neue Internetauftritt von '.$tpl['co
 		text-align:center;
 	}
 	#content {
-		position: absolute;
+		position:absolute;
 		left:50%;
 		width:600px;
 		height:280px;
