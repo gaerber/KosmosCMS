@@ -35,11 +35,11 @@ $tpl = array();
 
 $tpl['root_images'] = '/img/offline/';
 
-$tpl['company'] = 'Turnvereine Wilderswil';
-$tpl['header'] = 'Damenturnverein, Turnverein, Jugendturnen, Männerriege';
+$tpl['company'] = 'swiss-webdesign';
+$tpl['header'] = 'Neuer Internetauftritt';
 
 $tpl['offlinetitle'] = 'Neuer Internetauftritt';
-$tpl['offlinemessage'] = 'Hier entsteht der neue Internetauftritt der Turnvereine von Wilderswil.';
+$tpl['offlinemessage'] = 'Hier entsteht der neue Internetauftritt von '.$tpl['company'].'.';
 
 ?>
 <!DOCTYPE html>
