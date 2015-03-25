@@ -2,7 +2,7 @@
 
  /*
  =====================================================
- Name ........: Standart Seite
+ Name ........: Standard Seite
  Projekt .....: CMS 2.0 Kosmos
  Datiename ...: index.php
  -----------------------------------------------------
@@ -14,6 +14,7 @@
  |Version | Datum      | Aenderung
  |--------|------------|--------------------
  |1.0     | 30.08.2012 | Erstellt
+ |1.0     | 25.03.2015 | Umstellung auf HTML5
  -----------------------------------------------------
  Beschreibung :
  Standartseite alle Projekte, wenn das CMS noch nicht
@@ -41,14 +42,11 @@ $tpl['offlinetitle'] = 'Neuer Internetauftritt';
 $tpl['offlinemessage'] = 'Hier entsteht der neue Internetauftritt der Turnvereine von Wilderswil.';
 
 ?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-    "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="de" lang="de">
-
+<!DOCTYPE html>
+<html lang="de">
 <head>
-  <meta http-equiv="content-type" content="application/xhtml+xml;charset=utf-8" />
+  <meta charset="utf-8" />
   <title><?php echo $tpl['header']; ?> - <?php echo $tpl['company']; ?></title>
-  <meta http-equiv="Content-Style-Type" content="text/css" />
   <style type="text/css">
 	body {
 	 	background-color:#edede8;
@@ -57,25 +55,25 @@ $tpl['offlinemessage'] = 'Hier entsteht der neue Internetauftritt der Turnverein
 		font-family:Verdana;
 	}
 	#webdesign {
-	   position:absolute;
-	   right:10px;
-	   bottom:10px;
-	   margin:0;
-	   padding:0;
-	   height:40px;
-       font-size:14pt;
-	   font-weight:bold;
-	   line-height:40px;
-	   color:#bbb;
-    }
-    #webdesign img {
-        float:right;
-        margin-left:15px;
-        border:none;
-        height:40px;
-    }
+		position:absolute;
+		right:10px;
+		bottom:10px;
+		margin:0;
+		padding:0;
+		height:40px;
+		font-size:14pt;
+		font-weight:bold;
+		line-height:40px;
+		color:#bbb;
+	}
+	#webdesign img {
+		float:right;
+		margin-left:15px;
+		border:none;
+		height:40px;
+	}
 	#center {
-		position: absolute;
+		position:absolute;
 		top:50%;
 		width:99%;
 		text-align:center;
@@ -109,7 +107,7 @@ $tpl['offlinemessage'] = 'Hier entsteht der neue Internetauftritt der Turnverein
 <body>
 
 <div id="webdesign">
-  <a href="http://www.swiss-webdesign.ch/"><img src="<?php echo $tpl['root_images']; ?>swiss-webdesign.png"></a>
+  <a href="http://www.swiss-webdesign.ch/"><img src="<?php echo $tpl['root_images']; ?>swiss-webdesign.png" alt="swiss-webdesign" /></a>
 </div>
 
 <div id="center">
