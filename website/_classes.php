@@ -30,6 +30,7 @@
  |3.1.2   | 13.10.2014 | FTP CleanFolder fuer Dot-Files
  |3.1.3   | 11.12.2014 | Bugfix ftp Hilfsklassen
  |3.1.4   | 08.03.2015 | Bugfix versteckte Dateien
+ |3.1.5   | 25.03.2015 | Bugfix Content-Length
  -----------------------------------------------------
  Beschreibung :
  Alle Klassen enthalten.
@@ -46,26 +47,26 @@ include("class.form.php");
 class tpl {
 	var $template_file;
 	var $replace_array;
-	var $delimiterStart = "{";
-	var $delimiterEnd = "}";
+	var $delimiterStart = '{';
+	var $delimiterEnd = '}';
 
-	function setStartDelim($delim="{") {
+	function setStartDelim($delim) {
 		$this->delimiterStart = $delim;
 	}
 
-	function setEndDelim($delim="}") {
+	function setEndDelim($delim) {
 		$this->delimiterEnd = $delim;
 	}
 
 	function tpl($template_file) {
 		$template_file = ROOT_TEMPLATE.$template_file.TEMPLATE_TYPE;
 		if(file_exists($template_file)) {
-			$this->template_file = implode("", file($template_file));
+			$this->template_file = implode('', file($template_file));
 			return $this->template_file;
 		}
 		else {
-			//$this->template_file = "";
-			die("failed to load template file: ".$template_file);
+			//$this->template_file = '';
+			die('failed to load template file: '.$template_file);
 		}
 	}
 
@@ -95,15 +96,15 @@ class tpl {
 
 	function compress_gzip() {
 		$compression_level = 9;
-		$append_message = "\n<!-- zlib compression level ".$compression_level." -->";
+		$append_message = '<!-- zlib compression level '.$compression_level.' -->';
 
-		if(!headers_sent() && extension_loaded("zlib")
-				&& isset($_SERVER["HTTP_ACCEPT_ENCODING"])
-				&& (strstr($_SERVER["HTTP_ACCEPT_ENCODING"],"gzip"))) {
+		if(!headers_sent() && extension_loaded('zlib')
+				&& isset($_SERVER['HTTP_ACCEPT_ENCODING'])
+				&& (strstr($_SERVER['HTTP_ACCEPT_ENCODING'],'gzip'))) {
 			$tpl_source = gzencode($this->get().$append_message, $compression_level);
-    	  	header("Content-Encoding: gzip");
-    	  	header("Vary: Accept-Encoding");
-     	 	header("Content-Length: ".mb_strlen($tpl_source));
+    	  	header('Content-Encoding: gzip');
+    	  	header('Vary: Accept-Encoding');
+     	 	header('Content-Length: '.strlen($tpl_source));
      	 	echo($tpl_source);
 		}
     	else {
