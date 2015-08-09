@@ -78,8 +78,7 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && $current_album['i
 		/* Groesse pruefen */
 		if ($file_data['size'] <= FILE_SIZE_LIMIT) {
 			/* Erlaubte Dateityp */
-			if (in_array(mb_strtolower(array_pop(explode('.', $file_data['name']))),
-					$FileSystem_AllowedImageTypes)) {
+			if (isDatatypeAllowed($file_data['name'], $FileSystem_AllowedImageTypes)) {
 				/* Existiert dieser Dateinamen bereits */
 				if ($overwrite->getValue() || !$ftp->fileExists($current_path.$file_data['name'])) {
 					/* Es duerfen keine doppeleintraege in der Datenbank vorhanden sein */

@@ -138,8 +138,7 @@ if (isset($_GET['do'])) {
 					/* Groesse pruefen */
 					if ($file_data['size'] <= FILE_SIZE_LIMIT) {
 						/* Erlaubte Dateityp */
-						if (in_array(mb_strtolower(array_pop(explode('.', $file_data['name']))),
-								$FileSystem_AllowedDataTypes)) {
+						if (isDatatypeAllowed($file_data['name'], $FileSystem_AllowedDataTypes)) {
 							/* Existiert dieser Dateinamen bereits */
 							if ($overwrite->getValue() || !$ftp->fileExists($current_folder.$file_data['name'])) {
 								/* Datei auf FPT Server kopieren */
@@ -264,7 +263,7 @@ if (isset($_GET['do'])) {
 					if ($form->checkForm()) {
 						$new_file = ValidateFileSystem($file->getValue(), '.');
 						/* Dateiendung erlaubt ? */
-						if (in_array(array_pop(explode('.', $new_file)), $FileSystem_AllowedDataTypes)) {
+						if (isDatatypeAllowed($new_file, $FileSystem_AllowedDataTypes)) {
 							if (!$ftp->fileExists($current_folder.$new_file)) {
 								/* Vorbereiten um Ordner anzulegen */
 								if ($ftp->Rename($current_folder.$_GET['filename'], $new_file)) {
