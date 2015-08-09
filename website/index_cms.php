@@ -68,7 +68,8 @@ include('_functions.php');
 $Anfangszeit = getMicrotime();
 
 /* Datenbankverbindung herstellen */
-define('DB_CMS', DatabaseConnect());
+$db_stream = DatabaseConnect();
+define('DB_CMS', $db_stream);
 
 /* Globale Template Variablen */
 $HomepageContent = array();
