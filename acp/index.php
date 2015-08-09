@@ -63,8 +63,12 @@ include('_functions_acp.php');
 /* Menue */
 include('_menu.php');
 
+/* Messung der Generierungszeit starten */
+$Anfangszeit = getMicrotime();
+
 /* Datenbankverbindung herstellen */
-define('DB_CMS', DatabaseConnect());
+$db_stream = DatabaseConnect();
+define('DB_CMS', $db_stream);
 
 /* Informationen aus den Applikationen */
 $ACP_ApplicationInfo = array();
@@ -205,6 +209,12 @@ if (isset($acp_info_header)) {
 else {
 	$design->assign('head', '');
 }
+
+/* Versionsnummer */
+$design->assign('cms_version', SWISS_WEBDESIGN);
+
+/* Generierungszeit */
+$design->assign('runtime', number_format(getMicrotime()-$Anfangszeit, 4, ',', '.'));
 
 header('Content-Type: text/html; charset=utf-8');
 if (EN_DEBUG) {

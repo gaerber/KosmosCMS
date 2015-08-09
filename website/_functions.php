@@ -29,6 +29,7 @@
  |2.1     | 11.12.2014 | FTP Dateisystem
  |2.1.1   | 01.02.2015 | Bugfix / Rename
  |2.1.2   | 08.03.2015 | ValidateFileSystem() mehrere Zusatzzeichen
+ |2.1.3   | 09.08.2015 | isDatatypeAllowed eingefuehrt
  -----------------------------------------------------
  Beschreibung :
  Alle Funktionen fuer die CMS Software
@@ -297,6 +298,17 @@ function ValidateFileSystem($string, $zusatz=false) {
 
 	/* Rueckgabe */
 	return $validated;
+}
+
+/**
+ * Ermittelt ob ein Dateinamen ein bestimmtes Dateiformat hat.
+ * @param $filename Dateinamen.
+ * @param $allowed_datatypes Array mit allen erlaubten Datentypen.
+ * @return TRUE falls das Dateiformat erlaubt ist.
+ */
+function isDatatypeAllowed($filename, $allowed_datatypes) {
+	$extension = explode('.', $filename);
+	return in_array(mb_strtolower(array_pop($extension)), $allowed_datatypes);
 }
 
 

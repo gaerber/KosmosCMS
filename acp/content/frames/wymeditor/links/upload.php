@@ -62,8 +62,7 @@ if (ACP_FILE_SYSTEM_EN && ACP_AdminAccess(ACP_ACCESS_FILESYSTEM | ACP_ACCESS_FIL
 			/* Groesse pruefen */
 			if ($file_data['size'] <= FILE_SIZE_LIMIT) {
 				/* Erlaubte Dateityp */
-				if (in_array(mb_strtolower(array_pop(explode(".", $file_data['name']))),
-						$FileSystem_AllowedDataTypes)) {
+				if (isDatatypeAllowed($file_data['name'], $FileSystem_AllowedDataTypes)) {
 					/* Existiert dieser Dateinamen bereits */
 					if (!$ftp->fileExists($folderList->getValue().$file_data['name'])) {
 						/* Datei auf FPT Server kopieren */

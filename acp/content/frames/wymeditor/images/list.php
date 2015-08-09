@@ -73,8 +73,7 @@ if (ACP_FILE_SYSTEM_EN) {
 		while($file = $folder_pointer->readDir()) {
 			/* Nur Bilder sollen verarbeitet werden */
 			if (!$folder_pointer->isDir($file)) {
-				if (in_array(mb_strtolower(array_pop(explode(".", $file))),
-						$FileSystem_AllowedImageTypes)) {
+				if (isDatatypeAllowed($file, $FileSystem_AllowedImageTypes)) {
 					echo '<a href="#" class="image" onclick="parent.document.getElementById(\'wym_src\').value = \''
 					.FILESYSTEM_DIR.$current_folder.$file
 					.'\';parent.document.getElementById(\'wym_submit\').click();"><img src="'
