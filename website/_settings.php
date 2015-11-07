@@ -23,6 +23,7 @@
  |2.4.4   | 31.03.2013 | Ordner mysqlbackups hinzu
  |2.4.5   | 25.11.2014 | FILE_SYSTEM_CONFIGFILE hinzu
  |2.4.6   | 14.03.2015 | EN_DEBUG hinzu
+ |2.4.7   | 07.11.2015 | Unnötige Konstante entfernt
  -----------------------------------------------------
  Beschreibung :
  Einstellungen fuer die CMS Software
@@ -307,11 +308,6 @@ define('PAGINATION_NUM', 5);
  * Benutzerfreundliche Links erlauben (ReWrite Mode on)
  */
 define('MODE_REWRITE_ON', true);
-
-/**
- * Indexdatei (Meistens index.php)
- */
-define('INDEX_FILE', 'index');
 
 /**
  * GET Parameter mit dem Seitenname (ID)
