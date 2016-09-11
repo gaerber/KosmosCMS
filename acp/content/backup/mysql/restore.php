@@ -15,6 +15,7 @@
  |--------|------------|--------------------
  |1.0     | 17.07.2013 | Programm erstellt.
  |1.0.1   | 23.07.2013 | Bugfix: Temp-Datei.
+ |1.0.2   | 11.09.2016 | Bugfix: Vercshlüsselung
  -----------------------------------------------------
  Beschreibung :
  Spielt eine Sicherheitskopie auf den MySQL Server.
@@ -67,8 +68,9 @@ if ($ftp->ChangeDir($FileSystem_ModulePahts['mysqlbackups'])) {
 				if ($line['password'] == sha1($password->getValue())) {
 					$backup_file = tempnam(FILESYSTEM_TEMP, 'sql');
 					/* Sicherheitskopie einlesen und entschluesseln */
+					$key = str_pad(substr(DB_PASSWORD, 0, 16), 16 , "q");
 					$stream = $ftp->FileContents($_GET['backupfile']);
-					$stream = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, DB_PASSWORD, base64_decode($stream), MCRYPT_MODE_ECB,
+					$stream = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($stream), MCRYPT_MODE_ECB,
 							mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND)));
 					
 					/* Datei lokal entschluesselt zur Verfuegung stellen */

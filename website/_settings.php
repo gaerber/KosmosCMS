@@ -86,7 +86,7 @@ define('DB_HOST', 'localhost');
 define('DB_USER', 'cms2_user');
 
 /**
- * Datenbank Passwort
+ * Datenbank Passwort (min. 16 Zeichen)
  */
 define('DB_PASSWORD', 'Atc6NEWGTjEWHLbXJA');
 
