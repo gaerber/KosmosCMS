@@ -14,6 +14,7 @@
  |Version | Datum      | Aenderung
  |--------|------------|--------------------
  |1.0     | 13.07.2011 | Programm erstellt.
+ |1.1     | 11.09.2016 | Formaterung wie bei Vorschau.
  -----------------------------------------------------
  Beschreibung :
  Vorschau-Popup der gespeicherten Inhalten (Backups).
@@ -27,8 +28,10 @@ if (!defined("ACP_CHECK_SUM"))	die();
 ///////////////////////////////////////////////////////
 ACP_AdminAccess(ACP_ACCESS_WEBSITE, true);
 ///////////////////////////////////////////////////////
-$ACP_ApplicationInfo['title'] = "Backup Vorschau";
-$ACP_ApplicationInfo['body_css_class'] = "wym_dialog wym_dialog_preview";
+$ACP_ApplicationInfo['title'] = 'Backup Vorschau';
+$ACP_ApplicationInfo['stylesheet'] = '../templates/stylesheets/content.css';
+$ACP_ApplicationInfo['body_css_class'] = 'wym_dialog wym_dialog_preview';
+$ACP_ApplicationInfo['body_arg'] = 'id="content"';
 ///////////////////////////////////////////////////////
 
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
