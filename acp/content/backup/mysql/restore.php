@@ -16,6 +16,7 @@
  |1.0     | 17.07.2013 | Programm erstellt.
  |1.0.1   | 23.07.2013 | Bugfix: Temp-Datei.
  |1.0.2   | 11.09.2016 | Bugfix: Vercshlüsselung
+ |1.1     | 15.09.2016 | Erweiterung DB Backupfile
  -----------------------------------------------------
  Beschreibung :
  Spielt eine Sicherheitskopie auf den MySQL Server.
@@ -67,24 +68,36 @@ if ($ftp->ChangeDir($FileSystem_ModulePahts['mysqlbackups'])) {
 			if ($line = mysql_fetch_array($result)) {
 				if ($line['password'] == sha1($password->getValue())) {
 					$backup_file = tempnam(FILESYSTEM_TEMP, 'sql');
-					/* Sicherheitskopie einlesen und entschluesseln */
-					$key = str_pad(substr(DB_PASSWORD, 0, 16), 16 , "q");
+					/* Sicherheitskopie einlesen */
 					$stream = $ftp->FileContents($_GET['backupfile']);
-					$stream = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($stream), MCRYPT_MODE_ECB,
-							mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND)));
-					
-					/* Datei lokal entschluesselt zur Verfuegung stellen */
-					file_put_contents($backup_file, $stream) OR die('File Put Error');
-					
-					/* MySQL wiederherstellen */
-					$command = 'mysql --host="'.DB_HOST.'" --user="'.DB_USER.'" --password="'.DB_PASSWORD.'"'
-							.' '.DB_NAME.' < '.$backup_file;
-					exec($command);
-					unlink($backup_file);
-				    
-				    echo "<h1 class=\"first\">Datenbank Wiederherstellen</h1>";
-				    echo ActionReport(REPORT_OK, 'Datenbank wiederhergestellt', 
-							'Die Sicherheitskopie wurde erfolgreich eingespielt und die Datenbank wiederhergestellt.');
+					$backup_data = explode("\r\n", $stream);
+
+					/* Kompatibilitaetspruefung */					
+					if (sizeof($backup_data) == 2) {
+						/* Entschluesseln */
+						$key = str_pad(substr(DB_PASSWORD, 0, 16), 16 , "q");
+						$stream = trim(mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, base64_decode($backup_data[1]), MCRYPT_MODE_ECB,
+								mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND)));
+
+						/* Datei lokal entschluesselt zur Verfuegung stellen */
+						file_put_contents($backup_file, $stream) OR die('File Put Error');
+
+						/* MySQL wiederherstellen */
+						$command = 'mysql --host="'.DB_HOST.'" --user="'.DB_USER.'" --password="'.DB_PASSWORD.'"'
+								.' '.DB_NAME.' < '.$backup_file;
+						exec($command);
+						unlink($backup_file);
+
+					    echo "<h1 class=\"first\">Datenbank Wiederherstellen</h1>";
+					    echo ActionReport(REPORT_OK, 'Datenbank wiederhergestellt', 
+								'Die Sicherheitskopie wurde erfolgreich eingespielt und die Datenbank wiederhergestellt.');
+					}
+					else {
+					    echo "<h1 class=\"first\">Datenbank Wiederherstellen</h1>";
+					    echo ActionReport(REPORT_ERROR, 'Sicherheitskopie nicht kompatibel', 
+								'Die Sicherheitskopie ist nicht mit der aktuellen CMS-Version '.SWISS_WEBDESIGN.' kompatibel '
+								.'und die Datenbank kann nicht konvertiert werden. Nehmen Sie in dringenden Fällen Kontakt mit dem Supportteam auf.');
+					}
 				}
 				else {
 					/* Falsches Passwort */
@@ -102,8 +115,8 @@ if ($ftp->ChangeDir($FileSystem_ModulePahts['mysqlbackups'])) {
 			/* Ausgabe Formular */
 			echo "<h1 class=\"first\">Datenbank Wiederherstellen</h1>";
 			echo ActionReport(REPORT_INFO, 'Sicherheitshinweis', 
-					'Durch die Widerherstellung der Datenbank wird der jetzige Stand komplett gelöscht und der Stand der Sicherheitskopie wird eingespielt. Zu beachten gilt daher, dass zum Beispiel zwischenzeitlich geänderte Passwörter zurückgesetzt werden oder die Besucher seit der Sicherheitskopie nicht mehr gezählt werden.</p>
-					<p>Um nur Seiteninhalte wiederherzustellen sollten die vorgesehenen Sicherheitskopien verwendet werden. Diese sind über den Menüstamm erreichbar und verändern den Rest der Datenbank nicht.</p>
+					'Durch die Wiederherstellung der Datenbank wird der jetzige Stand komplett gelöscht und der Stand der Sicherheitskopie wird eingespielt. Zu beachten gilt daher, dass z. B. zwischenzeitlich geänderte Passwörter zurückgesetzt werden oder die Besucher seit der Sicherheitskopie nicht mehr gezählt werden.</p>
+					<p>Um nur Seiteninhalte wiederherzustellen, sollten die dafür vorgesehenen Sicherheitskopien verwendet werden. Diese sind über den Menüstamm erreichbar und verändern den Rest der Datenbank nicht.</p>
 					<p>Bei Unsicherheiten nehmen Sie Kontakt mit dem Supportteam auf.');
 			echo $form->getForm();
 		}
