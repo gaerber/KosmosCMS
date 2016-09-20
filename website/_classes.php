@@ -31,6 +31,7 @@
  |3.1.3   | 11.12.2014 | Bugfix ftp Hilfsklassen
  |3.1.4   | 08.03.2015 | Bugfix versteckte Dateien
  |3.1.5   | 25.03.2015 | Bugfix Content-Length
+ |3.1.6   | 13.08.2015 | Bugfix Ordnerloeschen
  -----------------------------------------------------
  Beschreibung :
  Alle Klassen enthalten.
@@ -1089,7 +1090,7 @@ class ftp {
 	 */
 	private function CleanFolder() {
 		/* Parameter -a damit auch dot-files geloescht werden */
-		$list = ftp_nlist($this->stream, ' -a');
+		$list = ftp_nlist($this->stream, '.');
 		if (is_array($list)) {
 			for ($i=count($list)-1; $i >=0; $i--) {
 				/* Ohne Zurueckverzeichnisse */

@@ -15,6 +15,8 @@
  |--------|------------|--------------------
  |1.0     | 17.07.2013 | Programm erstellt.
  |1.0.1   | 23.07.2013 | Bugfix: Temp-Datei.
+ |1.0.2   | 11.09.2016 | Bugfix: Vercshlüsselung
+ |1.1     | 15.09.2016 | Erweiterung DB Backupfile
  -----------------------------------------------------
  Beschreibung :
  Erstellen eines aktuellen Backups.
@@ -53,10 +55,16 @@ if ($form->checkForm()) {
 	exec($command);
 	
 	/* Sicherheitskopie verschluesseln */
+	$key = str_pad(substr(DB_PASSWORD, 0, 16), 16 , "q");
 	$stream = file_get_contents($backup_file);
-	$stream = trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, DB_PASSWORD, $stream, MCRYPT_MODE_ECB, 
+	$stream = trim(base64_encode(mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $stream, MCRYPT_MODE_ECB, 
 			mcrypt_create_iv(mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_ECB), MCRYPT_RAND))));
-	file_put_contents($backup_file, $stream);
+	
+	/* Zusatzinformationen speichern */
+	$infos = array('Version' => SWISS_WEBDESIGN, 'Domain' => $_SERVER['HTTP_HOST'], 'DBName' => DB_NAME, 'Date' => date('d.m.Y H:i:s', TIME_STAMP));
+	
+	/* Informationen und verschlüsseltes Backup zwischenspeichern */
+	file_put_contents($backup_file, json_encode($infos)."\r\n".$stream);
 	
 	/* In FTP verzeichnis kopieren */
 	$ftp = new ftp();

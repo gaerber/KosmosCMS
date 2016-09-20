@@ -126,16 +126,19 @@ $tpl = new tpl('frame');
 $tpl->assign('title', $ACP_ApplicationInfo['title']);
 $tpl->assign('content', $content);
 
+$framehead = '';
 if (isset($ACP_ApplicationInfo['javascript']))
-	$tpl->assign('javascript', '  <script type="text/javascript">\r\n    '
-			.$ACP_ApplicationInfo['javascript'].'\r\n  </script>');
-else
-	$tpl->assign('javascript', '');
+	$framehead .= '<script type="text/javascript">'.$ACP_ApplicationInfo['javascript'].'</script>';
+if (isset($ACP_ApplicationInfo['stylesheet']))
+	$framehead .= '<link rel="stylesheet" type="text/css" href="'.$ACP_ApplicationInfo['stylesheet'].'" />';
+$tpl->assign('frame_head', $framehead);
 
+$body_args = '';
 if (isset($ACP_ApplicationInfo['body_onload']))
-	$tpl->assign('body_onload', ' onload="'.$ACP_ApplicationInfo['body_onload'].'"');
-else
-	$tpl->assign('body_onload', '');
+	$body_args .= ' onload="'.$ACP_ApplicationInfo['body_onload'].'"';
+if (isset($ACP_ApplicationInfo['body_arg']))
+	$body_args .= ' '.$ACP_ApplicationInfo['body_arg'];
+$tpl->assign('body_args', $body_args);
 
 if (isset($ACP_ApplicationInfo['body_css_class']))
 	$tpl->assign('body_css_class', $ACP_ApplicationInfo['body_css_class']);
