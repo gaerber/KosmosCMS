@@ -53,7 +53,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 		}
 	}
 	else {
-		echo ActionReport(REPORT_EINGABE, "Nicht möglich", "Der Errichter darf nicht gesperrt werden! Stattdessen können Sie diesen sperren.");
+		echo ActionReport(REPORT_EINGABE, "Nicht möglich", "Der Errichter darf nicht gelöscht werden! Stattdessen können Sie diesen sperren.");
 	}
 }
 
