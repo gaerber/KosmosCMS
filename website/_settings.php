@@ -24,6 +24,7 @@
  |2.4.5   | 25.11.2014 | FILE_SYSTEM_CONFIGFILE hinzu
  |2.4.6   | 14.03.2015 | EN_DEBUG hinzu
  |2.4.7   | 07.11.2015 | Unnötige Konstante entfernt
+ |2.4.8   | 07.10.2017 | Defaultgrösse für Bilder
  -----------------------------------------------------
  Beschreibung :
  Einstellungen fuer die CMS Software
@@ -222,6 +223,16 @@ define('TEMPLATE_TYPE', '.htm');
 $DefaultErrorPages = array('403' => 1,
 		'404' => 2,
 		'550' => 3);
+
+/**
+ * Default Bild-Breite beim Hochladen im Editor
+ */
+define('CONTENT_IMAGE_DEFAULT_WIDTH', 600);
+
+/**
+ * Default Bild-Höhe beim Hochladen im Editor
+ */
+define('CONTENT_IMAGE_DEFAULT_HEIGHT', 350);
 
 
 /*** Module Freigabe ********************************/
