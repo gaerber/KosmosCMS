@@ -66,7 +66,7 @@ if (ACP_ACCESS_SYSTEM_EN) {
 	$access_grp = $form->addElement('radio', 'access', NULL, '2');
 	$access_groups = $form->addElement('select', 'access_group', 'Gruppen');
 	
-	$access_groups->setCssClass('select_groups');
+	$access_groups->setCssClass('select_groups hide');
 	$access_all->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
 	$access_log->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
 	$access_grp->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'block\';"');
@@ -166,7 +166,7 @@ if (!isset($abort)) {
 		if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue() && !sizeof($access_groups->getValue())) {
 			/* Es muss nim. eine Gruppe ausgewaehlt werden */
 			$access_groups->setError(true);
-			$access_groups->setCssClass('select_groups_view');
+			$access_groups->setCssClass('select_groups show');
 			/* Ausgabe des Formulars */
 			echo $form->getForm();
 		}
@@ -227,7 +227,7 @@ if (!isset($abort)) {
 	else {
 		/* Gruppenwahl verstecken */
 		if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
-			$access_groups->setCssClass('select_groups_view');
+			$access_groups->setCssClass('select_groups show');
 		}
 		/* Ausgabe des Formulars */
 		echo $form->getForm();

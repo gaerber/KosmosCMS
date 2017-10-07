@@ -42,7 +42,7 @@ $form = new formWizard('form', "?".$_SERVER["QUERY_STRING"], 'post', 'form_acp_s
 $access_log = $form->addElement('radio', 'access', 'Empfänger', '1');
 $access_grp = $form->addElement('radio', 'access', NULL, '2');
 $access_groups = $form->addElement('select', 'access_group', 'Gruppen');
-$access_groups->setCssClass('select_groups');
+$access_groups->setCssClass('select_groups hide');
 $access_log->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
 $access_grp->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'block\';"');
 $access_log->setSubLabel("Alle Benutzer");
@@ -70,7 +70,7 @@ if ($form->checkForm()) {
 	if ($access_grp->getValue() && !sizeof($access_groups->getValue())) {
 		/* Es muss nim. eine Gruppe ausgewaehlt werden */
 		$access_groups->setError(true);
-		$access_groups->setCssClass('select_groups_view');
+		$access_groups->setCssClass('select_groups show');
 		/* Ausgabe des Formulars */
 		echo $form->getForm();
 	}
@@ -148,7 +148,7 @@ if ($form->checkForm()) {
 else {
 	/* Ausgabe Formular */
 	if ($access_grp->getValue()) {
-		$access_groups->setCssClass('select_groups_view');
+		$access_groups->setCssClass('select_groups show');
 	}
 	echo $form->getForm();
 	

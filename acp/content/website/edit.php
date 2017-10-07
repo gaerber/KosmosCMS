@@ -124,7 +124,7 @@ if (ACP_ACCESS_SYSTEM_EN) {
 	$access_grp = $form->addElement('radio', 'access', NULL, '2');
 	$access_groups = $form->addElement('select', 'access_group', 'Gruppen');
 
-	$access_groups->setCssClass('select_groups');
+	$access_groups->setCssClass('select_groups hide');
 	$access_all->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
 	$access_log->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
 	$access_grp->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'block\';"');
@@ -305,7 +305,7 @@ if ($form->checkSubmit() && $form->checkForm()) {
 							"Es Existiert bereits eine Kategorie mit gleichem Namen.");
 			/* Gruppenwahl verstecken */
 			if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
-				$access_groups->setCssClass('select_groups_view');
+				$access_groups->setCssClass('select_groups show');
 			}
 			/* Formular ausgeben */
 			echo $form->getForm();
@@ -325,7 +325,7 @@ if ($form->checkSubmit() && $form->checkForm()) {
 							"Wenn Sie die Kategorie nur bestimmten Gruppen zur Verfügung stellen ".
 							"möchten, müssen Sie mindestens eine Gruppe auswählen.");
 				/* Formular ausgeben */
-				$access_groups->setCssClass('select_groups_view');
+				$access_groups->setCssClass('select_groups show');
 				echo $form->getForm();
 			}
 			else {
@@ -493,7 +493,7 @@ else {
 	if (!(isset($form_hide) && $form_hide == true)) {
 		/* Gruppenwahl verstecken */
 		if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
-			$access_groups->setCssClass('select_groups_view');
+			$access_groups->setCssClass('select_groups show');
 		}
 		/* Formular ausgeben */
 		echo $form->getForm();
