@@ -16,7 +16,7 @@
  |1.0     | 16.09.2011 | Programm erstellt.
  -----------------------------------------------------
  Beschreibung :
- Plugin: Administartoren können Gaestebucheintraege 
+ Plugin: Administartoren können Gaestebucheintraege
  kommentieren.
 
  (c) by Kevin Gerber
@@ -40,26 +40,26 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 	$comment = $form->addElement('textarea', 'comment', 'Kommentar');
 	$comment->setRowsCols(7,20);
 	$submit = $form->addElement('submit', 'btn', NULL, 'Speichern');
-	
+
 	/* Eintrag selektieren */
-	$result = mysql_query("SELECT * FROM ".DB_TABLE_PLUGIN."guestbook
-			WHERE id=".StdSqlSafety($_GET['id']), DB_CMS)
+	$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_PLUGIN."guestbook
+			WHERE id=".StdSqlSafety($_GET['id']))
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		/* Daten verarbeiten */
 		if ($line['writer_id']) {
-			$res_user = mysql_query("SELECT user_name, user_email, user_website
+			$res_user = Database::instance()->query("SELECT user_name, user_email, user_website
 					FROM ".DB_TABLE_ROOT."cms_access_user
-					WHERE user_id=".$line['writer_id'], DB_CMS)
+					WHERE user_id=".$line['writer_id'])
 					OR FatalError(FATAL_ERROR_MYSQL);
-			if ($line_user = mysql_fetch_array($res_user)) {
+			if ($line_user = $res_user->fetch_assoc()) {
 				/* Daten ueberschreiben */
 				$line['writer_name'] = $line_user['user_name'];
 				$line['writer_email'] = $line_user['user_email'];
 				$line['writer_website'] = $line_user['user_website'];
 			}
 		}
-		
+
 		/* Benutzerinformationen */
 		$user_infos = array();
 		if ($line['writer_email'])
@@ -67,34 +67,34 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 		if ($line['writer_website'])
 			$user_infos[] = $line['writer_website'];
 		$user_infos[] = printDate($line['timestamp'])." ".date(FORMAT_TIME, $line['timestamp']);
-		
+
 		/* Defaultwerte Setzen */
 		if (!$form->checkSubmit()) {
 			$comment->setValue(StdContentEdit($line['admin_comment']));
 		}
-		
+
 		/* Formularauswertung */
 		if ($form->checkForm()) {
 			/* Aenderung abspeichern */
-			if (mysql_query("UPDATE ".DB_TABLE_PLUGIN."guestbook SET
+			if (Database::instance()->query("UPDATE ".DB_TABLE_PLUGIN."guestbook SET
 					admin_comment='".StdSqlSafety(StdContent($comment->getValue(),false))."',
 					admin_id=".$_SESSION['admin_id']."
-					WHERE id=".StdSqlSafety($_GET['id']), DB_CMS))
+					WHERE id=".StdSqlSafety($_GET['id'])))
 				echo ActionReport(REPORT_OK, "Änderung übernommen",
 						"Die Änderung wurde erfolgreich übernommen!");
 			else
 				echo ActionReport(REPORT_ERROR, "Fehler", "Es trat ein Fehler beim Abspeichern auf!
-						<br />MySQL Fehler: ".mysql_error(DB_CMS));
+						<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 		}
 		else {
 			/* Ausgabe */
 			echo printBoxStart();
-			echo printBox($line['writer_name'], $line['comment'], 
+			echo printBox($line['writer_name'], $line['comment'],
 					"<a href=\"?page=guestbook-edit&amp;id=".$line['id']."\" onmouseover=\"Tip('Eintrag bearbeiten')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/guestbook/edit.png\" alt=\"\" /></a>
 					<a href=\"javascript:confirmDeletion('?page=guestbook-guestbook&amp;delete=".$line['id']."', 'Wollen Sie diesen Eintrag wirklich löschen?')\" onmouseover=\"Tip('Eintrag löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/guestbook/delete.png\" alt=\"\" /></a>",
 					$user_infos);
 			echo printBoxEnd();
-			
+
 			echo $form->getForm();
 		}
 	}

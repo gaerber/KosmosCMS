@@ -96,16 +96,16 @@ $submit = $form->addElement('submit', 'btn', NULL, 'Speichern');
 if ($form->checkSubmit() && $form->checkForm()) {
 	/* Loginnamen pruefen */
 	if (isset($_GET['id'])) {
-		$result = mysql_query("SELECT admin_id FROM ".DB_TABLE_ROOT."cms_admin
-				WHERE login='".StdSqlSafety($login->getValue())."' && admin_id!=".StdSqlSafety($_GET['id']), DB_CMS)
+		$result = Database::instance()->query("SELECT admin_id FROM ".DB_TABLE_ROOT."cms_admin
+				WHERE login='".StdSqlSafety($login->getValue())."' && admin_id!=".StdSqlSafety($_GET['id']))
 				OR FatalError(FATAL_ERROR_MYSQL);
 	}
 	else {
-		$result = mysql_query("SELECT admin_id FROM ".DB_TABLE_ROOT."cms_admin
-				WHERE login='".StdSqlSafety($login->getValue())."'", DB_CMS)
+		$result = Database::instance()->query("SELECT admin_id FROM ".DB_TABLE_ROOT."cms_admin
+				WHERE login='".StdSqlSafety($login->getValue())."'")
 				OR FatalError(FATAL_ERROR_MYSQL);
 	}
-	if (mysql_num_rows($result) == 0) {
+	if ($result->num_rows == 0) {
 		/* Rechte */
 		$access_int = 0;
 		for ($i=0; $i<sizeof($access); $i++) {
@@ -122,29 +122,29 @@ if ($form->checkSubmit() && $form->checkForm()) {
 				$sql_pw = ", password='".sha1($password->getValue())."' ";
 			else
 				$sql_pw = "";
-			if (mysql_query("UPDATE ".DB_TABLE_ROOT."cms_admin
+			if (Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_admin
 					SET login='".StdSqlSafety($login->getValue())."', name='".StdSqlSafety($name->getValue())."',
 					email='".StdSqlSafety($email->getValue())."', access=".$access_int.$sql_pw."
-					WHERE admin_id=".StdSqlSafety($_GET['id']), DB_CMS)) {
+					WHERE admin_id=".StdSqlSafety($_GET['id']))) {
 				echo ActionReport(REPORT_OK, "Administrator geändert",
 						"Der Administrator wurde erfolgreich geändert!");
 			}
 			else {
 				echo ActionReport(REPORT_ERROR, "Fehler",
-						"Der Administrator konnte nicht geändert werden!<br />MySQL Fehler: ".mysql_error(DB_CMS));
+						"Der Administrator konnte nicht geändert werden!<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 			}
 		}
 		else {
-			if (mysql_query("INSERT INTO ".DB_TABLE_ROOT."cms_admin(login, password, name, email, access)
+			if (Database::instance()->query("INSERT INTO ".DB_TABLE_ROOT."cms_admin(login, password, name, email, access)
 					VALUE('".StdSqlSafety($login->getValue())."', '".sha1($password->getValue())."',
 					'".StdSqlSafety($name->getValue())."', '".StdSqlSafety($email->getValue())."',
-					".$access_int.")", DB_CMS)) {
+					".$access_int.")")) {
 				echo ActionReport(REPORT_OK, "Administrator erstellt",
 						"Der neue Administrator wurde erfolgreich erstellt!");
 			}
 			else {
 				echo ActionReport(REPORT_ERROR, "Fehler",
-						"Der neue Administrator konnte nicht erstellt werden!<br />MySQL Fehler: ".mysql_error(DB_CMS));
+						"Der neue Administrator konnte nicht erstellt werden!<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 			}
 		}
 	}
@@ -159,10 +159,10 @@ if ($form->checkSubmit() && $form->checkForm()) {
 else {
 	if (isset($_GET['id'])) {
 		/* Formulare fuellen */
-		$result = mysql_query("SELECT admin_id, login, access, name, email FROM ".DB_TABLE_ROOT."cms_admin
-				WHERE locked=0 && admin_id=".StdSqlSafety($_GET['id']), DB_CMS)
+		$result = Database::instance()->query("SELECT admin_id, login, access, name, email FROM ".DB_TABLE_ROOT."cms_admin
+				WHERE locked=0 && admin_id=".StdSqlSafety($_GET['id']))
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			$login->setValue($line['login']);
 			$name->setValue($line['name']);
 			$email->setValue($line['email']);

@@ -39,12 +39,12 @@ if (isset($_GET['month']) && preg_match('/^(19|20)[\d]{2}[\-](0?[1-9]|1[012])$/'
 	echo '<h1 class="first">Statistik vom '.$GlobalMonthsLAN[$month[1]-1].' '.$month[0].'</h1>';
 	
 	/* Maximum ermitteln */
-	$result = mysql_query('SELECT MAX(visitors) AS max, SUM(visitors) AS visitors, SUM(views) AS views,
+	$result = Database::instance()->query('SELECT MAX(visitors) AS max, SUM(visitors) AS visitors, SUM(views) AS views,
 			DATEDIFF(MAX(day), MIN(day)) AS days
 			FROM '.DB_TABLE_PLUGIN.'stats_day
-			WHERE YEAR(day)='.$month[0].' AND MONTH(day)='.$month[1], DB_CMS)
+			WHERE YEAR(day)='.$month[0].' AND MONTH(day)='.$month[1])
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if (($line = mysql_fetch_assoc($result)) && $line['max'] > 0) {
+	if (($line = $result->fetch_assoc()) && $line['max'] > 0) {
 		$max = $line['max'];
 		$line['days'] += 1;
 		
@@ -73,13 +73,13 @@ if (isset($_GET['month']) && preg_match('/^(19|20)[\d]{2}[\-](0?[1-9]|1[012])$/'
 				<td></td>
 				</tr>';
 	
-		$result = mysql_query('SELECT DATE_FORMAT(day, "%w") AS weekday, DAY(day) AS day, visitors, views
+		$result = Database::instance()->query('SELECT DATE_FORMAT(day, "%w") AS weekday, DAY(day) AS day, visitors, views
 				FROM '.DB_TABLE_PLUGIN.'stats_day WHERE YEAR(day)='.$month[0].' AND MONTH(day)='.$month[1].'
-				ORDER BY day ASC', DB_CMS)
+				ORDER BY day ASC')
 				OR FatalError(FATAL_ERROR_MYSQL);
 		
 		$row_ctr = 1;
-		while ($row = mysql_fetch_assoc($result)) {
+		while ($row = $result->fetch_assoc()) {
 			if ($row_ctr++ % 2)
 				echo '<tr class="table_odd">';
 			else

@@ -35,9 +35,9 @@ $ACP_ApplicationInfo['menu_replace'] = 'id="secondmenu_stats"';
 echo '<h1 class="first">Top Zeiten</h1>';
 
 /* Maximum ermitteln */
-$result = mysql_query('SELECT MAX(views) FROM '.DB_TABLE_PLUGIN.'stats_views', DB_CMS)
+$result = Database::instance()->query('SELECT MAX(views) FROM '.DB_TABLE_PLUGIN.'stats_views')
 		OR FatalError(FATAL_ERROR_MYSQL);
-if (($line = mysql_fetch_row($result)) && $line[0] > 0) {
+if (($line = $result->fetch_row()) && $line[0] > 0) {
 	$max = $line[0];
 
 	echo '<table>';
@@ -47,14 +47,14 @@ if (($line = mysql_fetch_row($result)) && $line[0] > 0) {
 			<td></td>
 			</tr>';
 	
-	$result = mysql_query('SELECT hour, views
+	$result = Database::instance()->query('SELECT hour, views
 			FROM '.DB_TABLE_PLUGIN.'stats_views
 			WHERE views != 0
-			ORDER BY hour ASC', DB_CMS)
+			ORDER BY hour ASC')
 			OR FatalError(FATAL_ERROR_MYSQL);
 	
 	$row_ctr = 0;
-	while ($row = mysql_fetch_assoc($result)) {
+	while ($row = $result->fetch_assoc()) {
 		if ($row_ctr++ % 2)
 			echo '<tr class="table_even">';
 		else

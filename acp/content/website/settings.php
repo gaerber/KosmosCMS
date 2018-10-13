@@ -78,30 +78,30 @@ if ($form->checkSubmit() && $form->checkForm()) {
 			$sql_data = "";
 		}
 		/* Alles abspeichern */
-		if (mysql_query("INSERT INTO ".DB_TABLE_ROOT."cms_setting
+		if (Database::instance()->query("INSERT INTO ".DB_TABLE_ROOT."cms_setting
 				(".$sql_col." company, header, description, admin_email, online, offlinemessage)
 				VALUES(".$sql_data." '".StdSqlSafety($company->getValue())."',
 				'".StdSqlSafety($header->getValue())."',
 				'".StdSqlSafety($description->getValue())."',
 				'".StdSqlSafety($admin_email->getValue())."',
 				".$online->getValue().",
-				'".StdSqlSafety($offlinemessage->getValue())."')", DB_CMS)) {
+				'".StdSqlSafety($offlinemessage->getValue())."')")) {
 			echo ActionReport(REPORT_OK, "Einstellungen geändert",
 					"Die Einstellungen wurden erfolgreich geändert!");
 		}
 		else {
 			echo ActionReport(REPORT_ERROR, "Fehler",
-					"Die Einstellungen konnten nicht geändert werden!<br />MySQL Fehler: ".mysql_error(DB_CMS));
+					"Die Einstellungen konnten nicht geändert werden!<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 		}
 	}
 }
 else {
 	if (!$form->checkSubmit()) {
 		/* Daten aus Datenbank holen */
-		$result = mysql_query("SELECT * FROM ".DB_TABLE_ROOT."cms_setting
-				ORDER BY id DESC LIMIT 1", DB_CMS)
+		$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_ROOT."cms_setting
+				ORDER BY id DESC LIMIT 1")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			/* Zeile gefunden */
 			$company->setValue($line['company']);
 			$header->setValue($line['header']);

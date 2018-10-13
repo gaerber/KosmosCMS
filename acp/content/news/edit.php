@@ -65,7 +65,7 @@ if (ACP_ACCESS_SYSTEM_EN) {
 	$access_log = $form->addElement('radio', 'access', NULL, '1');
 	$access_grp = $form->addElement('radio', 'access', NULL, '2');
 	$access_groups = $form->addElement('select', 'access_group', 'Gruppen');
-	
+
 	$access_groups->setCssClass('select_groups hide');
 	$access_all->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
 	$access_log->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
@@ -88,9 +88,9 @@ $submit->setCssClassField("wymupdate");
 /* Defaultwerte Setzen */
 if (!$form->checkSubmit() && $news_id) {
 	/* Beitrag selektieren */
-	$result = mysql_query("SELECT * FROM ".DB_TABLE_PLUGIN."news WHERE id=".$news_id, DB_CMS)
+	$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_PLUGIN."news WHERE id=".$news_id)
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		if (ACP_AdminAccess(ACP_ACCESS_M_NEWS_COM)
 				|| ($line['writer'] == $_SESSION['admin_id'])) {
 			$caption->setValue($line['caption']);
@@ -99,10 +99,10 @@ if (!$form->checkSubmit() && $news_id) {
 			if ($line['locked'])
 				$locked->setChecked(true);
 			/* Kategorien */
-			$res_cat = mysql_query("SELECT id, name FROM ".DB_TABLE_PLUGIN."news_categorie
-					ORDER BY name ASC", DB_CMS)
+			$res_cat = Database::instance()->query("SELECT id, name FROM ".DB_TABLE_PLUGIN."news_categorie
+					ORDER BY name ASC")
 					OR FatalError(FATAL_ERROR_MYSQL);
-			while ($row = mysql_fetch_array($res_cat)) {
+			while ($row = $res_cat->fetch_assoc()) {
 				$news_categorie->addOption($row['name'], $row['id'],
 						(bool)($row['id'] == $line['categorie_id']));
 			}
@@ -116,10 +116,10 @@ if (!$form->checkSubmit() && $news_id) {
 					$access_grp->setChecked(true);
 				}
 				/* Gruppen */
-				$result = mysql_query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
-						ORDER BY name ASC", DB_CMS)
+				$result = Database::instance()->query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
+						ORDER BY name ASC")
 						OR FatalError(FATAL_ERROR_MYSQL);
-				while ($row = mysql_fetch_array($result)) {
+				while ($row = $result->fetch_assoc()) {
 					$access_groups->addOption($row['name'], 1<<$row['id'],
 							(bool)($line['access'] & (1<<$row['id'])));
 				}
@@ -140,21 +140,21 @@ if (!$form->checkSubmit() && $news_id) {
 }
 else {
 	/* Kategorien */
-	$res_cat = mysql_query("SELECT id, name FROM ".DB_TABLE_PLUGIN."news_categorie
-			ORDER BY name ASC", DB_CMS)
+	$res_cat = Database::instance()->query("SELECT id, name FROM ".DB_TABLE_PLUGIN."news_categorie
+			ORDER BY name ASC")
 			OR FatalError(FATAL_ERROR_MYSQL);
-	while ($row = mysql_fetch_array($res_cat)) {
+	while ($row = $res_cat->fetch_assoc()) {
 		$news_categorie->addOption($row['name'], $row['id']);
 	}
-	
+
 	/* Benutzer Gruppen */
 	if (ACP_ACCESS_SYSTEM_EN) {
 		if (!$form->checkSubmit())
 			$access_all->setChecked(true);
-		$result = mysql_query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
-				ORDER BY name ASC", DB_CMS)
+		$result = Database::instance()->query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
+				ORDER BY name ASC")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		while ($row = mysql_fetch_array($result)) {
+		while ($row = $result->fetch_assoc()) {
 			$access_groups->addOption($row['name'], 1<<$row['id']);
 		}
 	}
@@ -174,7 +174,7 @@ if (!isset($abort)) {
 	        /* ID Str ermitteln */
 			$validate_id_str = getIdStr($caption->getValue(),
 					DB_TABLE_PLUGIN."news", "&& id!=".$news_id);
-			
+
 			if (ACP_ACCESS_SYSTEM_EN) {
 				/* Berechtigungen berechnen */
 				if ($access_grp->getValue()) {
@@ -191,7 +191,7 @@ if (!isset($abort)) {
 			else {
 				$access = 0;
 			}
-			
+
 			/* Aenderung abspeichern */
 			if ($news_id) {
 				$sql = "UPDATE ".DB_TABLE_PLUGIN."news SET id_str='".$validate_id_str."',
@@ -213,14 +213,14 @@ if (!isset($abort)) {
 						'".StdSqlSafety(StdWysiwymPrepare($news_long->getValue(), false))."',
 						".$_SESSION['admin_id'].", ".TIME_STAMP.", ".$access.", ".(int)$locked->getValue().")";
 			}
-			if (mysql_query($sql, DB_CMS)) {
+			if (Database::instance()->query($sql)) {
 				/* Speicherung erfolgreich -> Newsletter */
 				echo ActionReport(REPORT_OK, "Gespeichert", "Die Neuigkeit wurde erfolgreich gespeichert!");
 			}
 			else {
 				/* Fehler beim speichern */
 				echo ActionReport(REPORT_ERROR, "Fehler", "Es trat eine Fehler beim abspeichern auf!
-						<br />MySQL Fehler: ".mysql_error(DB_CMS));
+						<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 			}
 		}
 	}

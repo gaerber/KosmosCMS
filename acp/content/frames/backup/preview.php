@@ -35,9 +35,9 @@ $ACP_ApplicationInfo['body_arg'] = 'id="content"';
 ///////////////////////////////////////////////////////
 
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-	$result = mysql_query("SELECT html FROM ".DB_TABLE_ROOT."cms_content WHERE id=".StdSqlSafety($_GET['id']), DB_CMS)
+	$result = Database::instance()->query("SELECT html FROM ".DB_TABLE_ROOT."cms_content WHERE id=".StdSqlSafety($_GET['id']))
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		echo $line['html'];
 	}
 	else {

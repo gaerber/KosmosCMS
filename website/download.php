@@ -203,7 +203,8 @@ $config['locked'] = $locked_merge;
 ///////////////////////////////////////
 
 if (!($config['access'] > 0 && CheckAccess($config['access']) && $config['locked'] == 0
-		|| (isset($config['module']) && ($config['locked'] != 0 || $config['access'] != 0) && LoginSystem(DB_CMS) && $_SESSION['admin_time_lastaction'] >= TIME_STAMP - MAX_ACP_LOGIN_TIME && (
+		|| (isset($config['module']) && ($config['locked'] != 0 || $config['access'] != 0) 
+						&& LoginSystem(Database::instance()) && $_SESSION['admin_time_lastaction'] >= TIME_STAMP - MAX_ACP_LOGIN_TIME && (
 				($config['module']=='photos' && ACP_AdminAccess(ACP_ACCESS_M_PHOTOS))
 				||($config['module']=='mysqlbackups' && ACP_AdminAccess(ACP_ACCESS_ADMIN))
 			))

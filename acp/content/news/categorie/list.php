@@ -37,19 +37,19 @@ echo "<h1 class=\"first\">Kategorien</h1>";
 /*** Aktionen ****************************************/
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 	/* Kategorie darf nicht verwendet werden */
-	$result_num_news = mysql_query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."news
-			WHERE categorie_id=".$_GET['delete'], DB_CMS)
+	$result_num_news = Database::instance()->query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."news
+			WHERE categorie_id=".$_GET['delete'])
 			OR FatalError(FATAL_ERROR_MYSQL);
-	$line = mysql_fetch_row($result_num_news);
-	
+	$line = $result_num_news->fetch_row();
+
 	if ($line[0] == 0) {
-		if (mysql_query("DELETE FROM ".DB_TABLE_PLUGIN."news_categorie
-				WHERE id=".StdSqlSafety($_GET['delete']), DB_CMS)) {
+		if (Database::instance()->query("DELETE FROM ".DB_TABLE_PLUGIN."news_categorie
+				WHERE id=".StdSqlSafety($_GET['delete']))) {
 			echo ActionReport(REPORT_OK, "Kategorie gelöscht", "Die Kategorie wurde erfolgreich gelöscht!");
 		}
 		else {
 			echo ActionReport(REPORT_ERROR, "Fehler",
-					"Die Kategorie konnte nicht gelöscht werden!<br />MySQL Fehler: ".mysql_error(DB_CMS));
+					"Die Kategorie konnte nicht gelöscht werden!<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 		}
 	}
 	else {
@@ -72,23 +72,23 @@ echo "    <tr class=\"table_title\">
 
 $row_ctr = 1;
 
-$result = mysql_query("SELECT id, name
+$result = Database::instance()->query("SELECT id, name
 		FROM ".DB_TABLE_PLUGIN."news_categorie
-		ORDER BY name ASC", DB_CMS)
+		ORDER BY name ASC")
 		OR FatalError(FATAL_ERROR_MYSQL);
-while ($row = mysql_fetch_array($result)) {
+while ($row = $result->fetch_assoc()) {
 	if ($row_ctr++ % 2)
 		echo "    <tr class=\"table_odd\">\r\n";
 	else
 		echo "    <tr class=\"table_even\">\r\n";
 
 	echo "      <td>".$row['name']."</td>\r\n";
-	
+
 	/* Berechnung anzahl Neuigkeiten */
-	$result_num_news = mysql_query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."news
-			WHERE categorie_id=".$row['id'], DB_CMS)
+	$result_num_news = Database::instance()->query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."news
+			WHERE categorie_id=".$row['id'])
 			OR FatalError(FATAL_ERROR_MYSQL);
-	$line = mysql_fetch_row($result_num_news);
+	$line = $result_num_news->fetch_row();
 	$num_news = $line[0];
 	echo "      <td>".$num_news."</td>\r\n";
 
@@ -100,7 +100,7 @@ while ($row = mysql_fetch_array($result)) {
 
 	/* Kategorie umbenennen */
 	echo "      <td class=\"icon\"><a href=\"?page=news-categorie-edit&amp;id=".$row['id']."\" onmouseover=\"Tip('Kategorie umbenennen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/categorie/edit.png\" alt=\"\" /></a></td>\r\n";
-	
+
 	/* Kategorie loeschen */
 	if ($num_news == 0)
 		echo "      <td class=\"icon\"><a href=\"javascript:confirmDeletion('?page=news-categorie-list&amp;delete=".$row['id']."', 'Wollen Sie wirklich diese Kategorie löschen?')\" onmouseover=\"Tip('Kategorie löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/categorie/delete.png\" alt=\"\" /></a></td>\r\n";

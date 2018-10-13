@@ -48,10 +48,10 @@ else {
 
 /* Kategorie ID pruefen */
 if ($categorie_id) {
-	$result = mysql_query("SELECT name FROM ".DB_TABLE_PLUGIN."news_categorie
-			WHERE id=".$categorie_id, DB_CMS)
+	$result = Database::instance()->query("SELECT name FROM ".DB_TABLE_PLUGIN."news_categorie
+			WHERE id=".$categorie_id)
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		/* Defaultwerte Setzen */
 		if (!$form->checkSubmit())
 			$name->setValue($line['name']);
@@ -70,32 +70,32 @@ if (!isset($dont_show_form)) {
 	if ($form->checkForm()) {
 		/* Pruefen dass Kategorie noch nicht existiert */
 		$validate_id_str = ValidateFileSystem($name->getValue());
-		$result = mysql_query("SELECT id FROM ".DB_TABLE_PLUGIN."news_categorie
+		$result = Database::instance()->query("SELECT id FROM ".DB_TABLE_PLUGIN."news_categorie
 				WHERE (id_str='".$validate_id_str."' || name='".StdSqlSafety($name->getValue())."')
-				 && id!=".$categorie_id, DB_CMS)
+				 && id!=".$categorie_id)
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if (mysql_num_rows($result) == 0) {
+		if ($result->num_rows == 0) {
 			/* Speichern */
 			if ($categorie_id) {
-				if (mysql_query("UPDATE ".DB_TABLE_PLUGIN."news_categorie 
+				if (Database::instance()->query("UPDATE ".DB_TABLE_PLUGIN."news_categorie 
 						SET id_str='".$validate_id_str."', name='".StdSqlSafety($name->getValue())."'
-						WHERE id=".$categorie_id, DB_CMS))
+						WHERE id=".$categorie_id))
 					echo ActionReport(REPORT_OK, "Kategorie gespeichert",
 							"Die Änderungen wurden erfolgreich übernommen.");
 				else
 					echo ActionReport(REPORT_ERROR, "Fehler",
 							"Die Änderungen konnten nicht übernommen werden.
-							<br />MySQL Fehler: ".mysql_error(DB_CMS));
+							<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 			}
 			else {
-				if (mysql_query("INSERT INTO ".DB_TABLE_PLUGIN."news_categorie(id_str, name)
-						VALUE('".$validate_id_str."', '".StdSqlSafety($name->getValue())."')", DB_CMS))
+				if (Database::instance()->query("INSERT INTO ".DB_TABLE_PLUGIN."news_categorie(id_str, name)
+						VALUE('".$validate_id_str."', '".StdSqlSafety($name->getValue())."')"))
 					echo ActionReport(REPORT_OK, "Kategorie erstellt",
 							"Die Kategorie wurden erfolgreich erstellt.");
 				else
 					echo ActionReport(REPORT_ERROR, "Fehler",
 							"Die Kategorie konnten nicht erstellt werden.
-							<br />MySQL Fehler: ".mysql_error(DB_CMS));
+							<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 			}
 		}
 		else {

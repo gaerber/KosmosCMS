@@ -40,11 +40,11 @@ echo "<h1 class=\"first\">Benutzer</h1>";
 
 /*** Aktionen ****************************************/
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-	$result = mysql_query('SELECT user_id_str FROM '.DB_TABLE_ROOT.'cms_access_user
-			WHERE user_id='.StdSqlSafety($_GET['delete']), DB_CMS);
-	if ($line = mysql_fetch_array($result)) {
-		if (mysql_query("DELETE FROM ".DB_TABLE_ROOT."cms_access_user
-				WHERE user_id=".StdSqlSafety($_GET['delete']), DB_CMS)) {
+	$result = Database::instance()->query('SELECT user_id_str FROM '.DB_TABLE_ROOT.'cms_access_user
+			WHERE user_id='.StdSqlSafety($_GET['delete']));
+	if ($line = $result->fetch_assoc()) {
+		if (Database::instance()->query("DELETE FROM ".DB_TABLE_ROOT."cms_access_user
+				WHERE user_id=".StdSqlSafety($_GET['delete']))) {
 			/* Benutzerbild loeschen, falls vorhanden */
 			if (is_array($UserSystem_imagesSettings)) {
 				$ftp = new ftp();
@@ -59,7 +59,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 		}
 		else {
 			echo ActionReport(REPORT_ERROR, "Fehler",
-					"Der Benutzer konnte nicht gelöscht werden!<br />MySQL Fehler: ".mysql_error(DB_CMS));
+					"Der Benutzer konnte nicht gelöscht werden!<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 		}
 	}
 	else {
@@ -68,10 +68,10 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 }
 
 if (isset($_GET['locked']) && is_numeric($_GET['locked'])) {
-	if (!mysql_query("UPDATE ".DB_TABLE_ROOT."cms_access_user SET user_locked=(!user_locked)
-			WHERE user_id=".StdSqlSafety($_GET['locked']), DB_CMS)) {
+	if (!Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_access_user SET user_locked=(!user_locked)
+			WHERE user_id=".StdSqlSafety($_GET['locked']))) {
 		echo ActionReport(REPORT_ERROR, "Fehler",
-				"Der Benutzer konnte nicht gesperrt/entsperrt werden!<br />MySQL Fehler: ".mysql_error(DB_CMS));
+				"Der Benutzer konnte nicht gesperrt/entsperrt werden!<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 	}
 }
 
@@ -83,10 +83,10 @@ echo "<p><img src=\"img/icons/user/user_add.png\" alt=\"\" />
 $filter_sql = "";
 $filter_txt = "";
 if (isset($_GET['group']) && is_numeric($_GET['group'])) {
-	$result = mysql_query("SELECT name FROM ".DB_TABLE_ROOT."cms_access_group
-			WHERE id=".(int)$_GET['group'], DB_CMS)
+	$result = Database::instance()->query("SELECT name FROM ".DB_TABLE_ROOT."cms_access_group
+			WHERE id=".(int)$_GET['group'])
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		$filter_sql = " WHERE (user_access & ". (1 << ((int)$_GET['group'])) .") ";
 		echo ActionReport(REPORT_INFO, "Filter", "Alle Benutzer aus der Gruppe: ".$line['name']);
 	}
@@ -94,10 +94,10 @@ if (isset($_GET['group']) && is_numeric($_GET['group'])) {
 
 /*** Tabelle *****************************************/
 /* Anzahl Benutzer Ermitteln */
-$result = mysql_query("SELECT count(*)
-		FROM ".DB_TABLE_ROOT."cms_access_user ".$filter_sql, DB_CMS)
+$result = Database::instance()->query("SELECT count(*)
+		FROM ".DB_TABLE_ROOT."cms_access_user ".$filter_sql)
 		OR FatalError(FATAL_ERROR_MYSQL);
-$line = mysql_fetch_row($result);
+$line = $result->fetch_row();
 
 if ($line[0] > 0) {
 	/* Berechnung Seitenzahlen */
@@ -113,15 +113,15 @@ if ($line[0] > 0) {
 	echo "      <td colspan=\"3\"></td>
 	    </tr>\r\n";
 	
-	$result = mysql_query("SELECT user_id, user_name, user_login, user_lastlogin, user_locked
+	$result = Database::instance()->query("SELECT user_id, user_name, user_login, user_lastlogin, user_locked
 			FROM ".DB_TABLE_ROOT."cms_access_user
 			".$filter_sql."	ORDER BY user_name ASC
-			LIMIT ".$classPagination->Offset().",".PAGINATION_PER_PAGE_LINE, DB_CMS)
+			LIMIT ".$classPagination->Offset().",".PAGINATION_PER_PAGE_LINE)
 			OR FatalError(FATAL_ERROR_MYSQL);
 	
 	$row_ctr = 1;
 	
-	while ($row = mysql_fetch_array($result)) {
+	while ($row = $result->fetch_assoc()) {
 		if ($row_ctr++ % 2)
 			echo "    <tr class=\"table_odd\">\r\n";
 		else

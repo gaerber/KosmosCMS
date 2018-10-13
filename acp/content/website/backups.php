@@ -33,29 +33,29 @@ $ACP_ApplicationInfo['menu_replace'] = "id=\"secondmenu_menustamm\"";
 ///////////////////////////////////////////////////////
 
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-	$result = mysql_query("SELECT id, label FROM ".DB_TABLE_ROOT."cms_menu
-			WHERE menu_is_categorie=0 && id=".StdSqlSafety($_GET['id']), DB_CMS)
+	$result = Database::instance()->query("SELECT id, label FROM ".DB_TABLE_ROOT."cms_menu
+			WHERE menu_is_categorie=0 && id=".StdSqlSafety($_GET['id']))
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		/* Titel */
 		echo "<h1 class=\"first\">Backups der Seite ".$line['label']."</h1>\r\n";
 
 		/* Bakups wiederherstellen */
 		if (isset($_GET['backup']) && is_numeric($_GET['backup'])) {
-			$result = mysql_query("SELECT html FROM ".DB_TABLE_ROOT."cms_content
-					WHERE page_id=".$line['id']." && id=".StdSqlSafety($_GET['backup']), DB_CMS)
+			$result = Database::instance()->query("SELECT html FROM ".DB_TABLE_ROOT."cms_content
+					WHERE page_id=".$line['id']." && id=".StdSqlSafety($_GET['backup']))
 					OR FatalError(FATAL_ERROR_MYSQL);
-			if ($line_backup = mysql_fetch_array($result)) {
+			if ($line_backup = $result->fetch_assoc()) {
 				/* Wiederherstellen */
-				if (mysql_query("INSERT INTO ".DB_TABLE_ROOT."cms_content(page_id, html, writer, timestamp)
+				if (Database::instance()->query("INSERT INTO ".DB_TABLE_ROOT."cms_content(page_id, html, writer, timestamp)
 						VALUES(".$line['id'].", '".$line_backup['html']."', ".$_SESSION['admin_id'].",
-						".TIME_STAMP.")", DB_CMS)) {
+						".TIME_STAMP.")")) {
 					echo ActionReport(REPORT_OK, "Backup wiederhergestellt",
 							"Das Backup wurde erfolgreich wiederhergestellt!");
 				}
 				else {
 					echo ActionReport(REPORT_ERROR, "Wiederherstellungsfehler",
-							"Das Backup konnte nicht wiederhergestellt werden!<br />MySQL Fehler: ".mysql_error(DB_CMS));
+							"Das Backup konnte nicht wiederhergestellt werden!<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 				}
 			}
 			else {
@@ -66,15 +66,15 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 		}
 
 		/* Backups holen mit Seitenzahlen */
-		$result = mysql_query("SELECT count(*) FROM ".DB_TABLE_ROOT."cms_content
-				WHERE page_id=".$line['id'], DB_CMS)
+		$result = Database::instance()->query("SELECT count(*) FROM ".DB_TABLE_ROOT."cms_content
+				WHERE page_id=".$line['id'])
 				OR FatalError(FATAL_ERROR_MYSQL);
-		$count = mysql_fetch_array($result);
+		$count = $result->fetch_row();
 		if ($count[0]) {
 			$c_pages = new pagination($count[0], isset($_GET['subpage']) ? $_GET['subpage'] : 1, 20);
-			$result = mysql_query("SELECT id, writer, timestamp FROM ".DB_TABLE_ROOT."cms_content
+			$result = Database::instance()->query("SELECT id, writer, timestamp FROM ".DB_TABLE_ROOT."cms_content
 					WHERE page_id=".$line['id']."
-					ORDER BY timestamp DESC LIMIT ".$c_pages->Offset().",".PAGINATION_PER_PAGE_LINE, DB_CMS)
+					ORDER BY timestamp DESC LIMIT ".$c_pages->Offset().",".PAGINATION_PER_PAGE_LINE)
 					OR FatalError(FATAL_ERROR_MYSQL);
 
 			/* Tabellenkopf */
@@ -86,7 +86,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 			$writer_name = "";
 			$writer_email = "";
 
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = $result->fetch_assoc()) {
 				if ($row_ctr++ % 2)
 					echo "<tr class=\"table_odd\">";
 				else

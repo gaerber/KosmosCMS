@@ -35,19 +35,19 @@ echo "<h1 class=\"first\">Gästebucheinträge</h1>";
 
 /* Eintrag loeschen */
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-	if (mysql_query("DELETE FROM ".DB_TABLE_PLUGIN."guestbook
-			WHERE id=".StdSqlSafety($_GET['delete']), DB_CMS)) {
+	if (Database::instance()->query("DELETE FROM ".DB_TABLE_PLUGIN."guestbook
+			WHERE id=".StdSqlSafety($_GET['delete']))) {
 		echo ActionReport(REPORT_OK, "Eintrag gelöscht", "Der Eintrag wurde erfolgreich gelöscht!");
 	}
 	else {
 		echo ActionReport(REPORT_ERROR, "Fehler beim löschen",
-				"Der Eintrag konnte nicht gelöscht werden!<br />MySQL Fehler:".mysql_error(DB_CMS));
+				"Der Eintrag konnte nicht gelöscht werden!<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 	}
 }
 
-$result = mysql_query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."guestbook", DB_CMS)
+$result = Database::instance()->query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."guestbook")
 		OR FatalError(FATAL_ERROR_MYSQL);
-$line = mysql_fetch_row($result);
+$line = $result->fetch_row();
 
 
 if ($line[0] > 0) {
@@ -55,21 +55,21 @@ if ($line[0] > 0) {
 	$classPagination = new pagination($line[0], isset($_GET[PAGE_POINTER])
 			? $_GET[PAGE_POINTER] : 1, PAGINATION_PER_PAGE);
 	
-	$result = mysql_query("SELECT * FROM ".DB_TABLE_PLUGIN."guestbook ORDER BY timestamp DESC
-			LIMIT ".$classPagination->Offset().",".PAGINATION_PER_PAGE, DB_CMS)
+	$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_PLUGIN."guestbook ORDER BY timestamp DESC
+			LIMIT ".$classPagination->Offset().",".PAGINATION_PER_PAGE)
 			OR FatalError(FATAL_ERROR_MYSQL);
 	
 	/* Ausgabe Liste */
 	echo printBoxStart();
 	
-	while ($row = mysql_fetch_array($result)) {
+	while ($row = $result->fetch_array()) {
 		/* Benutzerinfos bei registrierten Benutzer */
 		if ($row['writer_id']) {
-			$res = mysql_query("SELECT user_name, user_email, user_website
+			$res = Database::instance()->query("SELECT user_name, user_email, user_website
 					FROM ".DB_TABLE_ROOT."cms_access_user
-					WHERE user_id=".$row['writer_id'], DB_CMS)
+					WHERE user_id=".$row['writer_id'])
 					OR FatalError(FATAL_ERROR_MYSQL);
-			if ($line = mysql_fetch_array($res)) {
+			if ($line = $res->fetch_assoc()) {
 				/* Daten ueberschreiben */
 				$row['writer_name'] = $line['user_name'];
 				$row['writer_email'] = $line['user_email'];
