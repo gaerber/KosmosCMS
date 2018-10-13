@@ -39,10 +39,10 @@ echo '<h1 class="first">Besucherstatistik</h1>';
 $stats_ctr = array();
 
 /* Statistik starten ab dem ersten Tag, der in der Datenbank ist */
-$result = mysql_query('SELECT MIN(day) AS day_start, DATEDIFF(CURRENT_DATE, MIN(day)) AS days_online
-		FROM '.DB_TABLE_PLUGIN.'stats_day', DB_CMS)
+$result = Database::instance()->query('SELECT MIN(day) AS day_start, DATEDIFF(CURRENT_DATE, MIN(day)) AS days_online
+		FROM '.DB_TABLE_PLUGIN.'stats_day')
 		OR FatalError(FATAL_ERROR_MYSQL);
-if ($line = mysql_fetch_assoc($result)) {
+if ($line = $result->fetch_assoc()) {
 	$stats_ctr['StatOnlineDays'] = $line['days_online'] + 1;
 }
 else {
@@ -50,24 +50,24 @@ else {
 }
 
 /* Besucher gesamt */
-$result = mysql_query('SELECT name, number FROM '.DB_TABLE_ROOT.'cms_register 
-		WHERE name="Stats_CtrVisitors" OR name="Stats_CtrBots" OR name="Stats_CtrSpamBlock"', DB_CMS)
+$result = Database::instance()->query('SELECT name, number FROM '.DB_TABLE_ROOT.'cms_register 
+		WHERE name="Stats_CtrVisitors" OR name="Stats_CtrBots" OR name="Stats_CtrSpamBlock"')
 		OR FatalError(FATAL_ERROR_MYSQL);
-while ($row = mysql_fetch_assoc($result)) {
+while ($row = $result->fetch_assoc()) {
 	$stats_ctr[$row['name']] = $row['number'];
 }
 
 /* Seitenansichten gesamt */
-$result = mysql_query('SELECT SUM(views) FROM '.DB_TABLE_PLUGIN.'stats_views', DB_CMS)
+$result = Database::instance()->query('SELECT SUM(views) FROM '.DB_TABLE_PLUGIN.'stats_views')
 		OR FatalError(FATAL_ERROR_MYSQL);
-$line = mysql_fetch_row($result);
+$line = $result->fetch_row();
 $stats_ctr['Stats_CtrViews'] = $line[0];
 
 /* Besucher Online */
-$result = mysql_query('SELECT count(*) FROM '.DB_TABLE_PLUGIN.'stats_ip
-		WHERE timestamp>='.(TIME_STAMP - 300), DB_CMS)
+$result = Database::instance()->query('SELECT count(*) FROM '.DB_TABLE_PLUGIN.'stats_ip
+		WHERE timestamp>='.(TIME_STAMP - 300))
 		OR FatalError(FATAL_ERROR_MYSQL);
-$line = mysql_fetch_row($result);
+$line = $result->fetch_row();
 $stats_ctr['Stats_CtrOnline'] = $line[0];
 
 /* Ausgabe der Uebersicht */
@@ -99,11 +99,11 @@ echo printBoxEnd();
 /*** Tabelle Monatsstatistik *************************/
 
 /* Maximum ermitteln */
-$result = mysql_query('SELECT SUM(visitors) FROM '.DB_TABLE_PLUGIN.'stats_day
+$result = Database::instance()->query('SELECT SUM(visitors) FROM '.DB_TABLE_PLUGIN.'stats_day
 		GROUP BY YEAR(day), MONTH(day)
-		ORDER BY SUM(visitors) DESC LIMIT 0,1', DB_CMS)
+		ORDER BY SUM(visitors) DESC LIMIT 0,1')
 		OR FatalError(FATAL_ERROR_MYSQL);
-if (($line = mysql_fetch_row($result)) && $line[0] > 0) {
+if (($line = $result->fetch_row()) && $line[0] > 0) {
 	$max = $line[0];
 	
 	echo '<p>&nbsp;</p>';
@@ -115,14 +115,14 @@ if (($line = mysql_fetch_row($result)) && $line[0] > 0) {
 			<td></td>
 			</tr>';
 
-	$result = mysql_query('SELECT MONTH(day) AS month, YEAR(day) AS year, 
+	$result = Database::instance()->query('SELECT MONTH(day) AS month, YEAR(day) AS year, 
 			SUM(visitors) AS visitors, SUM(views) AS views 
 			FROM '.DB_TABLE_PLUGIN.'stats_day GROUP BY YEAR(day), MONTH(day)
-			ORDER BY day DESC', DB_CMS)
+			ORDER BY day DESC')
 			OR FatalError(FATAL_ERROR_MYSQL);
 	
 	$row_ctr = 1;
-	while ($row = mysql_fetch_assoc($result)) {
+	while ($row = $result->fetch_assoc()) {
 		if ($row_ctr++ % 2)
 			echo '<tr class="table_odd">';
 		else

@@ -34,10 +34,10 @@ echo "<p>Nachstehend ist eine Liste aller erlaubten Platzhalter der Nachricht<p>
 
 echo "<ol>";
 
-$result = mysql_query("SHOW COLUMNS FROM ".DB_TABLE_ROOT."cms_access_user", DB_CMS)
+$result = Database::instance()->query("SHOW COLUMNS FROM ".DB_TABLE_ROOT."cms_access_user")
 		OR FatalError(FATAL_ERROR_MYSQL);
 
-while ($row = mysql_fetch_array($result)) {
+while ($row = $result->fetch_assoc()) {
 	if ($row['Type'][0] != 't' && $row['Type'][0] != 'b' && $row['Field'] != "user_password") {
 		echo "<li>{".$row['Field']."}</li>";
 	}

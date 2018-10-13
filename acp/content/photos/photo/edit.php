@@ -52,9 +52,9 @@ else {
 /* Existiert dieses Album */
 if ($current_album = readAlbumConfig($ftp, $current_path)) {
 	/* Existiert das Foto in der Datenbank und im Filesystem? */
-	$result = mysql_query('SELECT * FROM '.DB_TABLE_PLUGIN.'photoalbum_photo WHERE album_id='.$current_album['id'].' AND id='.StdSqlSafety($_GET['id']), DB_CMS)
+	$result = Database::instance()->query('SELECT * FROM '.DB_TABLE_PLUGIN.'photoalbum_photo WHERE album_id='.$current_album['id'].' AND id='.StdSqlSafety($_GET['id']))
 		OR FatalError(FATAL_ERROR_MYSQL);
-	$line = mysql_fetch_assoc($result);
+	$line = $result->fetch_assoc();
 	if ($line && $ftp->fileExists($current_path.$line['file_name'])) {
 		
 		$access = getRecursiveAlbumAccess($current_album['id']);
@@ -89,13 +89,13 @@ if ($current_album = readAlbumConfig($ftp, $current_path)) {
 		/* Formular pruefen */
 		if ($form->checkForm()) {
 			/* Kommentar abspeichern */
-			if (mysql_query('UPDATE '.DB_TABLE_PLUGIN.'photoalbum_photo SET caption="'.StdSqlSafety($caption->getValue()).'" WHERE album_id='.$current_album['id'].' AND id='.StdSqlSafety($_GET['id']), DB_CMS)) {
+			if (Database::instance()->query('UPDATE '.DB_TABLE_PLUGIN.'photoalbum_photo SET caption="'.StdSqlSafety($caption->getValue()).'" WHERE album_id='.$current_album['id'].' AND id='.StdSqlSafety($_GET['id']))) {
 				echo ActionReport(REPORT_OK, 'Kommentar gespeichert',
 						'Der Fotokommentar wurde erfolgreich gespeichert.');
 			}
 			else {
 				echo ActionReport(REPORT_ERROR, 'MySQL Error',
-						'Der Fotokommentar konnte nicht gespeichert werden. '.mysql_error(DB_CMS));
+						'Der Fotokommentar konnte nicht gespeichert werden. '.Database::instance()->getErrorMessage());
 			}
 		}
 		else {

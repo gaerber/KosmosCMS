@@ -47,10 +47,10 @@ if ($_SESSION['admin_lastlogin'] > 0) {
 /* Daten Infos */
 $quantity_cat = 0;
 $quantity_page = 0;
-$result = mysql_query('SELECT menu_is_categorie, count(*) as quantity
-		FROM '.DB_TABLE_ROOT.'cms_menu GROUP BY menu_is_categorie', DB_CMS)
+$result = Database::instance()->query('SELECT menu_is_categorie, count(*) as quantity
+		FROM '.DB_TABLE_ROOT.'cms_menu GROUP BY menu_is_categorie')
 		OR FatalError(FATAL_ERROR_MYSQL);
-while ($row = mysql_fetch_array($result)) {
+while ($row = $result->fetch_assoc()) {
 	if ($row['menu_is_categorie'])
 		$quantity_cat = $row['quantity'];
 	else
@@ -68,41 +68,41 @@ if (ACP_MODULE_STATISTIC) {
 	$message = '';
 	
 	/* Besucher gesamt */
-	$result = mysql_query('SELECT number FROM '.DB_TABLE_ROOT.'cms_register 
-			WHERE name="Stats_CtrVisitors"', DB_CMS)
+	$result = Database::instance()->query('SELECT number FROM '.DB_TABLE_ROOT.'cms_register 
+			WHERE name="Stats_CtrVisitors"')
 			OR FatalError(FATAL_ERROR_MYSQL);
-	$line = mysql_fetch_row($result);
+	$line = $result->fetch_row();
 	$message .= '<span class="boxnumber">'.number_format($line[0], 0, '.', '\'').'</span>';
 	
 	/* Seitenangichten gesamt */
-	$result = mysql_query('SELECT SUM(views) FROM '.DB_TABLE_PLUGIN.'stats_views', DB_CMS)
+	$result = Database::instance()->query('SELECT SUM(views) FROM '.DB_TABLE_PLUGIN.'stats_views')
 			OR FatalError(FATAL_ERROR_MYSQL);
-	$line = mysql_fetch_row($result);
+	$line = $result->fetch_row();
 	//$message .= '/ <span class="boxnumber">'.number_format($line[0], 0, '.', '\'').'</span> Besucher<br />';
 	$message .= ' Besucher<br />';
 	
 	/* Besucher heute */
-	$result = mysql_query('SELECT visitors, views FROM '.DB_TABLE_PLUGIN.'stats_day
-			WHERE day=CURRENT_DATE', DB_CMS)
+	$result = Database::instance()->query('SELECT visitors, views FROM '.DB_TABLE_PLUGIN.'stats_day
+			WHERE day=CURRENT_DATE')
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_assoc($result)) {
+	if ($line = $result->fetch_assoc()) {
 		$message .= '<span class="boxnumber">'.number_format($line['visitors'], 0, '.', '\'').'</span> <!--/ 
 		<span class="boxnumber">'.number_format($line['views'], 0, '.', '\'').'</span>--> Heute<br />';
 	}
 	
 	/* Besucher gestern */
-	$result = mysql_query('SELECT visitors, views FROM '.DB_TABLE_PLUGIN.'stats_day
-			WHERE day=CURRENT_DATE-1', DB_CMS)
+	$result = Database::instance()->query('SELECT visitors, views FROM '.DB_TABLE_PLUGIN.'stats_day
+			WHERE day=CURRENT_DATE-1')
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_assoc($result))
+	if ($line = $result->fetch_assoc())
 		$message .= '<span class="boxnumber">'.number_format($line['visitors'], 0, '.', '\'').'</span> <!--/ 
 		<span class="boxnumber">'.number_format($line['views'], 0, '.', '\'').'</span>--> Gestern<br />';
 	
 	/* Besucher Online */
-	$result = mysql_query('SELECT count(*) FROM '.DB_TABLE_PLUGIN.'stats_ip
-			WHERE timestamp>='.(TIME_STAMP - 300), DB_CMS)
+	$result = Database::instance()->query('SELECT count(*) FROM '.DB_TABLE_PLUGIN.'stats_ip
+			WHERE timestamp>='.(TIME_STAMP - 300))
 			OR FatalError(FATAL_ERROR_MYSQL);
-	$line = mysql_fetch_row($result);
+	$line = $result->fetch_row();
 	$message .= '<span class="boxnumber">'.number_format($line[0], 0, '.', '\'').'</span> Online';
 	
 	echo printBox('Statistik', $message);

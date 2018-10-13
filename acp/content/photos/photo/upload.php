@@ -82,7 +82,7 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && $current_album['i
 				/* Existiert dieser Dateinamen bereits */
 				if ($overwrite->getValue() || !$ftp->fileExists($current_path.$file_data['name'])) {
 					/* Es duerfen keine doppeleintraege in der Datenbank vorhanden sein */
-					mysql_query('DELETE FROM '.DB_TABLE_PLUGIN.'photoalbum_photo WHERE file_name="'.$file_data['name'].'" AND album_id='.$current_album['id'], DB_CMS)
+					Database::instance()->query('DELETE FROM '.DB_TABLE_PLUGIN.'photoalbum_photo WHERE file_name="'.$file_data['name'].'" AND album_id='.$current_album['id'])
 							OR FatalError(FATAL_ERROR_MYSQL);
 					/* Datei auf FTP Server kopieren */
 					$ftp->ChangeDir($current_path);
@@ -111,15 +111,15 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && $current_album['i
 							}
 
 							/* Datenbankeintrag */
-							if (mysql_query('INSERT INTO '.DB_TABLE_PLUGIN.'photoalbum_photo(file_name, album_id, file_timestamp, caption, writer, timestamp)
+							if (Database::instance()->query('INSERT INTO '.DB_TABLE_PLUGIN.'photoalbum_photo(file_name, album_id, file_timestamp, caption, writer, timestamp)
 									VALUES("'.$file_data['name'].'", "'.$current_album['id'].'", '.$filetime.', "'.StdSqlSafety($comment).'", 
-									'.$_SESSION['admin_id'].', '.TIME_STAMP.')', DB_CMS)) {
+									'.$_SESSION['admin_id'].', '.TIME_STAMP.')')) {
 								echo ActionReport(REPORT_OK, 'Foto hochgeladen',
 										'Das Foto wurde erfolgreich hochgeladen!');
 							}
 							else {
 								echo ActionReport(REPORT_ERROR, 'MySQL Fehler',
-										'Datenbankeintrag konnte nicht erstellt werden! '.mysql_error(DB_CMS));
+										'Datenbankeintrag konnte nicht erstellt werden! '.Database::instance()->getErrorMessage());
 							}
 						}
 						else {

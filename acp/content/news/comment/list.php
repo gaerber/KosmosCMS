@@ -37,76 +37,76 @@ echo "<h1 class=\"first\">Neuigkeiten</h1>";
 
 /* Kommaentare loeschen */
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
-	if (mysql_query("DELETE FROM ".DB_TABLE_PLUGIN."news_comment
-			WHERE id=".StdSqlSafety($_GET['delete']), DB_CMS)) {
+	if (Database::instance()->query("DELETE FROM ".DB_TABLE_PLUGIN."news_comment
+			WHERE id=".StdSqlSafety($_GET['delete']))) {
 		echo ActionReport(REPORT_OK, "Kommentar gelöscht", "Der Kommentar wurde erfolgreich gelöscht!");
 	}
 	else {
 		echo ActionReport(REPORT_ERROR, "Fehler beim löschen",
-				"Der Kommentar konnte nicht gelöscht werden!<br />MySQL Fehler:".mysql_error(DB_CMS));
+				"Der Kommentar konnte nicht gelöscht werden!<br />MySQL Fehler:".Database::instance()->getErrorMessage());
 	}
 }
 
 /* ID pruefen */
 if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 	$news_id = (int) $_GET['id'];
-	
+
 	/* Neuigkeit Anzeigen */
-	$result = mysql_query("SELECT id, caption, news_short, writer, timestamp
-			FROM ".DB_TABLE_PLUGIN."news WHERE id=".$news_id, DB_CMS)
+	$result = Database::instance()->query("SELECT id, caption, news_short, writer, timestamp
+			FROM ".DB_TABLE_PLUGIN."news WHERE id=".$news_id)
 			OR FatalError(FATAL_ERROR_MYSQL);
-	
-	if ($line = mysql_fetch_array($result)) {
+
+	if ($line = $result->fetch_assoc()) {
 		/* Administrator Infos */
 		$admin_info_name = "";
 		$admin_info_email = "";
 		getWriterInfo($line['writer'], $admin_info_name, $admin_info_email);
-		
+
 		/* Ausgabe */
 		echo printBoxStart();
-		echo printBox($line['caption'], $line['news_short'], 
+		echo printBox($line['caption'], $line['news_short'],
 				"<a href=\"?page=news-edit&amp;id=".$line['id']."\" onmouseover=\"Tip('Neuigkeit bearbeiten')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/edit.png\" alt=\"\" /></a>
 				<a href=\"javascript:confirmDeletion('?page=news-news&amp;delete=".$line['id']."', 'Wollen Sie diese Neuigkeit wirklich löschen?')\" onmouseover=\"Tip('Neuigkeit löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/delete.png\" alt=\"\" /></a>",
 				printDate($line['timestamp'])." - ".$admin_info_name);
 		echo printBoxEnd();
-		
+
 		/* Liste mit allen Kommentaren */
 		echo "<h2>Kommentare</h2>";
-		
+
 		/* Anzahl Kommentare ermitteln*/
-		$result = mysql_query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."news_comment
-				WHERE news_id=".$news_id, DB_CMS)
+		$result = Database::instance()->query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."news_comment
+				WHERE news_id=".$news_id)
 				OR FatalError(FATAL_ERROR_MYSQL);
-		$line = mysql_fetch_row($result);
-		
+		$line = $result->fetch_row();
+
 		if ($line[0] > 0) {
 			/* Kommentare vorhanden */
 			$classPagination = new pagination($line[0], isset($_GET[PAGE_POINTER])
 					? $_GET[PAGE_POINTER] : 1, PAGINATION_PER_PAGE);
-			
-			$result = mysql_query("SELECT * FROM ".DB_TABLE_PLUGIN."news_comment
+
+			$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_PLUGIN."news_comment
 					WHERE news_id=".$news_id." ORDER BY timestamp DESC
-					LIMIT ".$classPagination->Offset().",".PAGINATION_PER_PAGE, DB_CMS)
+					LIMIT ".$classPagination->Offset().",".PAGINATION_PER_PAGE)
 					OR FatalError(FATAL_ERROR_MYSQL);
-			
+
 			echo printBoxStart();
-			
-			while ($row = mysql_fetch_array($result)) {
+
+			while ($row = $result->fetch_assoc()) {
 				/* Ausgaben der Kommentare */
 				/* Benutzerinfos bei registrierten Benutzer */
 				if ($row['writer_id']) {
-					$res = mysql_query("SELECT user_name, user_email, user_website
+					$res = Database::instance()->query("SELECT user_name, user_email, user_website
 							FROM ".DB_TABLE_ROOT."cms_access_user
-							WHERE user_id=".$row['writer_id'], DB_CMS)
+							WHERE user_id=".$row['writer_id'])
 							OR FatalError(FATAL_ERROR_MYSQL);
-					if ($line = mysql_fetch_array($res)) {
+					if ($line = $res->fetch_assoc()) {
 						/* Daten ueberschreiben */
 						$row['writer_name'] = $line['user_name'];
 						$row['writer_email'] = $line['user_email'];
 						$row['writer_website'] = $line['user_website'];
 					}
 				}
-				
+
 				/* Benutzerinformationen */
 				$user_infos = array();
 				if ($row['writer_email'])
@@ -114,16 +114,16 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 				if ($row['writer_website'])
 					$user_infos[] = $row['writer_website'];
 				$user_infos[] = printDate($row['timestamp'])." ".date(FORMAT_TIME, $row['timestamp']);
-				
+
 				/* Ausgabe */
-				echo printBox($row['writer_name'], $row['comment'], 
+				echo printBox($row['writer_name'], $row['comment'],
 						"<a href=\"?page=news-comment-edit&amp;id=".$row['id']."\" onmouseover=\"Tip('Kommentar bearbeiten')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/comment/edit.png\" alt=\"\" /></a>
 						<a href=\"javascript:confirmDeletion('?page=news-comment-list&amp;id=".$news_id."&amp;delete=".$row['id']."', 'Wollen Sie diesen Kommentar wirklich löschen?')\" onmouseover=\"Tip('Kommentar löschen')\" onmouseout=\"UnTip()\"><img src=\"img/icons/plugins/news/comment/delete.png\" alt=\"\" /></a>",
 						$user_infos, NULL, ($_SESSION['admin_lastlogin'] < $row['timestamp']));
 			}
-			
+
 			echo printBoxEnd();
-			
+
 			/* Seitenzahlen */
 			echo "<div class=\"pagination\">";
 			echo $classPagination->PaginationLinks("?page=news-comment-list&amp;id=".$news_id.

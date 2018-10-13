@@ -16,6 +16,7 @@
  |1.0     | 07.07.2011 | Programm erstellt.
  |1.0.1   | 11.07.2011 | UTF-8 Kodierung
  |1.0.2   | 14.03.2015 | Debugausgabe Projektabhaengig
+ |1.1     | 13.10.2018 | SQL API Umstellung
  -----------------------------------------------------
  Beschreibung :
  Sicherheitsstufen von Frames. Frames werden b.B. beim
@@ -60,9 +61,6 @@ include('../_classes.php');
 include('../_functions.php');
 include('_functions_acp.php');
 
-/* Datenbankverbindung herstellen */
-define('DB_CMS', DatabaseConnect());
-
 /* Informationen aus den Applikationen */
 $ACP_ApplicationInfo = array();
 
@@ -70,7 +68,7 @@ $ACP_ApplicationInfo = array();
 ///////////////////////////////////////
 // Login-System                      //
 ///////////////////////////////////////
-if (!LoginSystem(DB_CMS)) {
+if (!LoginSystem(Database::instance())) {
 	echo ActionReport(REPORT_ERROR, 'Keine berechtigung', 'Sie müssen sich anmelden um diese Seite zu sehen!');
 	die();
 }
@@ -157,6 +155,6 @@ else {
 ///////////////////////////////////////
 // Datenbankverbindung beenden       //
 ///////////////////////////////////////
-mysql_close(DB_CMS);
+Database::instance()->close();
 
 ?>

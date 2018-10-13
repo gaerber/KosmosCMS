@@ -17,6 +17,7 @@
  |2.0     | 29.01.2011 | Uebernahme
  |2.0.1   | 11.07.2011 | UTF-8 Kodierung
  |2.0.2   | 14.03.2015 | Debugausgabe Projektabhaengig
+ |2.1     | 13.10.2018 | SQL API Umstellung
  -----------------------------------------------------
  Beschreibung :
  Verwaltung des gesamten ACPs.
@@ -66,10 +67,6 @@ include('_menu.php');
 /* Messung der Generierungszeit starten */
 $Anfangszeit = getMicrotime();
 
-/* Datenbankverbindung herstellen */
-$db_stream = DatabaseConnect();
-define('DB_CMS', $db_stream);
-
 /* Informationen aus den Applikationen */
 $ACP_ApplicationInfo = array();
 
@@ -79,10 +76,10 @@ $ACP_ApplicationInfo = array();
 ///////////////////////////////////////
 if (isset($_POST['acp_login_name'], $_POST['acp_login_password'])) {
 	// User versucht sich einzuloggen
-	$result = mysql_query('SELECT *	FROM '.DB_TABLE_ROOT.'cms_admin
-			WHERE login="'.StdSqlSafety($_POST['acp_login_name']).'" && locked=0', DB_CMS)
+	$result = Database::instance()->query('SELECT *	FROM '.DB_TABLE_ROOT.'cms_admin
+			WHERE login="'.StdSqlSafety($_POST['acp_login_name']).'" && locked=0')
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($login_data = mysql_fetch_array($result)) {
+	if ($login_data = $result->fetch_assoc()) {
 		/* Loginname existiert */
 		if (sha1($_POST['acp_login_password']) == $login_data['password']) {
 			/* Login richtig -> Sessionen setzen */
@@ -96,9 +93,9 @@ if (isset($_POST['acp_login_name'], $_POST['acp_login_password'])) {
 			/* Rechte */
 			$_SESSION['admin_access'] = $login_data['access'];
 			/* Datum fuer last_login speichern */
-			mysql_query('UPDATE '.DB_TABLE_ROOT.'cms_admin
+			Database::instance()->query('UPDATE '.DB_TABLE_ROOT.'cms_admin
 					SET last_login='.TIME_STAMP.', ip_adress="'.$_SERVER['REMOTE_ADDR'].'"
-					WHERE admin_id='.$_SESSION['admin_id'], DB_CMS)
+					WHERE admin_id='.$_SESSION['admin_id'])
 					OR FatalError(FATAL_ERROR_MYSQL);
 			/* Relogin */
 			if (isset($_GET['page']) && $_GET['page'] == 'relogin') {
@@ -140,7 +137,7 @@ if (isset($_GET['page']) && $_GET['page'] == 'relogin') {
 ///////////////////////////////////////
 // Login-System                      //
 ///////////////////////////////////////
-if (!LoginSystem(DB_CMS)) {
+if (!LoginSystem(Database::instance())) {
 	die(LoginFormular(0));
 }
 else {
@@ -227,6 +224,6 @@ else {
 ///////////////////////////////////////
 // Datenbankverbindung beenden       //
 ///////////////////////////////////////
-mysql_close(DB_CMS);
+Database::instance()->close();
 
 ?>
