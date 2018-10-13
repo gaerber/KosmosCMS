@@ -30,6 +30,7 @@
  |2.1.1   | 01.02.2015 | Bugfix / Rename
  |2.1.2   | 08.03.2015 | ValidateFileSystem() mehrere Zusatzzeichen
  |2.1.3   | 09.08.2015 | isDatatypeAllowed eingefuehrt
+ |2.1.4   | 13.10.2018 | MySQL Fehlerausgabe
  -----------------------------------------------------
  Beschreibung :
  Alle Funktionen fuer die CMS Software
@@ -70,14 +71,18 @@ define("FATAL_ERROR_CONTENT", 1);
 define("FATAL_ERROR_MENU", 3);
 define("FATAL_ERROR_FILE", 4);
 function FatalError($error_nr) {
-	/* Datenbankverbindung beenden */
-	//mysql_close(DB_CMS);
-	
 	debug_print_backtrace();
 
 	/* Fehlerausgabe und Programmabbruch */
-	if ($error_nr == FATAL_ERROR_MYSQL)
-		die("MySqlError: " . mysql_error(DB_CMS));
+	if ($error_nr == FATAL_ERROR_MYSQL) {
+		if (Database::instance()->hasError()) {
+			die("New MySQL Error: " . Database::instance()->getErrorMessage());
+		}	
+		else {
+			// old style for compatibility
+			die("MySqlError: " . mysql_error(DB_CMS));
+		}
+	}
 	if ($error_nr == FATAL_ERROR_CONTENT)
 		die("Can't read error content!");
 	if ($error_nr == FATAL_ERROR_MENU)
