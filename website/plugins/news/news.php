@@ -32,20 +32,20 @@ if (ACP_MODULE_NEWS_EN) {
 	/* Einen Artikel (Komplette News mit Kommentaren ) */
 	if (isset($_GET[PLUGIN_NEWS_GETP_LONGNEWS]) && $_GET[PLUGIN_NEWS_GETP_LONGNEWS] != "") {
 		/* Komplette Neuigkeit ausgeben */
-		$result = mysql_query("SELECT * FROM ".DB_TABLE_PLUGIN."news
+		$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_PLUGIN."news
 				WHERE id_str='".StdSqlSafety($_GET[PLUGIN_NEWS_GETP_LONGNEWS])."'
-				&& locked=0", DB_CMS)
+				&& locked=0")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			/* Berechtigung pruefen */
 			if (CheckAccess($line['access'])) {
 				/* Ausgabe Neuigkeit */
 				$tpl = new tpl("plugins/news/article_long");
 				/* Kategorie Informationen */
-				$result = mysql_query("SELECT * FROM ".DB_TABLE_PLUGIN."news_categorie
-						WHERE id=".$line['categorie_id'], DB_CMS)
+				$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_PLUGIN."news_categorie
+						WHERE id=".$line['categorie_id'])
 						OR FatalError(FATAL_ERROR_MYSQL);
-				$line_cat = mysql_fetch_array($result);
+				$line_cat = $result->fetch_assoc();
 				$line['categorie_id_str'] = $line_cat['id_str'];
 				$line['categorie_name'] = $line_cat['name'];
 				/* Autor Informationen */
@@ -62,7 +62,7 @@ if (ACP_MODULE_NEWS_EN) {
 				$line['read_more_url_only'] = "{module_path}/".PLUGIN_NEWS_GETP_LONGNEWS."/".$line['id_str'];
 				$tpl->assign($line);
 				$tpl->out();
-				
+
 				/* Kommentare */
 				if (PLUGIN_NEWS_COMMENT_EN) {
 					/* Formular fuer Kommentare */
@@ -80,7 +80,7 @@ if (ACP_MODULE_NEWS_EN) {
 					$comment->setRowsCols(7,20);
 					$o_spam->printCaptcha();
 					$submit = $form->addElement('submit', 'btn', NULL, 'Speichern');
-					
+
 					/* Formular pruefen */
 					if ($form->checkForm()) {
 						if ($o_spam->check()) {
@@ -99,47 +99,47 @@ if (ACP_MODULE_NEWS_EN) {
 								$user_infos['email'] = StdSqlSafety($email->getValue());
 								$user_infos['website'] = StdSqlSafety($website->getValue());
 							}
-							if (mysql_query("INSERT INTO ".DB_TABLE_PLUGIN."news_comment(
+							if (Database::instance()->query("INSERT INTO ".DB_TABLE_PLUGIN."news_comment(
 									news_id, writer_id, writer_name, writer_email, writer_website,
 									comment, timestamp)VALUES(
 									".$line['id'].", ".$_SESSION['user_id'].", '".$user_infos['name']."',
 									'".$user_infos['email']."', '".$user_infos['website']."',
 									'".StdSqlSafety(StdContent($comment->getValue(), false))."',
-									".TIME_STAMP.")", DB_CMS)) {
+									".TIME_STAMP.")")) {
 								echo ActionReport(REPORT_OK, "Kommentar gespeichern",
 										"Vielen Dank für Ihren Kommentar!");
 							}
 							else {
 								echo ActionReport(REPORT_ERROR, "Fehler beim Abspeichern",
-										"Beim abspeichern trat eine Fehler auf!<br />Mysql Error: ".mysql_error(DB_CMS));
+										"Beim abspeichern trat eine Fehler auf!<br />Mysql Error: ".Database::instance()->getErrorMessage());
 							}
 						}
 					}
-					
+
 					/* Ausgabe der Kommentare (mit Seitenzahlen) */
-					$result = mysql_query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."news_comment
-							WHERE news_id=".$line['id'], DB_CMS)
+					$result = Database::instance()->query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."news_comment
+							WHERE news_id=".$line['id'])
 							OR FatalError(FATAL_ERROR_MYSQL);
-					$count = mysql_fetch_row($result);
-					
+					$count = $result->fetch_row();
+
 					if ($count[0] > 0) {
 						/* Eintraege vorhanden */
 						$classPagination = new pagination($count[0], isset($_GET[PLUGIN_NEWS_GETP_COM_PAGE])
 								? $_GET[PLUGIN_NEWS_GETP_COM_PAGE] : 1, PLUGIN_NEWS_NUM_COMMENT);
-						
-						$result = mysql_query("SELECT * FROM ".DB_TABLE_PLUGIN."news_comment
+
+						$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_PLUGIN."news_comment
 								WHERE news_id=".$line['id']." ORDER BY timestamp DESC
-								LIMIT ".$classPagination->Offset().",".PLUGIN_NEWS_NUM_COMMENT, DB_CMS)
+								LIMIT ".$classPagination->Offset().",".PLUGIN_NEWS_NUM_COMMENT)
 								OR FatalError(FATAL_ERROR_MYSQL);
-						
-						while ($row = mysql_fetch_array($result)) {
+
+						while ($row = $result->fetch_assoc()) {
 							/* Benutzerinfos bei registrierten Benutzer */
 							if ($row['writer_id']) {
-								$res = mysql_query("SELECT user_name, user_email_show, user_email, user_website
+								$res = Database::instance()->query("SELECT user_name, user_email_show, user_email, user_website
 										FROM ".DB_TABLE_ROOT."cms_access_user
-										WHERE user_id=".$row['writer_id'], DB_CMS)
+										WHERE user_id=".$row['writer_id'])
 										OR FatalError(FATAL_ERROR_MYSQL);
-								if ($line_usr = mysql_fetch_array($res)) {
+								if ($line_usr = $res->fetch_assoc()) {
 									/* Daten ueberschreiben */
 									$row['writer_name'] = $line_usr['user_name'];
 									if ($line_usr['user_email_show'])
@@ -149,10 +149,10 @@ if (ACP_MODULE_NEWS_EN) {
 									$row['writer_website'] = $line_usr['user_website'];
 								}
 							}
-							
+
 							/* Datum */
 							$row['date'] = printDate($row['timestamp']);
-							
+
 							/* Email */
 							if ($row['writer_email'] != "") {
 								$tpl = new tpl("plugins/news/comment_icon/email");
@@ -162,7 +162,7 @@ if (ACP_MODULE_NEWS_EN) {
 							else {
 								$place_holder['writer_email_tpl'] = "";
 							}
-							
+
 							/* Website */
 							if ($row['writer_website'] != "") {
 								$tpl = new tpl("plugins/guestbook/icon/website");
@@ -172,31 +172,31 @@ if (ACP_MODULE_NEWS_EN) {
 							else {
 								$place_holder['writer_website_tpl'] = "";
 							}
-							
+
 							/* Ausgabe */
 							$tpl = new tpl("plugins/news/comment");
 							$tpl->assign($place_holder);
 							$tpl->assign($row);
 							$tpl->out();
 						}
-						
+
 						/* Seitenzahlen */
 						if ($classPagination->NumberOfPage() > 1) {
 							echo "<div class=\"pagination\">";
 							echo $classPagination->PaginationLinks("{module_path}/".PLUGIN_NEWS_GETP_COM."/".$line['id_str']."/".PLUGIN_NEWS_GETP_COM_PAGE."/", PAGINATION_NUM);
 							echo "</div>\r\n";
 						}
-						
+
 						/* Neuster Kommentar fuer Stand der Seite */
-						$res = mysql_query('SELECT timestamp FROM '.DB_TABLE_PLUGIN.'news_comment
-								WHERE news_id='.$line['id'].' ORDER BY timestamp DESC LIMIT 1', DB_CMS)
+						$res = Database::instance()->query('SELECT timestamp FROM '.DB_TABLE_PLUGIN.'news_comment
+								WHERE news_id='.$line['id'].' ORDER BY timestamp DESC LIMIT 1')
 								OR FatalError(FATAL_ERROR_MYSQL);
-						if ($l = mysql_fetch_assoc($res)) {
+						if ($l = $res->fetch_assoc()) {
 							$PluginContent['date'] = printDate($l['timestamp']);
 						}
 					}
-					
-					
+
+
 					/* Ausgabe des Formulars */
 					if (!$form->checkForm()) {
 						$o_spam->printingForm();
@@ -226,50 +226,50 @@ if (ACP_MODULE_NEWS_EN) {
 		$filter_sql = "locked=0 ";
 		$filter_txt = "Beiträge";
 		if (isset($_GET[PLUGIN_NEWS_GETP_WRITER]) && $_GET[PLUGIN_NEWS_GETP_WRITER] != "") {
-			$result = mysql_query("SELECT admin_id, login, name FROM ".DB_TABLE_ROOT."cms_admin
-					WHERE login='".StdSqlSafety($_GET[PLUGIN_NEWS_GETP_WRITER])."'", DB_CMS)
+			$result = Database::instance()->query("SELECT admin_id, login, name FROM ".DB_TABLE_ROOT."cms_admin
+					WHERE login='".StdSqlSafety($_GET[PLUGIN_NEWS_GETP_WRITER])."'")
 					OR FatalError(FATAL_ERROR_MYSQL);
-			if ($line = mysql_fetch_array($result)) {
+			if ($line = $result->fetch_assoc()) {
 				$filter_sql .= "&& writer=".$line['admin_id']." ";
 				$filter_txt .= " von ".$line['name'];
 			}
 		}
 		if (isset($_GET[PLUGIN_NEWS_GETP_CAT]) && $_GET[PLUGIN_NEWS_GETP_CAT] != "") {
-			$result = mysql_query("SELECT id, id_str, name FROM ".DB_TABLE_PLUGIN."news_categorie
-					WHERE id_str='".StdSqlSafety($_GET[PLUGIN_NEWS_GETP_CAT])."'", DB_CMS)
+			$result = Database::instance()->query("SELECT id, id_str, name FROM ".DB_TABLE_PLUGIN."news_categorie
+					WHERE id_str='".StdSqlSafety($_GET[PLUGIN_NEWS_GETP_CAT])."'")
 					OR FatalError(FATAL_ERROR_MYSQL);
-			if ($line = mysql_fetch_array($result)) {
+			if ($line = $result->fetch_assoc()) {
 				$filter_sql .= "&& categorie_id=".$line['id'];
 				$filter_txt .= " aus der Kategorie ".$line['name'];
 			}
 		}
-		
+
 		/* Anzahl Neuigkeiten ermitteln*/
-		$result = mysql_query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."news WHERE ".$filter_sql." && ".CheckSQLAccess(), DB_CMS)
+		$result = Database::instance()->query("SELECT count(*) FROM ".DB_TABLE_PLUGIN."news WHERE ".$filter_sql." && ".CheckSQLAccess())
 				OR FatalError(FATAL_ERROR_MYSQL);
-		$line = mysql_fetch_row($result);
-		
+		$line = $result->fetch_row();
+
 		if ($line[0] > 0) {
 			/* Eintraege vorhanden */
 			if (PLUGIN_NEWS_VIEW_ALL) {
 				$classPagination = new pagination($line[0], isset($_GET[PLUGIN_NEWS_GETP_COM_PAGE])
 						? $_GET[PLUGIN_NEWS_GETP_COM_PAGE] : 1, PLUGIN_NEWS_NUM);
-				
-				$result = mysql_query("SELECT * FROM ".DB_TABLE_PLUGIN."news
+
+				$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_PLUGIN."news
 						WHERE ".$filter_sql." && ".CheckSQLAccess()." ORDER BY timestamp DESC
-						LIMIT ".$classPagination->Offset().",".PLUGIN_NEWS_NUM, DB_CMS)
+						LIMIT ".$classPagination->Offset().",".PLUGIN_NEWS_NUM)
 						OR FatalError(FATAL_ERROR_MYSQL);
 			}
 			else {
-				$result = mysql_query("SELECT *	FROM ".DB_TABLE_PLUGIN."news 
+				$result = Database::instance()->query("SELECT *	FROM ".DB_TABLE_PLUGIN."news
 						WHERE ".$filter_sql." && ".CheckSQLAccess()." ORDER BY timestamp DESC
-						LIMIT ".PLUGIN_NEWS_NUM, DB_CMS)
+						LIMIT ".PLUGIN_NEWS_NUM)
 						OR FatalError(FATAL_ERROR_MYSQL);
 			}
-			
+
 			$news_ctr = 1;
-			
-			while ($row = mysql_fetch_array($result)) {
+
+			while ($row = $result->fetch_assoc()) {
 				/* Ausgabe Neuigkeit */
 				$tpl = new tpl("plugins/news/article_short");
 				/* CSS Class first */
@@ -278,10 +278,10 @@ if (ACP_MODULE_NEWS_EN) {
 				else
 					$row['class_first'] = "";
 				/* Kategorie Informationen */
-				$result_cat = mysql_query("SELECT * FROM ".DB_TABLE_PLUGIN."news_categorie
-						WHERE id=".$row['categorie_id'], DB_CMS)
+				$result_cat = Database::instance()->query("SELECT * FROM ".DB_TABLE_PLUGIN."news_categorie
+						WHERE id=".$row['categorie_id'])
 						OR FatalError(FATAL_ERROR_MYSQL);
-				$line_cat = mysql_fetch_array($result_cat);
+				$line_cat = $result_cat->fetch_assoc();
 				$row['categorie_id_str'] = $line_cat['id_str'];
 				$row['categorie_name'] = $line_cat['name'];
 				/* Autor Informationen */
@@ -293,10 +293,10 @@ if (ACP_MODULE_NEWS_EN) {
 				$row['date'] = printDate($row['timestamp']);
 				/* Weiterlesen Kommentare */
 				/* Anzahl Kommentare */
-				$res_com = mysql_query("SELECT count(*), timestamp FROM ".DB_TABLE_PLUGIN."news_comment
-						WHERE news_id=".$row['id']." ORDER BY timestamp DESC", DB_CMS)
+				$res_com = Database::instance()->query("SELECT count(*), timestamp FROM ".DB_TABLE_PLUGIN."news_comment
+						WHERE news_id=".$row['id']." ORDER BY timestamp DESC")
 						OR FatalError(FATAL_ERROR_MYSQL);
-				if (($line_com = mysql_fetch_array($res_com)) && $line_com[0]) {
+				if (($line_com = $res_com->fetch_row()) && $line_com[0]) {
 					if ($line_com[0] == 1)
 						$row['comment_text'] = "1 Kommentar";
 					else
@@ -306,9 +306,9 @@ if (ACP_MODULE_NEWS_EN) {
 					/* Keine Kommentare */
 					$row['comment_text'] = "Kommentar schreiben";
 				}
-				
+
 				$row['read_more_url_only'] = "{module_path}/".PLUGIN_NEWS_GETP_LONGNEWS."/".$row['id_str'];
-				
+
 				if ($row['news_long'] != "") {
 					$row['read_more'] = "<a href=\"".$row['read_more_url_only']."\">Weiterlesen</a>";
 					if ($row['comment_text'][0] == 'K')
@@ -320,29 +320,29 @@ if (ACP_MODULE_NEWS_EN) {
 					$row['read_more'] = '';
 					$row['read_more_comment_text'] = $row['comment_text'];
 				}
-				
+
 				$row['comment_url'] = "<a href=\"{module_path}/".PLUGIN_NEWS_GETP_COM."/".$row['id_str']."\">".$row['comment_text']."</a>";
 				$row['read_more_comment_url'] = "<a href=\"{module_path}/".PLUGIN_NEWS_GETP_COM."/".$row['id_str']."\">".$row['read_more_comment_text']."</a>";
-				
+
 				$tpl->assign($row);
 				$tpl->out();
-				
+
 				$news_ctr++;
 			}
-			
+
 			/* Seitenzahlen */
 			if (PLUGIN_NEWS_VIEW_ALL && $classPagination->NumberOfPage() > 1) {
 				echo "<div class=\"pagination\">";
 				echo $classPagination->PaginationLinks("{module_path}/".PLUGIN_NEWS_GETP_COM_PAGE."/", PAGINATION_NUM);
 				echo "</div>\r\n";
 			}
-			
+
 			/* Neuster Artikel fuer Stand der Seite */
-			$result = mysql_query('SELECT timestamp FROM '.DB_TABLE_PLUGIN.'news
+			$result = Database::instance()->query('SELECT timestamp FROM '.DB_TABLE_PLUGIN.'news
 					WHERE '.$filter_sql.' && '.CheckSQLAccess().'
-					ORDER BY timestamp DESC LIMIT 1', DB_CMS)
+					ORDER BY timestamp DESC LIMIT 1')
 					OR FatalError(FATAL_ERROR_MYSQL);
-			if ($line = mysql_fetch_assoc($result)) {
+			if ($line = $result->fetch_assoc()) {
 				$PluginContent['date'] = printDate($line['timestamp']);
 			}
 		}

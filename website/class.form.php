@@ -268,9 +268,9 @@ class formWizardElement {
 	protected $css_class;
 	protected $css_class_field;
 	protected $description;
-	
+
 	protected $javascript;
-	
+
 	protected $readonly = false;
 
 	protected $error_empty=false;
@@ -446,7 +446,7 @@ class formWizardInput extends formWizardElement {
 			$this->customValidation = "/^(http|https|ftp|ftps)\\:\\/\\/[a-z0-9\-]+\.([a-z0-9\-]+\.)?[a-z]+/i";
 		else
 			$this->customValidation = $custom_pattern;
-		
+
 		$this->customValidationMsg = $custom_error_message;
 	}
 
@@ -523,7 +523,7 @@ class formWizardFile extends formWizardElement {
 	public function getValue() {
 		return $this->uploaded_file_data;
 	}
-	
+
 	public function setAcceptTypes($types) {
 		$this->accept = $types;
 	}
@@ -696,7 +696,7 @@ class formWizardChoice extends formWizardElement {
 	public function checkValue() {
 		/* Inhalt aktualisieren (ohne Funktion da hier anders) */
 		$this->checked = false;
-		
+
 		if (isset($_REQUEST[$this->getFormName()][$this->name_id])) {
 			if (is_array($_REQUEST[$this->getFormName()][$this->name_id])) {
 				if (in_array($this->value, $_REQUEST[$this->getFormName()][$this->name_id]))
@@ -869,7 +869,7 @@ class formWizardFileDrop extends formWizardFile {
 		$class_form->setFormId('dropzone');
 		formWizardFile::__construct($class_form, 'file', $id, $name, $name_id, $label, $value, $obligation);
 	}
-	
+
 	/**
 	 * Generiert den HTML-Code des Eingabefeldes
 	 */
@@ -886,7 +886,7 @@ class formWizardFileDrop extends formWizardFile {
     	$html .= formWizardFile::renderHtml();
     	return $html;
 	}
-	
+
 }
 
 /**
@@ -896,9 +896,9 @@ class formWizardImage extends formWizardElement {
 	private $image_folder;
 	private $image_default;
 	private $image_size = array('height' => 0, 'width' => 0);
-	
+
 	private $new_image;
-	
+
 	/**
 	 * Einstellungen des Bildes
 	 */
@@ -907,14 +907,14 @@ class formWizardImage extends formWizardElement {
 		$this->image_size['height'] = $height;
 		$this->image_size['width'] = $width;
 	}
-	
-	/** 
+
+	/**
 	 * Default Bild
 	 */
 	public function imageDefault($def) {
 		$this->image_default = $def;
 	}
-	
+
 	/**
 	 * Pruefen ob das Bild Vorhanden ist
 	 */
@@ -923,10 +923,10 @@ class formWizardImage extends formWizardElement {
 		$ftp = new ftp();
 		$return = $ftp->fileExists($this->image_folder.$this->value);
 		$ftp->close();
-		
+
 		return $return;
 	}
-	
+
 	/**
 	 * Ueberpruefung der Eingabe
 	 */
@@ -934,27 +934,27 @@ class formWizardImage extends formWizardElement {
 		if (isset($_REQUEST[$this->getFormName()][$this->name_id])) {
 			$this->value = StdString($_REQUEST[$this->getFormName()][$this->name_id]);
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Generiert den HTML-Code des Eingabefeldes
 	 */
 	public function renderHtml() {
 		$image_exists = $this->imageExists();
-		
+
 		$html = '<div class="images"><div><img id="form_image_'.$this->id.'" src="'.FILESYSTEM_DIR.$this->image_folder;
 		if ($this->value != '' && $image_exists)
 			$html .= $this->value;
 		else
 			$html .= $this->image_default;
 		$html .= '" alt="" /></div>';
-		
+
 		$html .= '<p><img src="img/icons/user/image_add.png" alt="" /> <a href="#" '.
 				'onclick="popup(\'frame.php?page=formwizard-image&amp;do=new&amp;'.
 				'file='.$this->value.'&amp;ref='.$this->id.'\')">Neues Bild</a></p>';
-		
+
 		if ($this->value != '' && $image_exists)
 			$html .= '<p id="form_image_url_'.$this->id.'">';
 		else
@@ -981,12 +981,12 @@ class spamProtection {
 	private $module_en = true;
 	private $id;
 	private $form;
-	
+
 	private $form_field_empty;
 	private $error_message = '';
-	
+
 	private $check_result = false;
-	
+
 	/**
 	 * Initialisiert die Klasse.
 	 * @param	$id Eindeutige Identivikation des Formulars (string).
@@ -999,24 +999,24 @@ class spamProtection {
 			$this->module_en = false;
 			return false;
 		}
-		
+
 		$this->id = 'demo';
 		$this->form = $form;
-		
+
 		/* Verborgenes Formularfeld hinzufuegen */
 		$this->form_field_empty = $this->form->addElement('text', 'spamProtectionEmpty');
 		$this->form_field_empty->setCssClass('spam-protect');
-		
+
 		/* Session-Daten vorbereiten */
 		if (!isset($_SESSION['spamProtection']))
 			$_SESSION['spamProtection'] = array();
-		
+
 		if (!isset($_SESSION['spamProtection'][$this->id]))
 			$_SESSION['spamProtection'][$this->id] = array();
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Formular wird angefordert
 	 */
@@ -1024,15 +1024,15 @@ class spamProtection {
 		/* Relevanz des Modules pruefen */
 		if (!$this->module_en)
 			return false;
-		
+
 		/* Erste Anforderung des Formulars */
 		if (!$this->form->checkSubmit()) {
 			$_SESSION['spamProtection'][$this->id]['t_form'] = TIME_STAMP;
 		}
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Captcha im Formular einfuegen.
 	 */
@@ -1040,10 +1040,10 @@ class spamProtection {
 		/* Relevanz des Modules pruefen */
 		if (!$this->module_en || !ACP_MODULE_SPAM_CAPTCHA)
 			return false;
-		
+
 		/** @todo Captcha generieren */
 	}
-	
+
 	/**
 	 * Auswertung des SPAM Schutzes.
 	 * @note	Darf nur einmal Aufgeruft werden.
@@ -1053,16 +1053,16 @@ class spamProtection {
 		/* Relevanz des Modules pruefen */
 		if (!$this->module_en)
 			return true;
-		
+
 		/** @todo Captcha auswerten */
-		
+
 		/* Leeres Formularfeld */
 		if ($this->form_field_empty->getValue() != '') {
 			$this->error_message = 'Das erste Formularfeld muss leer sein.';
 			$this->statsSpamDetected();
 			return false;
 		}
-		
+
 		/* 2 Minuten Reload-Sperre */
 		if (isset($_SESSION['spamProtection'][$this->id]['t_submit'])
 				&& $_SESSION['spamProtection'][$this->id]['t_submit'] + 120 > TIME_STAMP) {
@@ -1070,7 +1070,7 @@ class spamProtection {
 			$this->statsSpamDetected();
 			return false;
 		}
-		
+
 		/* Formular muss vorher angefordert werden */
 		if (!isset($_SESSION['spamProtection'][$this->id]['t_form'])
 				|| $_SESSION['spamProtection'][$this->id]['t_form'] == 0) {
@@ -1078,23 +1078,23 @@ class spamProtection {
 			$this->statsSpamDetected();
 			return false;
 		}
-		
+
 		/* Min 10 Sekunden zum ausfuellen des Formulars */
 		if ($_SESSION['spamProtection'][$this->id]['t_form'] + 10 > TIME_STAMP) {
 			$this->error_message = 'Sie waren zu schnell mit dem Ausfüllen des Formulars.';
 			$this->statsSpamDetected();
 			return false;
 		}
-		
+
 		/* Alles Korrekt -> Kein SPAM */
 		$_SESSION['spamProtection'][$this->id]['t_form'] = 0;
 		$_SESSION['spamProtection'][$this->id]['t_submit'] = TIME_STAMP;
-		
+
 		$this->check_result = true;
-		
+
 		return true;
 	}
-	
+
 	/**
 	 * Status des letzten Checks
 	 */
@@ -1102,28 +1102,28 @@ class spamProtection {
 		/* Relevanz des Modules pruefen */
 		if (!$this->module_en)
 			return true;
-		
+
 		return $this->check_result;
 	}
-	
+
 	/**
 	 * Ausgabe der ERROR Nachricht
 	 */
 	function getErrorMessage() {
 		return $this->error_message;
 	}
-	
+
 	/**
 	 * Erweiterung: Statistik SPAM-Versuche zaehlen
 	 */
 	function statsSpamDetected() {
 		if (!ACP_MODULE_STATISTIC)
 			return true;
-		
-		mysql_query('UPDATE '.DB_TABLE_ROOT.'cms_register SET number=(number+1)
-				WHERE name="Stats_CtrSpamBlock"', DB_CMS)
+
+		Database::instance()->query('UPDATE '.DB_TABLE_ROOT.'cms_register SET number=(number+1)
+				WHERE name="Stats_CtrSpamBlock"')
 				OR FatalError(FATAL_ERROR_MYSQL);
-		
+
 		return true;
 	}
 }
