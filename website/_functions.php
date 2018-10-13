@@ -40,21 +40,6 @@
  */
 
 /**
- * Stellt die Datenbankverbindung her
- * @return Stream der Datenbankverbindung
- */
-function DatabaseConnect() {
-	/* Verbinden */
-	$db_cms = mysql_connect(DB_HOST, DB_USER, DB_PASSWORD) OR FatalError(FATAL_ERROR_MYSQL);
-	/* Datenbank waehlen */
-	mysql_select_db(DB_NAME) OR FatalError(FATAL_ERROR_MYSQL);
-	/* Verbindungskodierung */
-	mysql_query("set names 'utf8'") OR FatalError(FATAL_ERROR_MYSQL);
-	/* Rueckgabe */
-	return $db_cms;
-}
-
-/**
  * Generiert den UNIX Zeitstempel inklusive Mikrosekunden zum berechnen der Runtime
  * @return UNIX Zeitstempel inklusive Mikrosekunden
  */
@@ -74,15 +59,8 @@ function FatalError($error_nr) {
 	debug_print_backtrace();
 
 	/* Fehlerausgabe und Programmabbruch */
-	if ($error_nr == FATAL_ERROR_MYSQL) {
-		if (Database::instance()->hasError()) {
-			die("New MySQL Error: " . Database::instance()->getErrorMessage());
-		}
-		else {
-			// old style for compatibility
-			die("MySqlError: " . mysql_error(DB_CMS));
-		}
-	}
+	if ($error_nr == FATAL_ERROR_MYSQL)
+		die("New MySQL Error: " . Database::instance()->getErrorMessage());
 	if ($error_nr == FATAL_ERROR_CONTENT)
 		die("Can't read error content!");
 	if ($error_nr == FATAL_ERROR_MENU)
