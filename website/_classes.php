@@ -32,6 +32,7 @@
  |3.1.4   | 08.03.2015 | Bugfix versteckte Dateien
  |3.1.5   | 25.03.2015 | Bugfix Content-Length
  |3.1.6   | 13.08.2015 | Bugfix Ordnerloeschen
+ |4.0     | 13.10.2018 | Datenbank Abstraktion
  -----------------------------------------------------
  Beschreibung :
  Alle Klassen enthalten.
@@ -41,6 +42,50 @@
  */
 
 include("class.form.php");
+
+/**
+ * Database abstraction
+ */
+class Database {
+	public static function instance() {
+		if (self::$instance == NULL) {
+			self::$instance = new Database();
+		}
+		return self::$instance;
+	}
+
+	public function query($sql) {
+		return $this->mysqli->query($sql);
+	}
+
+	public function hasError() {
+		return ($this->mysqli->errno != 0);
+	}
+
+	public function getErrorMessage() {
+		return $this->mysqli->error;
+	}
+
+	public function close() {
+		$this->mysqli->close();
+		self::$instance = NULL;
+	}
+
+	private function __construct() {
+		$this->connect();
+		$this->mysqli->set_charset("utf8") OR FatalError(FATAL_ERROR_MYSQL);
+	}
+
+	private function connect() {
+		$this->mysqli = new mysqli(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
+		if ($this->mysqli->connect_errno) {
+			die('MySQL connection error: '.$this->mysqli->connect_error);
+		}
+	}
+
+	protected static $instance = NULL;
+	private $mysqli;
+}
 
 /**
  * Template Klasse
