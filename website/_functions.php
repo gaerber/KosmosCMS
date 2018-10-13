@@ -575,7 +575,7 @@ function callbackWysiwymImage($treffer) {
  * SQL absichern
  */
 function StdSqlSafety($string) {
-	return mysql_real_escape_string($string, DB_CMS);
+	return Database::instance()->getHandle()->real_escape_string($string);
 }
 
 /**

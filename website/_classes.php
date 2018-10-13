@@ -71,6 +71,10 @@ class Database {
 		self::$instance = NULL;
 	}
 
+	public function getHandle() {
+		return $this->mysqli;
+	}
+
 	private function __construct() {
 		$this->connect();
 		$this->mysqli->set_charset("utf8") OR FatalError(FATAL_ERROR_MYSQL);
