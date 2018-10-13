@@ -33,10 +33,10 @@ $plugin_access_groups = 0x01;
 
 /* Bestimmte Gruppe anzeigen */
 if (isset($_GET['group']) && $_GET['group'] != "") {
-	$result = mysql_query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_groups
-			WHERE id_str='".StdSqlSafety($_GET['group'])."'", DB_CMS)
+	$result = Database::instance()->query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_groups
+			WHERE id_str='".StdSqlSafety($_GET['group'])."'")
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		$plugin_access_groups = 1 << $line['id'];
 	}
 }
@@ -49,9 +49,9 @@ if (isset($moduleParameter['show_groups_only'])) {
 if (isset($_GET['sort'])) {
 	/* Sortierung */
 	$sort = explode("-", $_GET['sort']);
-	if (sizeof($sort) == 2 
+	if (sizeof($sort) == 2
 			&& ($sort[0] == "user_name" || $sort[0] == "user_lastlogin"
-				|| $sort[0] == "user_regist" || $sort[0] == "user_points") 
+				|| $sort[0] == "user_regist" || $sort[0] == "user_points")
 			&& ($sort[1] == "asc" || $sort[1] == "desc")) {
 		$sql_sort = $sort[0]." ".strtoupper($sort[1]);
 	}
@@ -64,21 +64,21 @@ if (!isset($sql_sort)) {
 }
 
 /* URL zur Seite mit dem Kontakt Modul ermitteln */
-$result = mysql_query('SELECT menu.id 
-		FROM '.DB_TABLE_ROOT.'cms_plugin AS plugin 
+$result = Database::instance()->query('SELECT menu.id
+		FROM '.DB_TABLE_ROOT.'cms_plugin AS plugin
 		INNER JOIN '.DB_TABLE_ROOT.'cms_menu AS menu ON plugin.id=menu.plugin
-		WHERE plugin.label="Kontaktformular"', DB_CMS)
+		WHERE plugin.label="Kontaktformular"')
 		OR FatalError(FATAL_ERROR_MYSQL);
-if ($line = mysql_fetch_row($result)) {
-	$o_modlue_path = new activePage(DB_CMS);
+if ($line = $result->fetch_row()) {
+	$o_modlue_path = new activePage(Database::instance());
 	$url = $o_modlue_path->getUrlById($line[0]);
 }
 
-$result = mysql_query("SELECT * FROM ".DB_TABLE_ROOT."cms_access_user
-		WHERE (user_access & ".$plugin_access_groups.") && (user_locked=0) ORDER BY ".$sql_sort, DB_CMS)
+$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_ROOT."cms_access_user
+		WHERE (user_access & ".$plugin_access_groups.") && (user_locked=0) ORDER BY ".$sql_sort)
 		OR FatalError(FATAL_ERROR_MYSQL);
 
-while ($row = mysql_fetch_array($result)) {
+while ($row = $result->fetch_assoc()) {
 	$tpl = new tpl("plugins/members/user");
 	/* Email Form */
 	if ($row['user_email_show'] && isset($url)) {
@@ -94,12 +94,12 @@ while ($row = mysql_fetch_array($result)) {
 	$tpl->out();
 }
 
-		
+
 /* Neuster Benutzer fuer Stand der Seite */
-$result = mysql_query('SELECT user_regist FROM '.DB_TABLE_ROOT.'cms_access_user
-		ORDER BY user_regist DESC LIMIT 1', DB_CMS)
+$result = Database::instance()->query('SELECT user_regist FROM '.DB_TABLE_ROOT.'cms_access_user
+		ORDER BY user_regist DESC LIMIT 1')
 		OR FatalError(FATAL_ERROR_MYSQL);
-if ($line = mysql_fetch_assoc($result)) {
+if ($line = $result->fetch_assoc()) {
 	$PluginContent['date'] = printDate($line['user_regist']);
 }
 

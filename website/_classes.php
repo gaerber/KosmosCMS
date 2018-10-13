@@ -177,9 +177,9 @@ function countSubLevels($id) {
 	static $level=0;
 	$level_max = 0;
 
-	$result = mysql_query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu WHERE menu_sub=".$id, DB_CMS)
+	$result = Database::instance()->query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu WHERE menu_sub=".$id)
 			OR FatalError(FATAL_ERROR_MYSQL);
-	while ($row = mysql_fetch_array($result)) {
+	while ($row = $result->fetch_assoc()) {
 		$level++;
 		$level_temp = countSubLevels($row['id']);
 		if ($level_temp > $level_max)
@@ -201,9 +201,9 @@ function countLevels($id) {
 	$level = 0;
 
 	while ($id > 0) {
-		$result = mysql_query("SELECT menu_sub FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".$id, DB_CMS)
+		$result = Database::instance()->query("SELECT menu_sub FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".$id)
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			$level++;
 			$id = $line['menu_sub'];
 		}
@@ -263,10 +263,10 @@ class activePage {
 					$this->active_page_id = $this->active_elements[count($this->active_elements)-1];
 				}
 				/* Pruefen ob es eine Kategorie ist */
-				$result = mysql_query("SELECT menu_is_categorie FROM ".DB_TABLE_ROOT."cms_menu
-						WHERE id=".$this->active_page_id, $this->db_stream)
+				$result = $this->db_stream->query("SELECT menu_is_categorie FROM ".DB_TABLE_ROOT."cms_menu
+						WHERE id=".$this->active_page_id)
 						OR FatalError(FATAL_ERROR_MYSQL);
-				if ($line = mysql_fetch_array($result)) {
+				if ($line = $result->fetch_assoc()) {
 					if ($line['menu_is_categorie'] == 1) {
 						$this->url_is_categorie = true;
 						$this->active_page_id = $this->selectFirstPage($this->active_page_id);
@@ -318,7 +318,7 @@ class activePage {
 		$this->user_no_access = false;
 		$this->page_locked = false;
 		$this->active_elements = array();
-		
+
 		/* Active Elements aendern zur neuen Stammbaumgenerierung */
 		if ($this->calcPathById($active_page_id)) {
 			/* Bei Spezialseiten (HTTP Error Pages) spielt locked und access keine Rolle */
@@ -346,7 +346,7 @@ class activePage {
 	function getUrlIsCategorie() {
 		return $this->url_is_categorie;
 	}
-	
+
 	function getActuelPath() {
 		return $this->path_array;
 	}
@@ -358,11 +358,11 @@ class activePage {
 	 * Rekursive Funktion um den Pfad aufzuloesen
 	 */
 	private function solvePath($menu_sub) {
-		$result = mysql_query("SELECT id, access FROM ".DB_TABLE_ROOT."cms_menu
+		$result = $this->db_stream->query("SELECT id, access FROM ".DB_TABLE_ROOT."cms_menu
 				WHERE id_str='".$this->path_array[$this->path_ptr]."' && menu_sub=".$menu_sub."
-				&& locked=0", $this->db_stream)
+				&& locked=0")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			/* Pruefen ob der Benutzer die Berechtigung hat */
 			if (!CheckAccess($line['access'])) {
 				$this->user_no_access = true;
@@ -395,23 +395,23 @@ class activePage {
 	 * existiert,
 	 */
 	function selectFirstPage($categorie) {
-		$result = mysql_query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu
+		$result = $this->db_stream->query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu
 				WHERE menu_is_categorie=0 && menu_sub=".$categorie."
 				&& locked=0 && ".CheckSQLAccess()."
-				ORDER BY menu_order ASC LIMIT 1", $this->db_stream)
+				ORDER BY menu_order ASC LIMIT 1")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			$this->active_elements[] = $line['id'];
 			return $line['id'];
 		}
 		else {
 			/* Keine Seite in dieser Kategorie -> Nach Unterkategorien suchen */
-			$result = mysql_query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu
+			$result = $this->db_stream->query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu
 					WHERE menu_is_categorie=1 && menu_sub=".$categorie."
 					&& locked=0 && ".CheckSQLAccess()."
-					ORDER BY menu_order ASC", $this->db_stream)
+					ORDER BY menu_order ASC")
 					OR FatalError(FATAL_ERROR_MYSQL);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = $result->fetch_assoc()) {
 				$this->active_elements[] = $row['id'];
 				/* Die gefundenen Unterkategorien werden der Reihe nach durchsucht */
 				$temp_first_page_id = $this->selectFirstPage($row['id']);
@@ -426,17 +426,17 @@ class activePage {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * URL einer bestimmten Seite aufloesen.
 	 * @param id ID der Seite nach der aufgeloest werden soll.
 	 * @note \v user_no_access, \v page_locked und \v active_elements muss vorher zurueckgesetzt werden.
 	 */
 	private function calcPathById($id) {
-		$result = mysql_query('SELECT menu_sub, access, locked FROM '.DB_TABLE_ROOT.'cms_menu
+		$result = $this->db_stream->query('SELECT menu_sub, access, locked FROM '.DB_TABLE_ROOT.'cms_menu
 				WHERE id='.$id, $this->db_stream)
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			/* Pruefen ob der Benutzer die Berechtigung hat */
 			if (!CheckAccess($line['access'])) {
 				$this->user_no_access = true;
@@ -461,7 +461,7 @@ class activePage {
 			return false;
 		}
 	}
-	
+
 	/**
 	 * Ermittelt die URL einer eliebigen Seite
 	 * @param $page_id ID der Seite
@@ -473,32 +473,32 @@ class activePage {
 		$this->user_no_access = false;
 		$this->page_locked = false;
 		$this->active_elements = array();
-		
+
 		/* Stambaum der Seite generieren */
 		if (!$this->calcPathById($page_id))
 			return false;
-			
+
 		/* Zugriff auf diese Seite pruefen */
 		if ($this->user_no_access || $this->page_locked)
 			return false;
-		
+
 		/* Pfad in URL umwandeln */
 		$url = ROOT_WEBSITE;
 		$id_list = implode(', ', $this->active_elements);
-		
-		$result = mysql_query('SELECT id_str FROM '.DB_TABLE_ROOT.'cms_menu 
-				WHERE id IN ('.$id_list.') ORDER BY FIELD(id, '.$id_list.') DESC', DB_CMS)
+
+		$result = $this->db_stream->query('SELECT id_str FROM '.DB_TABLE_ROOT.'cms_menu
+				WHERE id IN ('.$id_list.') ORDER BY FIELD(id, '.$id_list.') DESC')
 				OR FatalError(FATAL_ERROR_MYSQL);
-		while ($row = mysql_fetch_row($result)) {
+		while ($row = $result->fetch_row()) {
 			$url .= $row[0].'/';
 		}
-		
+
 		/* Letztens / ist ueberfluessig */
 		$url = substr($url, 0, -1);
-		
+
 		/* Abschluss URL */
 		$url .= URL_ENDSTR_PAGE;
-		
+
 		return $url;
 	}
 }
@@ -509,7 +509,7 @@ class activePage {
  */
 class buildMenuTree {
 	private $db_stream;
-	
+
 	private $active_elements = array();
 
 	private $active_page_id = NULL;
@@ -542,7 +542,7 @@ class buildMenuTree {
 	function setSqlCondition($condition) {
 		$this->settings['sql_condition'] = $condition;
 	}
-	
+
 	function allowPluginSubmenu($allow) {
 		$this->settings['allow_plugin_submenu'] = $allow;
 	}
@@ -615,20 +615,20 @@ class buildMenuTree {
 	 */
 	private function buildMenu($sub_categorie) {
 		/* In einer Kategorie koennen sich Unterkategorien und Seiten befinden */
-		$result = mysql_query("SELECT id, id_str, label, menu_is_categorie, plugin
+		$result = $this->db_stream->query("SELECT id, id_str, label, menu_is_categorie, plugin
 				FROM ".DB_TABLE_ROOT."cms_menu
 				WHERE menu_sub=".$sub_categorie."
 				".$this->settings['sql_condition']."
-				ORDER BY menu_order ASC", $this->db_stream)
+				ORDER BY menu_order ASC")
 				OR FatalError(FATAL_ERROR_MYSQL);
 
 		$html_menu = "";
 
 		$e = 1;
-		$elements = mysql_num_rows($result);
+		$elements = $result->num_rows;
 
 		/* Kategorien und Seiten dieser Ebene */
-		while ($row = mysql_fetch_array($result)) {
+		while ($row = $result->fetch_assoc()) {
 			$this->settings['path'][] = $row['id_str'];
 			/* Nur wenn Unterkategorien gedruckt werden duerfen, wird nach ihnen gesucht */
 			if (($this->settings['level'] < $this->settings['max_level'])
@@ -640,10 +640,10 @@ class buildMenuTree {
 				$html_sub_menu = $this->buildMenu($row['id']);
 				/* Submenus von Plugins */
 				if ($row['plugin'] && $this->settings['allow_plugin_submenu']) {
-					$res = mysql_query("SELECT path_menu FROM ".DB_TABLE_ROOT."cms_plugin
-							WHERE id=".$row['plugin']." && locked=0", $this->db_stream)
+					$res = $this->db_stream->query("SELECT path_menu FROM ".DB_TABLE_ROOT."cms_plugin
+							WHERE id=".$row['plugin']." && locked=0")
 							OR FatalError(FATAL_ERROR_MYSQL);
-					if ($line = mysql_fetch_array($res)) {
+					if ($line = $res->fetch_assoc()) {
 						if ($line['path_menu'] != "")
 							$html_sub_menu .= $this->getPluginSubmenu($line['path_menu']);
 					}
@@ -724,11 +724,11 @@ class buildMenuTree {
 
 		/* Zuerst die Kategorien */
 		for ($i = 0; $i < $elements; $i++) {
-			$result = mysql_query("SELECT id, id_str, label, menu_is_categorie
+			$result = $this->db_stream->query("SELECT id, id_str, label, menu_is_categorie
 					FROM ".DB_TABLE_ROOT."cms_menu
-					WHERE id=".$this->active_elements[$i], $this->db_stream)
+					WHERE id=".$this->active_elements[$i])
 					OR FatalError(FATAL_ERROR_MYSQL);
-			if ($line = mysql_fetch_array($result)) {
+			if ($line = $result->fetch_assoc()) {
 				$path_array[] = $line['id_str'];
 				$pos = $this->positionElements($e, $elements);
 
@@ -784,10 +784,10 @@ class buildMenuTree {
 			return true;
 		}
 
-		$result = mysql_query("SELECT id_str, menu_sub FROM ".DB_TABLE_ROOT."cms_menu
-				WHERE id=".$element_id, $this->db_stream)
+		$result = $this->db_stream->query("SELECT id_str, menu_sub FROM ".DB_TABLE_ROOT."cms_menu
+				WHERE id=".$element_id)
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			if ($path != "")
 				$path = $line['id_str']."/".$path;
 			else
@@ -803,18 +803,18 @@ class buildMenuTree {
 		}
 		return false;
 	}
-	
+
 	/**
 	 * Generiert das Submenu eines Modules
 	 * @param $path ist der Pfad zum generieren
 	 **/
 	private function getPluginSubmenu($path) {
 		$html_menu = "";
-		
+
 		if (!file_exists(ROOT_PLUGIN.$path)) {
 			die("Module ".$path." could not load!");
 		}
-		
+
 		include(ROOT_PLUGIN.$path);
 		return $html_menu;
 	}
@@ -874,7 +874,7 @@ class pagination {
 	public function NumberOfPage() {
 		return $this->num_page;
 	}
-	
+
 	/**
 	 * Aktuelle Seite
 	 */
@@ -995,7 +995,7 @@ class ftp {
 		if (FTP_SERVER_USE_SSL) {
 			$this->stream = ftp_ssl_connect(FTP_SERVER_HOST, FTP_SERVER_HOST_PORT);
 		}
-		
+
 		if ($this->stream == false) {
 			/* Unsichere Verbindung falls SSL nicht unterstuetzt */
 			$this->stream = ftp_connect(FTP_SERVER_HOST, FTP_SERVER_HOST_PORT);
@@ -1009,7 +1009,7 @@ class ftp {
 		else {
 			die('Error: Could not connect to the ftp server!');
 		}
-		
+
 		/* In Startverzeichnis wechseln */
 		$this->ChangeDir('/');
 	}
@@ -1027,19 +1027,19 @@ class ftp {
 	function ChangeDir($folder) {
 		return ftp_chdir($this->stream, FTP_DIR.$folder);
 	}
-	
+
 	/**
 	 * Sicherheitspruefung des Verzeichnisses
 	 */
 	private function checkPath($file) {
 		$file = str_replace('../', '', $file);
 		$ftp_path = pathinfo($file);
-		
+
 		if ($ftp_path['dirname'] != '.') {
 			if (!$this->ChangeDir($ftp_path['dirname']))
 				return false;
 		}
-		
+
 		return $ftp_path['basename'];
 	}
 
@@ -1049,7 +1049,7 @@ class ftp {
 	function mkdir($dir_name) {
 		return ftp_mkdir($this->stream, $dir_name);
 	}
-	
+
 	/**
 	 * CHMOD Rechte einer Datei/Ordner wechseln
 	 */
@@ -1070,10 +1070,10 @@ class ftp {
 			$bool = ftp_put($this->stream, $remote_file, $local_file, FTP_BINARY);
 		else
 			$bool = ftp_fput($this->stream, $remote_file, $local_file, FTP_BINARY);
-		
+
 		return $bool;
 	}
-	
+
 	/**
 	 * Eine Datei vom FTP Server Herunterladen und in eine bestehende Datei speichern.
 	 */
@@ -1089,20 +1089,20 @@ class ftp {
 	function FileContents($remote_file) {
 		/* Temporaere Datei als Zwischenspeicher */
 		$p_local_file = tmpfile();
-		
+
 		/* Config Datei herunterladen */
 		if (!$this->FileRead($remote_file, $p_local_file))
 			return false;
-		
+
 		/* Zeiger an Dateianfang */
 		fseek($p_local_file, 0);
-		
+
 		/* Dateiinhalt einlesen */
 		$str_content = fread($p_local_file, $this->fileSize($remote_file));
-		
+
 		/* Temporaere Datei wieder schliessen */
 		fclose($p_local_file);
-		
+
 		/* Inhalt rueckgeben */
 		return $str_content;
 	}
@@ -1165,7 +1165,7 @@ class ftp {
 		/* Sicherheitskontrolle */
 		if (mb_substr('/'.$this->CurrentDir(), 1, mb_strlen(FTP_DIR)) != FTP_DIR) die('Fatal ftp Class Error!');
 	}
-	
+
 	/**
 	 * Prueft, ob der angegebene Dateiname ein Verzeichnis ist.
 	 */
@@ -1191,12 +1191,12 @@ class ftp {
 		$dir = new ftpOpenDir($this, FTP_DIR.$folder);
 		if ($dir->state_construct)
 			return $dir;
-		
+
 		/* Objekt wieder loeschen */
 		unset($dir);
 		return NULL;
 	}
-	
+
 	/**
 	 * Verzeichnis schliessen.
 	 */
@@ -1210,7 +1210,7 @@ class ftp {
 			return FALSE;
 		}
 	}
-	
+
 	/**
 	 * Verzeichnisliste erstellen.
 	 * @param $folder Orndernamen von dem Ausgegangen werden soll.
@@ -1226,10 +1226,10 @@ class ftp {
 		/* Liste der Unterordner erstellen und ausfuehren */
 		$list = new ftpFolderList($this);
 		$list->buildList($folder, $p_func_callback, $recursive);
-		
+
 		/* Klasse wieder loeschen */
 		unset($list);
-		
+
 		return true;
 	}
 
@@ -1240,13 +1240,13 @@ class ftp {
 	function fileExists($file_name) {
 		if (!($file_name = $this->checkPath($file_name)))
 			return false;
-			
+
 		if (ftp_size($this->stream, $file_name) >= 0)
 			return TRUE;
 		else
 			return FALSE;
 	}
-	
+
 	/**
 	 * Prueft ob ein Verzeichnis existiert.
 	 * @param $folder_name Verzeichnisnamen mit Phad vom Stammverzeichnis des FTP Servers aus.
@@ -1254,10 +1254,10 @@ class ftp {
 	function folderExists($folder_name) {
 		if (!($folder_name = $this->checkPath($folder_name)))
 			return false;
-		
+
 		return $this->isDir($folder_name);
 	}
-	
+
 	/**
 	 * Liefert UNIX Timestamp der letzten Dateiaenderung.
 	 * @param $data Dateinamen.
@@ -1266,10 +1266,10 @@ class ftp {
 	function fileTime($file_name) {
 		if (!($file_name = $this->checkPath($file_name)))
 			return false;
-			
+
 		return ftp_mdtm($this->stream, $file_name);
 	}
-	
+
 	/**
 	 * Liefert die Groesse einer Datei.
 	 * @param $data Dateinamen.
@@ -1278,10 +1278,10 @@ class ftp {
 	function fileSize($file_name) {
 		if (!($file_name = $this->checkPath($file_name)))
 			return false;
-			
+
 		return ftp_size($this->stream, $file_name);
 	}
-	
+
 	/**
 	 * Konfiguration eines Verzeichnisses lesen.
 	 * @param[in]	Verzeichnis.
@@ -1289,17 +1289,17 @@ class ftp {
 	 */
 	function readFolderConfig($folder) {
 		$retval = NULL;
-	
+
 		/* Pruefen ob Verzeichnis existiert und eine Konfigurationsdatei vorhanden ist */
 		if ($this->folderExists($folder) && $this->fileExists($folder.'/'.FILE_SYSTEM_CONFIGFILE)) {
 			/* Config Datei einlesen */
 			$s_config = $this->FileContents($folder.'/'.FILE_SYSTEM_CONFIGFILE);
 			$retval = json_decode($s_config, true);
 		}
-		
+
 		return $retval;
 	}
-	
+
 	/**
 	 * Schreiben der Konfigurationen eines Verzeichnisses.
 	 * @param[in]	$folder Verzeichnis.
@@ -1308,12 +1308,12 @@ class ftp {
 	 */
 	function writeFolderConfig($folder, $config) {
 		$retval = false;
-	
+
 		/* Pruefen ob Verzeichnis existiert */
 		if ($this->folderExists($folder)) {
 			/* JSON generieren */
 			$s_config = json_encode($config);
-			
+
 			/* Konfigurationsdatei erzeugen */
 			if ($ftemp = tmpfile()) {
 				/* Verzeichnisschutz erstellen */
@@ -1326,7 +1326,7 @@ class ftp {
 				fclose($ftemp);
 			}
 		}
-		
+
 		return $retval;
 	}
 
@@ -1344,10 +1344,10 @@ class ftp {
  */
 class ftpFolderList {
 	private $ftp;
-	
+
 	private $level=1;
 	private $p_func_callback, $recursive;
-	
+
 	/**
 	 * Generiert eine Liste mit allen Unterordnert.
 	 * @param $ftp Zeiger auf das Elternelement mit der geoeffneten FZTP Verbindung.
@@ -1355,7 +1355,7 @@ class ftpFolderList {
 	function __construct($ftp) {
 		$this->ftp = $ftp;
 	}
-	
+
 	/**
 	 * Erstellt die komplette Lister der Unterverzeichnisse.
 	 * @param $folder Orndernamen von dem Ausgegangen werden soll.
@@ -1370,15 +1370,15 @@ class ftpFolderList {
 	function buildList($folder, $p_func_callback, $recursive) {
 		$this->p_func_callback = $p_func_callback;
 		$this->recursive = $recursive;
-		
+
 		/* Verzeichnisnamen speichern mit Abschliessendem / */
 		if (!substr($folder, -1, 1) == '/')
 			$folder = $folder.'/';
-		
+
 		/* Erstellung starten */
 		$this->readSubFolders($folder);
 	}
-	
+
 	/**
 	 * Sucht alle Verzeichnise in einem Ordner und ruft die Benutzerfunktion auf.
 	 * @param $current_folder Aktueller Ordner.
@@ -1389,7 +1389,7 @@ class ftpFolderList {
 		if($folder_pointer = $this->ftp->openDir($current_folder)) {
 			/* Funktionspointer funktionieren nur als Variablen */
 			$p_folder = $this->p_func_callback;
-			
+
 			/* Alle Verzeichnisse und Dateine des Ordners einzeln verarbeiten */
 			while($file = $folder_pointer->readDir()) {
 				/* Es intereessieren nur die gefundenen Ordner */
@@ -1407,12 +1407,12 @@ class ftpFolderList {
 					else {
 						/* Benutzerfunktion ausfuehren */
 						$function_pointer($file);
-					}		
+					}
 				}
 			}
 			/* Ordner schliessen */
 			$this->ftp->closeDir($folder_pointer);
-		}	
+		}
 	}
 }
 
@@ -1426,9 +1426,9 @@ class ftpOpenDir {
 	private $raw_list;
 	private $data_list;
 	private $dir_path;
-	
+
 	public $state_construct=false;
-	
+
 	/**
 	 * Verzeichnis oeffnen und alle Dateien und Verzeichnisse einlesen.
 	 * @param $ftp Zeiger auf das Elternelement mit der geoeffneten FZTP Verbindung.
@@ -1436,7 +1436,7 @@ class ftpOpenDir {
 	 */
 	function __construct($ftp, $folder) {
 		$this->ftp = $ftp;
-		
+
 		/* Verzeichnisnamen speichern mit Abschliessendem / */
 		if (substr($folder, -1, 1) == '/')
 			$this->dir_path = $folder;
@@ -1445,13 +1445,13 @@ class ftpOpenDir {
 
 		/* Liste aller Dateinen im Verzeichnis erstellen */
 		$this->raw_list = ftp_rawlist($this->ftp->stream, substr($this->dir_path, 0, -1));
-		
+
 		$this->data_list = $this->parseRawList($this->raw_list);
 
 		/* Klasse erfolgreich erstellt und Daten gelesen */
 		$this->state_construct = true;
 	}
-	
+
 	/**
 	 * Parser der RAW Liste vom FTP Server.
 	 * @param $rawList String Array mit den Rohdaten.
@@ -1501,7 +1501,7 @@ class ftpOpenDir {
 			return !empty($Output) ? $Output : FALSE;
 		}
 	}
-	
+
 	/**
 	 * Gibt den Dateinamen der naechsten Datei des Verzeichnisses zurueck.
 	 * @return Dateinamen der naechsten Datei, im Fehlerfall FASE.
@@ -1518,7 +1518,7 @@ class ftpOpenDir {
 			return FALSE;
 		}
 	}
-	
+
 	/**
 	 * Sortierung der Verzeichnisse und Dateien
 	 */
@@ -1531,14 +1531,14 @@ class ftpOpenDir {
 				$isdir[] = $element['isdir'];
 				$name[] = $element['name'];
 			}
-			
+
 			return array_multisort($isdir, SORT_DESC, $name, SORT_ASC, $this->data_list);
 		}
-		
+
 		/* Keine Liste: Ordner ist leer und muss nicht sortiert werden. */
 		return true;
 	}
-	
+
 	/**
 	 * Liefert UNIX Timestamp der letzten Dateiaenderung.
 	 * @param $data Dateinamen.
@@ -1546,10 +1546,10 @@ class ftpOpenDir {
 	 */
 	function fileTime($format='unix') {
 		$str_months = array('Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec');
-		
+
 		$month = array_keys($str_months, $this->data_list[$this->data_list_ctr]['month']);
 		$month = $month[0];
-		
+
 		if ($format == 'str') {
 			/* Ausgabe als String */
 			return $this->data_list[$this->data_list_ctr]['day'].' '.$this->data_list[$this->data_list_ctr]['month']
@@ -1568,7 +1568,7 @@ class ftpOpenDir {
 			}
 		}
 	}
-	
+
 	/**
 	 * Prueft, ob der angegebene Dateiname ein Verzeichnis ist.
 	 * @param $data Dateinamen.
@@ -1577,7 +1577,7 @@ class ftpOpenDir {
 	function isDir() {
 		return ($this->data_list[$this->data_list_ctr]['isdir'] == 1);
 	}
-	
+
 	/**
 	 * Liefert die Groesse einer Datei.
 	 * @param $data Dateinamen.

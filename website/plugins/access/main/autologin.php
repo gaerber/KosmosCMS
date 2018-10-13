@@ -29,14 +29,14 @@ if (!defined("SWISS_WEBDESIGN"))	die();
 if (ACP_ACCESS_SYSTEM_EN && MAX_AUTOLOGIN_TIME) {
 	if (!isset($_SESSION['user_id'], $_SESSION['user_login'], $_SESSION['user_password'])
 			&& isset($_COOKIE['cms_autologin_login']) && isset($_COOKIE['cms_autologin_password'])) {
-		$result = mysql_query("SELECT user_id, user_login, user_password, user_lastlogin, user_access
+		$result = Database::instance()->query("SELECT user_id, user_login, user_password, user_lastlogin, user_access
 				FROM ".DB_TABLE_ROOT."cms_access_user
 				WHERE user_login='".StdSqlSafety($_COOKIE["cms_autologin_login"])."'
 				&& user_password='".StdSqlSafety($_COOKIE["cms_autologin_password"])."'
 				&& user_lastlogin>=".(TIME_STAMP - MAX_AUTOLOGIN_TIME)."
-				&& user_locked=0", DB_CMS)
+				&& user_locked=0")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			/* Anmeldung erfolgreich -> in Session abspeichern */
 			$_SESSION['user_id'] = $line['user_id'];
 			$_SESSION['user_login'] = $line['user_login'];
@@ -47,8 +47,8 @@ if (ACP_ACCESS_SYSTEM_EN && MAX_AUTOLOGIN_TIME) {
 			setcookie("cms_autologin_login", $line['user_login'], TIME_STAMP + MAX_AUTOLOGIN_TIME, "/");
 			setcookie("cms_autologin_password", $line['user_password'], TIME_STAMP + MAX_AUTOLOGIN_TIME, "/");
 			/* Letzter Login nachtragen */
-			mysql_query("UPDATE ".DB_TABLE_ROOT."cms_access_user SET user_lastlogin=".TIME_STAMP."
-					WHERE user_id=".$_SESSION['user_id'], DB_CMS)
+			Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_access_user SET user_lastlogin=".TIME_STAMP."
+					WHERE user_id=".$_SESSION['user_id'])
 					OR FatalError(FATAL_ERROR_MYSQL);
 		}
 		else {

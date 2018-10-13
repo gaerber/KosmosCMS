@@ -17,12 +17,13 @@
  |1.1     | 08.08.2013 | Modul Erweiterung (Fotoalbum)
  |2.0     | 24.11.2014 | Config in JSON
  |2.0.1   | 14.03.2015 | Debugausgabe Projektabhaengig
+ |2.1     | 13.10.2018 | SQL API Umstellung
  -----------------------------------------------------
  Beschreibung :
  Downloader fuer interne Dateien.
  Parameter:
  -path   Pfad zur Datei auf FTP Server.
- -inline Falls gesetzt wird Datei automatisch 
+ -inline Falls gesetzt wird Datei automatisch
          geoeffnet.
  -thumb  Falls Thumb aus dem Modul Photos geladen
          werden soll.
@@ -50,23 +51,23 @@ $mime = array(
 		'pptx' => 'application/vnd.ms-powerpoint',
 		'pps'  => 'application/vnd.ms-powerpoint',
 		'ppsx' => 'application/vnd.ms-powerpoint',
-		
+
 		'exe'  => 'application/octet-stream',
 		'txt'  => 'text/plain',
 		'htm'  => 'text/html',
 		'html' => 'text/html',
 		'sql'  => 'text/plain',
-		
+
 		'mp2'  => 'audio/mpeg',
 		'mp3'  => 'audio/mpeg',
 		'wav'  => 'audio/x-wav',
-		
+
 		'jpg'  => 'image/jpeg',
 		'gif'  => 'image/gif',
 		'png'  => 'image/png',
 		'bmp'  => 'image/bmp',
 		'jpeg' => 'image/jpeg',
-		
+
 		'mpeg' => 'video/mpeg',
 		'mpg'  => 'video/mpeg',
 		'mov'  => 'video/quicktime',
@@ -114,9 +115,6 @@ session_start();
 include('_classes.php');
 include('_functions.php');
 include('acp/_functions_acp.php');
-
-/* Datenbankverbindung herstellen */
-define('DB_CMS', DatabaseConnect());
 
 
 ///////////////////////////////////////
@@ -182,7 +180,7 @@ for ($ap = explode('/', $path_folder); sizeof($ap) > 0; array_pop($ap)) {
 			$access_merge = ($access_merge != 0) ? $access_merge&$c['access'] : $c['access'];
 		}
 		$locked_merge |= $c['locked'];
-		
+
 		/* Letzte Konfiguration uebernehmen */
 		$config = $c;
 	}
@@ -237,6 +235,6 @@ echo $content;
 // Datenbankverbindung beenden       //
 ///////////////////////////////////////
 $ftp->close();
-mysql_close(DB_CMS);
+Database::instance()->close();
 
 ?>

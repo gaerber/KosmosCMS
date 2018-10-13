@@ -34,20 +34,20 @@ if (ACP_ACCESS_SYSTEM_EN) {
 			$PluginContent['caption'] = 'Passwort ändern';
 			$PluginContent['slogan'] = 'Erneuern Sie hier Ihr Passwort';
 			echo '<h1 class="first">Passwort ändern</h1>';
-			
+
 			$form = new formWizard('form', '?password', 'post', 'form_standard');
 			$password0 = $form->addElement('password', 'password0', 'Altes Passwort', NULL, true);
 			$password1 = $form->addElement('password', 'password1', 'Neues Passwort', NULL, true);
 			$password2 = $form->addElement('password', 'password2', 'Passwort wiederholen', NULL, true);
 			$submit = $form->addElement('submit', 'btn', NULL, 'Ändern');
-			
+
 			if ($form->checkForm()) {
 				if (sha1($password0->getValue()) == $_SESSION['user_password']) {
 					if ($password1->getValue() == $password2->getValue()) {
 						/* Passwort aendern */
-						if (mysql_query('UPDATE '.DB_TABLE_ROOT.'cms_access_user SET
+						if (Database::instance()->query('UPDATE '.DB_TABLE_ROOT.'cms_access_user SET
 								user_password="'.sha1($password1->getValue()).'"
-								WHERE user_id='.$_SESSION['user_id'], DB_CMS)) {
+								WHERE user_id='.$_SESSION['user_id'])) {
 							$_SESSION['user_password'] = sha1($password1->getValue());
 							echo ActionReport(REPORT_OK, 'Passwort geändert',
 									'Das Passwort wurde erfolgreich geändert.');
@@ -55,7 +55,7 @@ if (ACP_ACCESS_SYSTEM_EN) {
 						else {
 							echo ActionReport(REPORT_ERROR, 'Fehlgeschlagen',
 									'Das Passwort konnte nicht geändert werden.
-									<br />MySQL Error:'.mysql_error(DB_CMS));
+									<br />MySQL Error:'.Database::instance()->getErrorMessage());
 						}
 					}
 					else {
@@ -87,12 +87,12 @@ if (ACP_ACCESS_SYSTEM_EN) {
 				echo $form->getForm();
 			}
 		}
-		
+
 		/* Profilinformationen aendern */
 		else if (isset($_GET['profile'])) {
 			include('profile_edit.php');
 		}
-		
+
 		/* Benutzer hat sich erfolgreich angemeldet */
 		else {
 			$tpl = new tpl("plugins/access/login/user");
@@ -109,17 +109,17 @@ if (ACP_ACCESS_SYSTEM_EN) {
 			$PluginContent['caption'] = 'Passwort zurücksetzen';
 			$PluginContent['slogan'] = 'Ihr neues Passwort wird Ihnen per Email zugesendet.';
 			echo '<h1 class="first">Passwort zurücksetzen</h1>';
-			
+
 			$form = new formWizard('form', '?password', 'post', 'form_standard');
 			$email = $form->addElement('text', 'email', 'Email Adresse', NULL, true);
 			$email->setCustomValidation('email', NULL);
 			$submit = $form->addElement('submit', 'btn', NULL, 'Zurücksetzen');
-			
+
 			if ($form->checkForm()) {
-				$result = mysql_query('SELECT user_login, user_email FROM '.DB_TABLE_ROOT.'cms_access_user
-						WHERE user_email="'.StdSqlSafety($email->getValue()).'"', DB_CMS)
+				$result = Database::instance()->query('SELECT user_login, user_email FROM '.DB_TABLE_ROOT.'cms_access_user
+						WHERE user_email="'.StdSqlSafety($email->getValue()).'"')
 						OR FatalError(FATAL_ERROR_MYSQL);
-				if ($line = mysql_fetch_assoc($result)) {
+				if ($line = $result->fetch_assoc()) {
 					echo 'Comming Soon...';
 				}
 				else {
@@ -134,12 +134,12 @@ if (ACP_ACCESS_SYSTEM_EN) {
 				echo $form->getForm();
 			}
 		}
-		
+
 		/* Neues Konto erstellen */
 		else if (isset($_GET['profile'])) {
 			include('profile_edit.php');
 		}
-		
+
 		/* Loginformular anzeigen */
 		else {
 			$tpl = new tpl("plugins/access/login/form");

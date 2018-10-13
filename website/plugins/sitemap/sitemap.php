@@ -17,7 +17,7 @@
  -----------------------------------------------------
  Beschreibung :
  Plugin: Liste aller Seiten.
- 
+
  TO DO: Manipulation durch Module.
 
  (c) by Kevin Gerber
@@ -28,7 +28,7 @@
 if (!defined("SWISS_WEBDESIGN"))	die();
 ///////////////////////////////////////////////////////
 
-$o_menutree = new buildMenuTree(DB_CMS);
+$o_menutree = new buildMenuTree(Database::instance());
 $o_menutree->setSqlCondition(" && locked=0 && ".CheckSQLAccess());
 $o_menutree->allowPluginSubmenu(true);
 

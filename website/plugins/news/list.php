@@ -32,24 +32,24 @@ if (!defined("SWISS_WEBDESIGN"))	die();
 ///////////////////////////////////////////////////////
 
 if (ACP_MODULE_NEWS_EN) {
-	$result = mysql_query("SELECT id, id_str, caption FROM ".DB_TABLE_PLUGIN."news
+	$result = $this->db_stream->query("SELECT id, id_str, caption FROM ".DB_TABLE_PLUGIN."news
 			WHERE ".CheckSQLAccess()." && locked=0
-			ORDER BY timestamp DESC", $this->db_stream)
+			ORDER BY timestamp DESC")
 			OR FatalError(FATAL_ERROR_MYSQL);
-	
+
 	$ctr = 1;
-	$anz_elements = mysql_num_rows($result);
-	
-	while ($row = mysql_fetch_array($result)) {
+	$anz_elements = $result->num_rows;
+
+	while ($row = $result->fetch_assoc()) {
 		$replace = array('element' => 'page', 'level' => $this->settings['level'],
 				'pos' => $this->positionElements($ctr, $anz_elements), 'active' => '');
-	
+
 		$temp_template_folder = $this->settings['template_folder'];
 		foreach ($replace as $key => $value) {
 			$temp_template_folder = str_replace("{".$key."}", $value,
 					$temp_template_folder);
 		}
-	
+
 		/* Ausgabe */
 		$tpl = new tpl($temp_template_folder);
 		$tpl->assign($row);
@@ -58,9 +58,9 @@ if (ACP_MODULE_NEWS_EN) {
 		$tpl->assign('label', $row['caption']);
 		$tpl->assign("url", ROOT_WEBSITE.implode("/", $this->settings['path']).URL_ENDSTR_PAGE
 				."/".PLUGIN_NEWS_GETP_LONGNEWS."/".$row['id_str']);
-	
+
 		$html_menu .= $tpl->get();
-		
+
 		$ctr++;
 	}
 }

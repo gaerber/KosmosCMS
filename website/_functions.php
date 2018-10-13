@@ -77,7 +77,7 @@ function FatalError($error_nr) {
 	if ($error_nr == FATAL_ERROR_MYSQL) {
 		if (Database::instance()->hasError()) {
 			die("New MySQL Error: " . Database::instance()->getErrorMessage());
-		}	
+		}
 		else {
 			// old style for compatibility
 			die("MySqlError: " . mysql_error(DB_CMS));
@@ -101,7 +101,7 @@ function CheckSQLAccess($table = '') {
 	if ($table != '') {
 		$table .= '.';
 	}
-	
+
 	if (isset($_SESSION, $_SESSION['user_id'], $_SESSION['user_access'])) {
 		/* Benutzer ist angemeldet */
 		$sql = '(('.$table.'access = 0) || ('.$table.'access & '.$_SESSION['user_access'].'))';
@@ -139,16 +139,16 @@ function CheckAccess($access) {
  * Informationen ueber einen Autor
  */
 function getWriterInfo($a_id, &$a_name, &$a_email) {
-	$result = mysql_query('SELECT name, email FROM '.DB_TABLE_ROOT.'cms_admin
-			WHERE admin_id='.$a_id, DB_CMS)
+	$result = Database::instance()->query('SELECT name, email FROM '.DB_TABLE_ROOT.'cms_admin
+			WHERE admin_id='.$a_id)
 					OR FatalError(FATAL_ERROR_MYSQL);
-	if (mysql_num_rows($result)) {
-		$line = mysql_fetch_array($result);
+	if ($result->num_rows) {
+		$line = $result->fetch_assoc();
 		$a_name = $line['name'];
 		$a_email = $line['email'];
 		return true;
 	}
-	
+
 	/* Admin nicht gefunden */
 	return false;
 }
@@ -180,9 +180,9 @@ function printDate($timestamp) {
 function mysql_count($sql_from, $sql_where) {
 	if ($sql_where != '')
 		$sql_where = ' WHERE '.$sql_where;
-	$result = mysql_query('SELECT count(*) FROM '.$sql_from.$sql_where, DB_CMS)
+	$result = Database::instance()->query('SELECT count(*) FROM '.$sql_from.$sql_where)
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result))
+	if ($line = $result->fetch_row())
 		return $line[0];
 	else
 		return -1;
@@ -219,20 +219,20 @@ function ActionReport($report, $stringTitel, $stringNachricht) {
 
 function getIdStr($name, $db_tabel, $sql_conditions="", $db_col="id_str") {
 	$name = ValidateFileSystem($name);
-	
+
 	/* Laenge pruefen */
 	$name = substr($name, 0, 30);
 	$name = preg_replace("/-$/", "", $name);
-	
+
 	if ($db_tabel == "NOCHECK")
 		return $name;
-	
+
 	/* Abbruch nur durch return */
 	while (true) {
-        $result = mysql_query("SELECT count(*) FROM ".$db_tabel." 
-				WHERE (".$db_col."='".$name."') ".$sql_conditions, DB_CMS)
+        $result = Database::instance()->query("SELECT count(*) FROM ".$db_tabel."
+				WHERE (".$db_col."='".$name."') ".$sql_conditions)
 				OR FatalError(FATAL_ERROR_MYSQL);
-		$line = mysql_fetch_array($result);
+		$line = $result->fetch_row();
 		if ($line[0]) {
 			/* Ist eine numerische Zahl am Schluss */
 			if (preg_match("/[0-9]+$/", $name)) {
@@ -450,11 +450,11 @@ function BinaryMultiples($size) {
  */
 function getSmallUrlView($url) {
 	$url = preg_replace("/\/$/s", "", $url);
-	
+
 	$service = preg_replace("/^(http|https|ftp|ftps)\:\/\/(.+)/s", "$1://", $url);
 	$url = substr($url, strlen($service));
 	$url_parts = explode("/", $url);
-	
+
 	if (sizeof($url_parts) > 2)
 		return $service.$url_parts[0]."/.../".$url_parts[sizeof($url_parts)-1];
 	if (sizeof($url_parts) == 2)
@@ -556,7 +556,7 @@ function StdWysiwymPrepare($string) {
 
 	/* Bilder Validierung nach W3C */
 	$string = preg_replace_callback("/<img ([^>]+) \/>/s", "callbackWysiwymImage", $string);
-	
+
 	/* Erste Ueberschrift */
 	$string = str_replace(' class="first"', '', $string);
 	$string = preg_replace("/^<h1>(.+)<\/h1>/s", "<h1 class=\"first\">$1</h1>", $string);
@@ -647,18 +647,18 @@ function pluginCallback($treffer) {
 function moduleCallback($treffer) {
 	/* Parameter Array */
 	global $moduleParameter;
-	
+
 	/* Muss bereits als Array definert sein */
 	if (!is_array($moduleParameter))
 		die("Error in Modul Parameter!");
-	
+
 	/* Alle Leerschlaege entfernen */
 	$treffer[1] = str_replace(" ", "", $treffer[1]);
-	
+
 	/* Selektion der moeglichen Parameter
 	 * Jeder Parameter soll mit einem ';' enden */
 	$para = explode(";", $treffer[1]);
-	
+
 	/* Parsen aller Parameter */
 	for ($i=0; $i < sizeof($para); $i++) {
 		$para_data = explode("=", $para[$i]);
@@ -668,7 +668,7 @@ function moduleCallback($treffer) {
 			$moduleParameter[$para_data[0]] = $para_data[1];
 		}
 	}
-	
+
 	/* Modul Platzhalter */
 	return "{MODUL}";
 }
@@ -684,20 +684,20 @@ function moduleCallback($treffer) {
  */
 function readAlbumConfig($ftp, $album_path) {
 	global $FileSystem_ModulePahts;
-	
+
 	/* Spezialbehandlung ROOT */
 	if ($album_path == $FileSystem_ModulePahts['photos']) {
 		return array('id' => 0, 'locked' => 0, 'access' => 0);
 	}
-	
+
 	/* Config Datei einlesen */
 	if ($config = $ftp->readFolderConfig($album_path)) {
 		if (is_numeric($config['album_id'])) {
 			$album_id = (int) $config['album_id'];
 			/* Abfrage des Datenbankaekuivalents */
-			$result = mysql_query('SELECT * FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE id='.$album_id, DB_CMS)
+			$result = Database::instance()->query('SELECT * FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE id='.$album_id)
 					OR FatalError(FATAL_ERROR_MYSQL);
-			if ($line = mysql_fetch_assoc($result)) {
+			if ($line = $result->fetch_assoc()) {
 				return $line;
 			}
 		}
@@ -714,13 +714,13 @@ function readAlbumConfig($ftp, $album_path) {
  */
 function getRecursiveAlbumAccess($album_id) {
 	$retval = array('access' => 0, 'locked' => 0);
-	
-	/* Rekursive Vererbung der Zurgiffsrechte 
+
+	/* Rekursive Vererbung der Zurgiffsrechte
 	 * Quelle: http://wiki.yaslaw.info/dokuwiki/doku.php/mysql/AdjacencyTree/index */
 	$sql = 'SELECT nav.access AS access, nav.locked AS locked
 	FROM
 	(
-		SELECT  
+		SELECT
 			@cnt := @cnt + 1 AS cnt,
 			-- Die letzte ParentID als ID ausgeben
 			@id AS id,
@@ -733,20 +733,20 @@ function getRecursiveAlbumAccess($album_id) {
 		WHERE
 			@id IS NOT NULL
 	) AS dat
-	-- Das ganze mit der Navigationstabelle verlinken on den Titel 
+	-- Das ganze mit der Navigationstabelle verlinken on den Titel
 	-- und ggf. weitere Informationen auszulesen
 	 INNER JOIN '.DB_TABLE_PLUGIN.'photoalbum AS nav
 		ON dat.id = nav.id';
-		
-	$result = mysql_query($sql) OR FatalError(FATAL_ERROR_MYSQL);
-	while ($row = mysql_fetch_assoc($result)) {
+
+	$result = Database::instance()->query($sql) OR FatalError(FATAL_ERROR_MYSQL);
+	while ($row = $result->fetch_assoc()) {
 		/* Der selbe Mechanismus wie im Download-Modul */
 		if ($row['access'] != 0) {
 			$retval['access'] = ($retval['access'] != 0) ? $retval['access']&$row['access'] : $row['access'];
 		}
 		$retval['locked'] |= $row['locked'];
 	}
-	
+
 	return $retval;
 }
 
@@ -775,7 +775,7 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
 		/* Quelldatei existiert nicht */
 		return false;
 	}
-	
+
 	/* Originalbildgroesse */
 	$size_src = getimagesize($img_src);
     /* Erstellen des urspruenglichen Bildes */
@@ -796,17 +796,17 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
         default:
             return false;
     }
-    
+
     /* Falls eine temporaere Quelldatei existiert, kann diese non geloescht werden */
     if (isset($image_src_temp)) {
     	unlink($image_src_temp);
     }
-    
+
     if ($img_src_data) {
     	/* Berechnung der Streckungsfaktoren */
     	$factor_h = $size_src[1] / $hight;
     	$factor_w = $size_src[0] / $width;
-    	
+
     	/* Wie muss das Bild zugeschnitten werden */
     	if ($factor_h > $factor_w) {
     		/* Bild ist zu hoch -> Breite anpassen oder oben und unten abschneiden */
@@ -832,10 +832,10 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
             	$x_offset = round(($size_src[0] - $size_src_big_w) / 2, 0);
    			}
     	}
-   		
+
         /* Thumbnail anlegen */
 		$img_thumb = ImageCreateTrueColor($width, $hight);
-        
+
         if ($img_thumb) {
             /* Thumbnail skalieren */
             if ($proportional) {
@@ -846,17 +846,17 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
             	$handler = imagecopyresized($img_thumb, $img_src_data, 0,0,$x_offset,$y_offset,
 						$width, $hight, $size_src_big_w, $size_src_big_h);
             }
-            
+
 			if (!$handler) {
                 /* Bilder loeschen */
                 imagedestroy($img_src_data);
                 imagedestroy($img_thumb);
                 return false;
             }
-            
+
 			/* Temporaerer Speicherort auf Server */
 			$image_scaled_temp = tempnam(FILESYSTEM_TEMP, 'img');
-	
+
 			$bool = false;
 			if (file_exists($image_scaled_temp)) {
 	            switch($size_src[2]) {
@@ -873,7 +873,7 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
 	                    $bool = ImagePNG($img_thumb, $image_scaled_temp, round($quality / 10, 0));
 	                    break;
 	            }
-	            
+
 	            /* Thumbnail hochladen per FTP */
 				if ($bool) {
 					/* FTP Upload */
@@ -885,7 +885,7 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
             /* Bilder loeschen */
             imagedestroy($img_src_data);
             imagedestroy($img_thumb);
-            
+
             /* Thumbnail sollte erstellt sein */
             return $bool;
         }
@@ -893,7 +893,7 @@ function ImageResizeFtp($ftp, $img_src, $img_dest, $hight, $width, $proportional
             imagedestroy($img_src_data);
             return false;
         }
-        
+
     }
     else {
          return false;
