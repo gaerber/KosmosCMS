@@ -108,7 +108,7 @@ class tpl {
 		$this->delimiterEnd = $delim;
 	}
 
-	function tpl($template_file) {
+	function __construct($template_file) {
 		$template_file = ROOT_TEMPLATE.$template_file.TEMPLATE_TYPE;
 		if(file_exists($template_file)) {
 			$this->template_file = implode('', file($template_file));
