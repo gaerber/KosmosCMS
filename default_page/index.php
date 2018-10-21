@@ -40,6 +40,7 @@ $tpl['header'] = 'Neuer Internetauftritt';
 
 $tpl['offlinetitle'] = 'Neuer Internetauftritt';
 $tpl['offlinemessage'] = 'Hier entsteht der neue Internetauftritt von '.$tpl['company'].'.';
+$tpl['working-in-progress'] = true;
 
 ?>
 <!DOCTYPE html>
@@ -112,7 +113,7 @@ $tpl['offlinemessage'] = 'Hier entsteht der neue Internetauftritt von '.$tpl['co
 
 <div id="center">
   <div id="content">
-    <img src="<?php echo $tpl['root_images']; ?>in_work.jpg" alt="" />
+    <img src="<?php echo $tpl['root_images']; echo $tpl['working-in-progress']==true ? "in_work.jpg" : "discontinued.png"; ?>" alt="" />
     <h1><?php echo $tpl['offlinetitle']; ?></h1>
     <p><?php echo $tpl['offlinemessage']; ?></p>
   </div>

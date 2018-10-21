@@ -42,7 +42,7 @@ $form = new formWizard('form', "?".$_SERVER["QUERY_STRING"], 'post', 'form_acp_s
 $access_log = $form->addElement('radio', 'access', 'Empfänger', '1');
 $access_grp = $form->addElement('radio', 'access', NULL, '2');
 $access_groups = $form->addElement('select', 'access_group', 'Gruppen');
-$access_groups->setCssClass('select_groups');
+$access_groups->setCssClass('select_groups hide');
 $access_log->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
 $access_grp->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'block\';"');
 $access_log->setSubLabel("Alle Benutzer");
@@ -58,10 +58,10 @@ $message->setRowsCols(10, 20);
 $submit = $form->addElement('submit', 'btn', NULL, 'Senden');
 
 /* Liste aller Gruppen */
-$result = mysql_query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
-		ORDER BY name ASC", DB_CMS)
+$result = Database::instance()->query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
+		ORDER BY name ASC")
 		OR FatalError(FATAL_ERROR_MYSQL);
-while ($row = mysql_fetch_array($result)) {
+while ($row = $result->fetch_assoc()) {
 	$access_groups->addOption($row['name'], 1<<$row['id']);
 }
 
@@ -70,17 +70,17 @@ if ($form->checkForm()) {
 	if ($access_grp->getValue() && !sizeof($access_groups->getValue())) {
 		/* Es muss nim. eine Gruppe ausgewaehlt werden */
 		$access_groups->setError(true);
-		$access_groups->setCssClass('select_groups_view');
+		$access_groups->setCssClass('select_groups show');
 		/* Ausgabe des Formulars */
 		echo $form->getForm();
 	}
 	else {
 		/* Absender Emailadresse */
-		$result = mysql_query("SELECT newsletter_email, newsletter_sender
+		$result = Database::instance()->query("SELECT newsletter_email, newsletter_sender
 				FROM ".DB_TABLE_ROOT."cms_setting
-				ORDER BY id DESC LIMIT 1", DB_CMS)
+				ORDER BY id DESC LIMIT 1")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			$newsletter_message_sender = $line['newsletter_sender']." <".$line['newsletter_email'].">";
 			/* Eamil Header */
 			$newsletter_header = "Mime-Version: 1.0\nContent-type: text/plain; charset=utf-8\nContent-Transfer-Encoding: 8bit\nFrom: ".$newsletter_message_sender."\n";
@@ -99,11 +99,11 @@ if ($form->checkForm()) {
 				$access = 1;
 			}
 			/* Beutzer Selektieren */
-			$result = mysql_query("SELECT * FROM ".DB_TABLE_ROOT."cms_access_user
-					WHERE (user_access & ".$access.") && user_allow_newsletter=1 && user_email!=''", DB_CMS)
+			$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_ROOT."cms_access_user
+					WHERE (user_access & ".$access.") && user_allow_newsletter=1 && user_email!=''")
 					OR FatalError(FATAL_ERROR_MYSQL);
 			$email_ctr = 0;
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = $result->fetch_assoc()) {
 				/* Email vorbereiten */
 				$newsletter_message_tmp = $newsletter_message;
 				foreach ($row as $search => $replace) {
@@ -120,15 +120,15 @@ if ($form->checkForm()) {
 				}
 			}
 			/* Pruefen ob alle Mails gesendet wurden */
-			if (mysql_num_rows($result)) {
-				if (mysql_num_rows($result) == $email_ctr) {
+			if ($result->num_rows) {
+				if ($result->num_rows == $email_ctr) {
 					echo ActionReport(REPORT_OK, "Alle Newsletter wurden versendet",
 							"Alle ".$email_ctr." Newsletter wurden erfolgreich versendet!");
 				}
 				else {
 					/* Nicht alle Mails wurden versendet */
 					echo ActionReport(REPORT_ERROR, "Nicht alle Newsletter wurden versendet",
-							"Es konnten nur ".$email_ctr." von ".mysql_num_rows($result)
+							"Es konnten nur ".$email_ctr." von ".$result->num_rows
 							." Newsletter versendet werden!");
 				}
 			}
@@ -148,7 +148,7 @@ if ($form->checkForm()) {
 else {
 	/* Ausgabe Formular */
 	if ($access_grp->getValue()) {
-		$access_groups->setCssClass('select_groups_view');
+		$access_groups->setCssClass('select_groups show');
 	}
 	echo $form->getForm();
 	

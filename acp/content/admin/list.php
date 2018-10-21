@@ -39,13 +39,13 @@ echo "<h1 class=\"first\">Administratoren</h1>";
 if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 	if ($_GET['delete'] != 1) {
 		if ($_SESSION['admin_id'] != $_GET['delete']) {
-			if (mysql_query("UPDATE ".DB_TABLE_ROOT."cms_admin SET login='', locked=1
-					WHERE admin_id=".StdSqlSafety($_GET['delete']), DB_CMS)) {
+			if (Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_admin SET login='', locked=1
+					WHERE admin_id=".StdSqlSafety($_GET['delete']))) {
 				echo ActionReport(REPORT_OK, "Administrator gelöscht", "Der Administrator wurde erfolgreich gelöscht!");
 			}
 			else {
 				echo ActionReport(REPORT_ERROR, "Fehler",
-						"Der Administrator konnte nicht gelöscht werden!<br />MySQL Fehler: ".mysql_error(DB_CMS));
+						"Der Administrator konnte nicht gelöscht werden!<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 			}
 		}
 		else {
@@ -53,7 +53,7 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 		}
 	}
 	else {
-		echo ActionReport(REPORT_EINGABE, "Nicht möglich", "Der Errichter darf nicht gesperrt werden! Stattdessen können Sie diesen sperren.");
+		echo ActionReport(REPORT_EINGABE, "Nicht möglich", "Der Errichter darf nicht gelöscht werden! Stattdessen können Sie diesen sperren.");
 	}
 }
 
@@ -61,21 +61,21 @@ if (isset($_GET['delete']) && is_numeric($_GET['delete'])) {
 if (isset($_GET['raiser'])) {
 	if ($_SESSION['admin_id'] != 1) {
 		if ($_GET['raiser'] == 'unlock') {
-			if (mysql_query("UPDATE ".DB_TABLE_ROOT."cms_admin SET locked=0 WHERE admin_id=1", DB_CMS)) {
+			if (Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_admin SET locked=0 WHERE admin_id=1")) {
 				echo ActionReport(REPORT_OK, "Errichter freigegeben", "Der Errichter wurde erfolgreich freigegeben! Mit seinem bisherigen Passwort kann er sich nun im ACP anmelden.");
 			}
 			else {
 				echo ActionReport(REPORT_ERROR, "Fehler",
-						"Der Errichter konnte nicht freigegeben werden!<br />MySQL Fehler: ".mysql_error(DB_CMS));
+						"Der Errichter konnte nicht freigegeben werden!<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 			}
 		}
 		else if ($_GET['raiser'] == 'lock') {
-			if (mysql_query("UPDATE ".DB_TABLE_ROOT."cms_admin SET locked=1 WHERE admin_id=1", DB_CMS)) {
+			if (Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_admin SET locked=1 WHERE admin_id=1")) {
 				echo ActionReport(REPORT_OK, "Errichter gesperrt", "Der Errichter wurde erfolgreich gesperrt!");
 			}
 			else {
 				echo ActionReport(REPORT_ERROR, "Fehler",
-						"Der Errichter konnte nicht gesperrt werden!<br />MySQL Fehler: ".mysql_error(DB_CMS));
+						"Der Errichter konnte nicht gesperrt werden!<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 			}
 		}
 	}
@@ -98,11 +98,11 @@ echo "    <tr class=\"table_title\">
 
 $row_ctr = 1;
 
-$result = mysql_query("SELECT admin_id, name, last_login, locked
+$result = Database::instance()->query("SELECT admin_id, name, last_login, locked
 		FROM ".DB_TABLE_ROOT."cms_admin
-		WHERE locked=0 OR admin_id=1 ORDER BY name ASC", DB_CMS)
+		WHERE locked=0 OR admin_id=1 ORDER BY name ASC")
 		OR FatalError(FATAL_ERROR_MYSQL);
-while ($row = mysql_fetch_array($result)) {
+while ($row = $result->fetch_assoc()) {
 	if ($row_ctr++ % 2)
 		echo "    <tr class=\"table_odd\">\r\n";
 	else

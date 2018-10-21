@@ -60,10 +60,10 @@ $submit = $form->addElement('submit', 'btn', NULL, 'Senden');
 
 /* Emails an Benutzer */
 if (isset($_GET['user']) && $_GET['user'] != "") {
-	$result = mysql_query("SELECT user_name, user_email, user_email_show FROM ".DB_TABLE_ROOT."cms_access_user
-			WHERE user_id_str='".StdSqlSafety($_GET['user'])."'", DB_CMS)
+	$result = Database::instance()->query("SELECT user_name, user_email, user_email_show FROM ".DB_TABLE_ROOT."cms_access_user
+			WHERE user_id_str='".StdSqlSafety($_GET['user'])."'")
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		if ($line['user_email_show']) {
 			$contact_data = array();
 			$contact_data['title'] = "Nachricht an ".$line['user_name'];
@@ -78,10 +78,10 @@ if (isset($_GET['user']) && $_GET['user'] != "") {
 /* Default Zieladresse */
 if (!isset($contact_data)) {
 	$contact_data = array();
-	$result = mysql_query("SELECT admin_email FROM ".DB_TABLE_ROOT."cms_setting
-			ORDER BY id DESC LIMIT 1", DB_CMS)
+	$result = Database::instance()->query("SELECT admin_email FROM ".DB_TABLE_ROOT."cms_setting
+			ORDER BY id DESC LIMIT 1")
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		$contact_data['title'] = "";
 		$contact_data['name'] = 'den Administrator';
 		$contact_data['email'] = $line['admin_email'];
@@ -103,7 +103,7 @@ if ($form->checkForm()) {
 			$email_cc->assign($search, $object->getValue());
 			$email_cc->assign('receiver_name', $contact_data['name']);
 		}
-		
+
 		if (getUserInfo('user_id')) {
 			$email_to->assign($_SESSION);
 			$email_cc->assign($_SESSION);
@@ -114,7 +114,7 @@ if ($form->checkForm()) {
 			$user_name = $form_data['user_name']->getValue();
 			$user_email = $form_data['user_email']->getValue();
 		}
-		
+
 		/* Email senden */
 		$header = "Mime-Version: 1.0\nContent-type: text/plain; charset=utf-8\nContent-Transfer-Encoding: 8bit\n";
 		if(mail($contact_data['email'], $form_data['betreff']->getValue(), StdStringEmail($email_to->get()),

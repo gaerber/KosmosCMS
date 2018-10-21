@@ -41,15 +41,15 @@ if ($form->checkSubmit() && $form->checkForm()) {
 	/* Alle Felder ausgefuellt */
 	if ($pw_new->getValue() == $pw_new2->getValue()) {
 		/* Altes Passwort pruefen */
-		$result = mysql_query("SELECT password FROM ".DB_TABLE_ROOT."cms_admin
-				WHERE admin_id=".StdSqlSafety($_SESSION['admin_id']), DB_CMS)
+		$result = Database::instance()->query("SELECT password FROM ".DB_TABLE_ROOT."cms_admin
+				WHERE admin_id=".StdSqlSafety($_SESSION['admin_id']))
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			if ($line['password'] == sha1($pw_old->getValue())) {
 				/* Passwort aendern */
 				echo "<h1 class=\"first\">Passwortändern</h1>";
-				if (mysql_query("UPDATE ".DB_TABLE_ROOT."cms_admin SET password='".sha1($pw_new->getValue())."'
-						WHERE admin_id=".StdSqlSafety($_SESSION['admin_id']), DB_CMS)) {
+				if (Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_admin SET password='".sha1($pw_new->getValue())."'
+						WHERE admin_id=".StdSqlSafety($_SESSION['admin_id']))) {
 					/* Passwort aktualisieren */
 					$_SESSION['admin_password'] = sha1($pw_new->getValue());
 					echo ActionReport(REPORT_OK, "Passwort geändert",
@@ -57,7 +57,7 @@ if ($form->checkSubmit() && $form->checkForm()) {
 				}
 				else {
 					echo ActionReport(REPORT_ERROR, "Fehler",
-							"Das Passwort konnte nicht geändert werden!<br />".mysql_error(DB_CMS));
+							"Das Passwort konnte nicht geändert werden!<br />".Database::instance()->getErrorMessage());
 				}
 			}
 			else {

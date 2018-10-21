@@ -63,19 +63,19 @@ if (ACP_MODULE_GUESTBOOK_EN) {
 				$user_infos['email'] = StdSqlSafety($email->getValue());
 				$user_infos['website'] = StdSqlSafety($website->getValue());
 			}
-			if (mysql_query("INSERT INTO ".DB_TABLE_PLUGIN."guestbook(
+			if (Database::instance()->query("INSERT INTO ".DB_TABLE_PLUGIN."guestbook(
 					writer_id, writer_name, writer_email, writer_website,
 					comment, timestamp)VALUES(
 					".$_SESSION['user_id'].", '".$user_infos['name']."',
 					'".$user_infos['email']."', '".$user_infos['website']."',
 					'".StdSqlSafety(StdContent($comment->getValue(), false))."',
-					".TIME_STAMP.")", DB_CMS)) {
+					".TIME_STAMP.")")) {
 				echo ActionReport(REPORT_OK, "Beitrag gespeichern",
 						"Vielen Dank für Ihren Beitrag!");
 			}
 			else {
 				echo ActionReport(REPORT_ERROR, 'Fehler beim Abspeichern',
-						'Beim abspeichern trat eine Fehler auf!<br />Mysql Error: '.mysql_error(DB_CMS));
+						'Beim abspeichern trat eine Fehler auf!<br />Mysql Error: '.Database::instance()->getErrorMessage());
 			}
 		}
 		else {

@@ -44,7 +44,7 @@ function addSubmenuOptions($o_submenu, $active=NULL) {
 	/* Erster Eintrag ohne Mutterelement */
 	$o_submenu->addOption('Kein Mutterelement', 0);
 
-	$o_menutree = new buildMenuTree(DB_CMS);
+	$o_menutree = new buildMenuTree(Database::instance());
 
 	if ($_GET['mode'] == "page") {
 		$menutree_txt = $o_menutree->getMenuTree(0, (MENU_MAX_LEVEL-2), 1, true,
@@ -124,7 +124,7 @@ if (ACP_ACCESS_SYSTEM_EN) {
 	$access_grp = $form->addElement('radio', 'access', NULL, '2');
 	$access_groups = $form->addElement('select', 'access_group', 'Gruppen');
 
-	$access_groups->setCssClass('select_groups');
+	$access_groups->setCssClass('select_groups hide');
 	$access_all->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
 	$access_log->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
 	$access_grp->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'block\';"');
@@ -145,12 +145,12 @@ $submit->setCssClassField("wymupdate");
 if (!$form->checkSubmit()) {
 	if (isset($_GET['id'])) {
 		/* Seite bearbeiten */
-		$result = mysql_query("SELECT * FROM ".DB_TABLE_ROOT."cms_menu
+		$result = Database::instance()->query("SELECT * FROM ".DB_TABLE_ROOT."cms_menu
 				WHERE id=".StdSqlSafety($_GET["id"])."
-				&& menu_is_categorie=".(int)($_GET["mode"] != "page"), DB_CMS)
+				&& menu_is_categorie=".(int)($_GET["mode"] != "page"))
 				OR FatalError(FATAL_ERROR_MYSQL);
 
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			$id_str->setValue($line['id_str']);
 			$label->setValue($line['label']);
 			if ($line['menu_view']
@@ -164,11 +164,11 @@ if (!$form->checkSubmit()) {
 				$locked->setChecked(true);
 			if ($_GET['mode'] == "page") {
 				/* Inhalt */
-				$result = mysql_query("SELECT html FROM ".DB_TABLE_ROOT."cms_content
+				$result = Database::instance()->query("SELECT html FROM ".DB_TABLE_ROOT."cms_content
 						WHERE page_id=".$line["id"]."
-						ORDER BY timestamp DESC LIMIT 1", DB_CMS)
+						ORDER BY timestamp DESC LIMIT 1")
 						OR FatalError(FATAL_ERROR_MYSQL);
-				if ($line_content = mysql_fetch_array($result))
+				if ($line_content = $result->fetch_assoc())
 					if ($line_content['html'])
 						$content->setValue($line_content['html']);
 					else
@@ -181,10 +181,10 @@ if (!$form->checkSubmit()) {
 			if ($_GET['mode'] == "page") {
 				/* Plugins */
 				$plugin->addOption("Kein Modul", 0);
-				$result = mysql_query("SELECT id, label FROM ".DB_TABLE_ROOT."cms_plugin
-						WHERE locked=0 ORDER BY label ASC", DB_CMS)
+				$result = Database::instance()->query("SELECT id, label FROM ".DB_TABLE_ROOT."cms_plugin
+						WHERE locked=0 ORDER BY label ASC")
 						OR FatalError(FATAL_ERROR_MYSQL);
-				while ($row = mysql_fetch_array($result)) {
+				while ($row = $result->fetch_assoc()) {
 					$plugin->addOption($row['label'], $row['id'],
 							(bool) ($line['plugin'] == $row['id']));
 				}
@@ -198,10 +198,10 @@ if (!$form->checkSubmit()) {
 					$access_grp->setChecked(true);
 				}
 				/* Gruppen */
-				$result = mysql_query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
-						ORDER BY name ASC", DB_CMS)
+				$result = Database::instance()->query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
+						ORDER BY name ASC")
 						OR FatalError(FATAL_ERROR_MYSQL);
-				while ($row = mysql_fetch_array($result)) {
+				while ($row = $result->fetch_assoc()) {
 					$access_groups->addOption($row['name'], 1<<$row['id'],
 							(bool)($line['access'] & (1<<$row['id'])));
 				}
@@ -236,20 +236,20 @@ if ($form->checkSubmit() || (!$form->checkSubmit() && !isset($_GET['id']))) {
 	/* Plugins */
 	if ($_GET['mode'] == "page") {
 		$plugin->addOption("Kein Modul", 0);
-		$result = mysql_query("SELECT id, label FROM ".DB_TABLE_ROOT."cms_plugin
-				WHERE locked=0 ORDER BY label ASC", DB_CMS)
+		$result = Database::instance()->query("SELECT id, label FROM ".DB_TABLE_ROOT."cms_plugin
+				WHERE locked=0 ORDER BY label ASC")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		while ($row = mysql_fetch_array($result)) {
+		while ($row = $result->fetch_assoc()) {
 			$plugin->addOption($row['label'], $row['id']);
 		}
 	}
 
 	/* Gruppen */
 	if (ACP_ACCESS_SYSTEM_EN) {
-		$result = mysql_query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
-				ORDER BY name ASC", DB_CMS)
+		$result = Database::instance()->query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
+				ORDER BY name ASC")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		while ($row = mysql_fetch_array($result)) {
+		while ($row = $result->fetch_assoc()) {
 			$access_groups->addOption($row['name'], 1<<$row['id']);
 		}
 	}
@@ -260,10 +260,10 @@ if ($form->checkSubmit() || (!$form->checkSubmit() && !isset($_GET['id']))) {
 if ($form->checkSubmit() && $form->checkForm()) {
 	/* Checken, dass id_str nicht doppelt existiert */
 	if (isset($_GET['id'])) {
-		$result = mysql_query("SELECT menu_sub FROM ".DB_TABLE_ROOT."cms_menu
-				WHERE id=".StdSqlSafety($_GET["id"]), DB_CMS)
+		$result = Database::instance()->query("SELECT menu_sub FROM ".DB_TABLE_ROOT."cms_menu
+				WHERE id=".StdSqlSafety($_GET["id"]))
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			$check_menu_sub = $line['menu_sub'];
 		}
 		else {
@@ -283,17 +283,17 @@ if ($form->checkSubmit() && $form->checkForm()) {
 
 	if (isset($check_menu_sub)) {
 		if (isset($_GET['id']))
-			$result = mysql_query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu
+			$result = Database::instance()->query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu
 					WHERE id!=".StdSqlSafety($_GET["id"])."
 					&& menu_sub=".$check_menu_sub."
-					&& id_str='".getIdStr($id_str->getValue(), "NOCHECK")."'", DB_CMS)
+					&& id_str='".getIdStr($id_str->getValue(), "NOCHECK")."'")
 					OR FatalError(FATAL_ERROR_MYSQL);
 		else
-			$result = mysql_query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu
+			$result = Database::instance()->query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu
 					WHERE menu_sub=".$check_menu_sub."
-					&& id_str='".getIdStr($id_str->getValue(), "NOCHECK")."'", DB_CMS)
+					&& id_str='".getIdStr($id_str->getValue(), "NOCHECK")."'")
 					OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			/* Dieser Seitennamen existiert bereits */
 			$id_str->setError(true);
 			/* Fehlerausgabe */
@@ -305,7 +305,7 @@ if ($form->checkSubmit() && $form->checkForm()) {
 							"Es Existiert bereits eine Kategorie mit gleichem Namen.");
 			/* Gruppenwahl verstecken */
 			if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
-				$access_groups->setCssClass('select_groups_view');
+				$access_groups->setCssClass('select_groups show');
 			}
 			/* Formular ausgeben */
 			echo $form->getForm();
@@ -325,7 +325,7 @@ if ($form->checkSubmit() && $form->checkForm()) {
 							"Wenn Sie die Kategorie nur bestimmten Gruppen zur Verfügung stellen ".
 							"möchten, müssen Sie mindestens eine Gruppe auswählen.");
 				/* Formular ausgeben */
-				$access_groups->setCssClass('select_groups_view');
+				$access_groups->setCssClass('select_groups show');
 				echo $form->getForm();
 			}
 			else {
@@ -369,12 +369,12 @@ if ($form->checkSubmit() && $form->checkForm()) {
 				}
 				else {
 					/* Berechnung menu_order */
-					$result = mysql_query("SELECT menu_order FROM ".DB_TABLE_ROOT."cms_menu
+					$result = Database::instance()->query("SELECT menu_order FROM ".DB_TABLE_ROOT."cms_menu
 							WHERE menu_sub=".$menu_sub->getValue()."
-							ORDER BY menu_order DESC LIMIT 1", DB_CMS)
+							ORDER BY menu_order DESC LIMIT 1")
 							OR FatalError(FATAL_ERROR_MYSQL);
 
-					if ($line = mysql_fetch_array($result)) {
+					if ($line = $result->fetch_assoc()) {
 						$menu_order = $line['menu_order'] + 1;
 					}
 					else {
@@ -417,16 +417,16 @@ if ($form->checkSubmit() && $form->checkForm()) {
 				}
 
 				/* Abspeichern */
-				if (mysql_query($sql, DB_CMS)) {
+				if (Database::instance()->query($sql)) {
 					/* Seite / Kategorie abgespeichert */
 					if ($_GET['mode'] == "page") {
 						if (isset($_GET['id'])) {
 							/* Inhalt abspeichern wenn er geaendert wurde */
-							$result = mysql_query("SELECT html FROM ".DB_TABLE_ROOT."cms_content
+							$result = Database::instance()->query("SELECT html FROM ".DB_TABLE_ROOT."cms_content
 									WHERE page_id=".StdSqlSafety($_GET["id"])."
-									ORDER BY timestamp DESC LIMIT 1", DB_CMS)
+									ORDER BY timestamp DESC LIMIT 1")
 									OR FatalError(FATAL_ERROR_MYSQL);
-							if ($line = mysql_fetch_array($result)) {
+							if ($line = $result->fetch_assoc()) {
 								$content_html = StdWysiwymPrepare($content->getValue());
 								if ($line['html'] != $content_html) {
 									/* Inhalt wurde geaendert oder wurde nicht gefunden */
@@ -458,7 +458,7 @@ if ($form->checkSubmit() && $form->checkForm()) {
 									".TIME_STAMP.")";
 						}
 
-						if ($sql == "" || mysql_query($sql, DB_CMS)) {
+						if ($sql == "" || Database::instance()->query($sql)) {
 							/* Alles OK */
 							if (isset($_GET['id']))
 								echo ActionReport(REPORT_OK, "Seite gespeichert",
@@ -470,7 +470,7 @@ if ($form->checkSubmit() && $form->checkForm()) {
 						else {
 							echo ActionReport(REPORT_ERROR, "Fehler",
 									"Beim Abspeichern des Inhaltes trat ein Fehler auf!
-									<br />MySQL Fehler: ".mysql_error());
+									<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 						}
 					}
 					else {
@@ -483,7 +483,7 @@ if ($form->checkSubmit() && $form->checkForm()) {
 					}
 				}
 				else {
-					echo ActionReport(REPORT_ERROR, "Fehler beim abspeichern", mysql_error());
+					echo ActionReport(REPORT_ERROR, "Fehler beim abspeichern", Database::instance()->getErrorMessage());
 				}
 			}
 		}
@@ -493,7 +493,7 @@ else {
 	if (!(isset($form_hide) && $form_hide == true)) {
 		/* Gruppenwahl verstecken */
 		if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
-			$access_groups->setCssClass('select_groups_view');
+			$access_groups->setCssClass('select_groups show');
 		}
 		/* Formular ausgeben */
 		echo $form->getForm();

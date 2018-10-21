@@ -28,33 +28,33 @@ if (!defined("SWISS_WEBDESIGN"))	die();
 ///////////////////////////////////////////////////////
 
 if (ACP_MODULE_NEWS_EN) {
-	
+
 	/* HTML Buffer */
 	$PluginContent['plugin_news_headlines'] = '';
-	
+
 	/* URL des Moduls ermitteln fuer die Links */
-	$result = mysql_query('SELECT menu.id 
-			FROM '.DB_TABLE_ROOT.'cms_plugin AS plugin 
+	$result = Database::instance()->query('SELECT menu.id
+			FROM '.DB_TABLE_ROOT.'cms_plugin AS plugin
 			INNER JOIN '.DB_TABLE_ROOT.'cms_menu AS menu ON plugin.id=menu.plugin
-			WHERE plugin.label="Neuigkeiten"', DB_CMS)
+			WHERE plugin.label="Neuigkeiten"')
 			OR FatalError(FATAL_ERROR_MYSQL);
-	$line = mysql_fetch_row($result);
-	
-	$o_modlue_path = new activePage(DB_CMS);
-	
+	$line = $result->fetch_row();
+
+	$o_modlue_path = new activePage(Database::instance());
+
 	if ($url = $o_modlue_path->getUrlById($line[0])) {
-		$result = mysql_query('SELECT * FROM '.DB_TABLE_PLUGIN.'news
+		$result = Database::instance()->query('SELECT * FROM '.DB_TABLE_PLUGIN.'news
 				WHERE locked=0 && '.CheckSQLAccess().' && timestamp>='.(TIME_STAMP - 5184000).' ORDER BY timestamp DESC
-				LIMIT 0,2', DB_CMS)
+				LIMIT 0,2')
 				OR FatalError(FATAL_ERROR_MYSQL);
-		
-		while ($row = mysql_fetch_array($result)) {
+
+		while ($row = $result->fetch_assoc()) {
 			$tpl = new tpl('plugins/news/headlines');
 			/* Kategorie Informationen */
-			/*$res_cat = mysql_query("SELECT * FROM ".DB_TABLE_PLUGIN."news_categorie
-					WHERE id=".$row['categorie_id'], DB_CMS)
+			/*$res_cat = Database::instance()->query("SELECT * FROM ".DB_TABLE_PLUGIN."news_categorie
+					WHERE id=".$row['categorie_id'])
 					OR FatalError(FATAL_ERROR_MYSQL);
-			$line_cat = mysql_fetch_array($res_cat);
+			$line_cat = $cat_res->fetch_assoc();
 			$row['categorie_id_str'] = $line_cat['id_str'];
 			$row['categorie_name'] = $line_cat['name'];*/
 			/* Autor Informationen */

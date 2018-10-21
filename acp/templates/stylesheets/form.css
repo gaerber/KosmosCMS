@@ -107,7 +107,7 @@ form.form_acp_standard select, form.form_acp_standard input.input_file {
 	width:70.5%;
 }
 
-/*** Bilder aud dem Dateisystem **********************************************/
+/*** Bilder aus dem Dateisystem **********************************************/
 form.form_acp_standard ol li div.images div {
 	float:left;
 	margin:0 10px 4px 0;
@@ -152,10 +152,10 @@ p.form_end {
 }
 
 /*** Grupenwahl **************************************************************/
-form.form_acp_standard ol li.select_groups {
+form.form_acp_standard ol li.hide {
 	display:none;
 }
-form.form_acp_standard ol li.select_groups_view {
+form.form_acp_standard ol li.show {
 	display:block;
 }
 

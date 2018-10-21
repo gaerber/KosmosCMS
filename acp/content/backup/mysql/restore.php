@@ -62,10 +62,10 @@ if ($ftp->ChangeDir($FileSystem_ModulePahts['mysqlbackups'])) {
 		/* Auswertung */
 		if ($form->checkForm()) {
 			/* Passwort pruefen */
-			$result = mysql_query("SELECT password FROM ".DB_TABLE_ROOT."cms_admin
-					WHERE admin_id=".StdSqlSafety($_SESSION['admin_id']), DB_CMS)
+			$result = Database::instance()->query("SELECT password FROM ".DB_TABLE_ROOT."cms_admin
+					WHERE admin_id=".StdSqlSafety($_SESSION['admin_id']))
 					OR FatalError(FATAL_ERROR_MYSQL);
-			if ($line = mysql_fetch_array($result)) {
+			if ($line = $result->fetch_assoc()) {
 				if ($line['password'] == sha1($password->getValue())) {
 					$backup_file = tempnam(FILESYSTEM_TEMP, 'sql');
 					/* Sicherheitskopie einlesen */

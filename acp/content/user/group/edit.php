@@ -38,7 +38,7 @@ if (isset($_GET['id']))
 	echo "<h1 class=\"first\">Gruppe bearbeiten</h1>";
 else
 	echo "<h1 class=\"first\">Neue Gruppe</h1>";
-	
+
 /* Formular */
 $form = new formWizard('form', "?".$_SERVER["QUERY_STRING"], 'post', 'form_acp_standard');
 $name = $form->addElement('text', 'name', 'Name', NULL, true);
@@ -47,10 +47,10 @@ $submit = $form->addElement('submit', 'btn', NULL, 'Speichern');
 /* Defaultwerte Setzen */
 if (!$form->checkSubmit() && isset($_GET['id'])) {
 	/* Daten lesen */
-	$result = mysql_query("SELECT name FROM ".DB_TABLE_ROOT."cms_access_group
-			WHERE id=".StdSqlSafety($_GET['id']), DB_CMS)
+	$result = Database::instance()->query("SELECT name FROM ".DB_TABLE_ROOT."cms_access_group
+			WHERE id=".StdSqlSafety($_GET['id']))
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		$name->setValue($line['name']);
 	}
 	else {
@@ -65,40 +65,40 @@ if (!isset($dont_show_form)) {
 	if ($form->checkSubmit() && $form->checkForm()) {
 		/* ID Namen pruefen */
 		$validate_id_str = getIdStr($name->getValue(), "NOCHECK");
-		
+
 		if (isset($_GET['id'])) {
-			$result = mysql_query("SELECT id FROM ".DB_TABLE_ROOT."cms_access_group
+			$result = Database::instance()->query("SELECT id FROM ".DB_TABLE_ROOT."cms_access_group
 					WHERE (id_str='".$validate_id_str."' || name='".StdSqlSafety($name->getValue())."')
-						&& id!=".StdSqlSafety($_GET['id']), DB_CMS)
+						&& id!=".StdSqlSafety($_GET['id']))
 					OR FatalError(FATAL_ERROR_MYSQL);
 		}
 		else {
-			$result = mysql_query("SELECT id FROM ".DB_TABLE_ROOT."cms_access_group
-					WHERE id_str='".$validate_id_str."' || name='".StdSqlSafety($name->getValue())."'", DB_CMS)
+			$result = Database::instance()->query("SELECT id FROM ".DB_TABLE_ROOT."cms_access_group
+					WHERE id_str='".$validate_id_str."' || name='".StdSqlSafety($name->getValue())."'")
 					OR FatalError(FATAL_ERROR_MYSQL);
 		}
-		if (mysql_num_rows($result) == 0) {
+		if ($result->num_rows == 0) {
 			/* Speichern */
 			if (isset($_GET['id'])) {
-				if (mysql_query("UPDATE ".DB_TABLE_ROOT."cms_access_group 
+				if (Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_access_group
 						SET id_str='".$validate_id_str."', name='".StdSqlSafety($name->getValue())."'
-						WHERE id=".StdSqlSafety($_GET['id']), DB_CMS))
+						WHERE id=".StdSqlSafety($_GET['id'])))
 					echo ActionReport(REPORT_OK, "Gruppe gespeichert",
 							"Die Änderungen wurden erfolgreich übernommen.");
 				else
 					echo ActionReport(REPORT_ERROR, "Fehler",
 							"Die Änderungen konnten nicht übernommen werden.
-							<br />MySQL Fehler: ".mysql_error(DB_CMS));
+							<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 			}
 			else {
-				if (mysql_query("INSERT INTO ".DB_TABLE_ROOT."cms_access_group(id_str, name)
-						VALUE('".$validate_id_str."', '".StdSqlSafety($name->getValue())."')", DB_CMS))
+				if (Database::instance()->query("INSERT INTO ".DB_TABLE_ROOT."cms_access_group(id_str, name)
+						VALUE('".$validate_id_str."', '".StdSqlSafety($name->getValue())."')"))
 					echo ActionReport(REPORT_OK, "Gruppe erstellt",
 							"Die Gruppe wurden erfolgreich erstellt.");
 				else
 					echo ActionReport(REPORT_ERROR, "Fehler",
 							"Die Gruppe konnten nicht erstellt werden.
-							<br />MySQL Fehler: ".mysql_error(DB_CMS));
+							<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 			}
 		}
 		else {

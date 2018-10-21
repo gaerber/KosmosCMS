@@ -48,7 +48,7 @@ echo "<h1>Eigene CMS Seiten</h1>";
 echo '</div>';
 
 /* Menuestammbaum generieren */
-$o_menutree = new buildMenuTree(DB_CMS);
+$o_menutree = new buildMenuTree(Database::instance());
 $o_menutree->setSqlCondition('&& locked=0 && id NOT IN ('.implode(',', $DefaultErrorPages).')');
 $menutree_txt = $o_menutree->getMenuTree(0, MENU_MAX_LEVEL, 1, true,
 		"menu/wymeditor/frame");
@@ -61,7 +61,7 @@ array_pop($a_options);
 echo '<div class="data-list"><ol>';
 for ($i=0; $i < sizeof($a_options); $i++) {
 	$a_options_data = explode("$", $a_options[$i]);
-	
+
 	echo '<li><a href="#" onclick="parent.document.getElementById(\'wym_href\').value = \''
 				.$a_options_data[1].'\';parent.document.getElementById(\'wym_submit\').click();">'
 				.str_repeat("&nbsp;", 4 * ($a_options_data[0]-1)).$a_options_data[2].'</a></li>';
@@ -69,4 +69,3 @@ for ($i=0; $i < sizeof($a_options); $i++) {
 echo '</ol></div>';
 
 ?>
-

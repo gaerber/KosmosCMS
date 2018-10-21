@@ -49,7 +49,7 @@ if (isset($_GET['album']) && $_GET['album'] != '') {
 	if (substr($album, strlen($album)-1, 1) != '/') {
 		$album .= '/';
 	}
-	$current_path .= $album;	
+	$current_path .= $album;
 }
 else {
 	$album = '';
@@ -63,35 +63,35 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && !($current_album[
 		echo ActionReport(REPORT_INFO, 'Unteralbum',
 				'Das neue Album wird im besethenden Album <a href="?page=photos-show&album='.$album.'"><b>'.$current_album['caption'].'</b></a> angelegt.');
 	}
-	
+
 	/* Formular */
 	$form = new formWizard('form', '?'.$_SERVER['QUERY_STRING'], 'post', 'form_acp_standard');
 	$caption = $form->addElement('text', 'caption', 'Titel', null, true);
 	$description = $form->addElement('textarea', 'description', 'Beschreibung');
 	$description->setRowsCols(4, 20);
-	
+
 	if (ACP_ACCESS_SYSTEM_EN) {
 		$access_all = $form->addElement('radio', 'access', 'Berechtigung', '0');
 		$access_log = $form->addElement('radio', 'access', NULL, '1');
 		$access_grp = $form->addElement('radio', 'access', NULL, '2');
 		$access_groups = $form->addElement('select', 'access_group', 'Gruppen');
-	
-		$access_groups->setCssClass('select_groups');
+
+		$access_groups->setCssClass('select_groups hide');
 		$access_all->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
 		$access_log->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'none\';"');
 		$access_grp->setJavaScript('onclick="document.getElementsByClassName(\'select_groups\')[0].style.display=\'block\';"');
-	
+
 		$access_all->setSubLabel("Alle Besucher");
 		$access_log->setSubLabel("Nur angemeldete Besucher");
 		$access_grp->setSubLabel("Nur Besucher aus bestimmten Gruppen");
-	
+
 		$access_groups->setMultiple(true);
 		$access_groups->setSize(7);
 	}
-	
+
 	$locked = $form->addElement('checkbox', 'locked', 'Sperren', 1);
 	$submit = $form->addElement('submit', 'btn', NULL, 'Speichern');
-	
+
 	/* Defaultwerte Setzen */
 	if (!$form->checkSubmit() && !isset($_GET['new'])) {
 		$caption->setValue($current_album['caption']);
@@ -108,10 +108,10 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && !($current_album[
 				$access_grp->setChecked(true);
 			}
 			/* Gruppen */
-			$result = mysql_query('SELECT id, name FROM '.DB_TABLE_ROOT.'cms_access_group
-					ORDER BY name ASC', DB_CMS)
+			$result = Database::instance()->query('SELECT id, name FROM '.DB_TABLE_ROOT.'cms_access_group
+					ORDER BY name ASC')
 					OR FatalError(FATAL_ERROR_MYSQL);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = $result->fetch_assoc()) {
 				$access_groups->addOption($row['name'], 1<<$row['id'],
 						(bool)($current_album['access'] & (1<<$row['id'])));
 			}
@@ -122,27 +122,27 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && !($current_album[
 		if (ACP_ACCESS_SYSTEM_EN) {
 			if (!$form->checkSubmit())
 				$access_all->setChecked(true);
-			$result = mysql_query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
-					ORDER BY name ASC", DB_CMS)
+			$result = Database::instance()->query("SELECT id, name FROM ".DB_TABLE_ROOT."cms_access_group
+					ORDER BY name ASC")
 					OR FatalError(FATAL_ERROR_MYSQL);
-			while ($row = mysql_fetch_array($result)) {
+			while ($row = $result->fetch_assoc()) {
 				$access_groups->addOption($row['name'], 1<<$row['id']);
 			}
 		}
 	}
-	
+
 	/* Formular pruefen */
 	if ($form->checkForm()) {
 		if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue() && !sizeof($access_groups->getValue())) {
 			/* Es muss nim. eine Gruppe ausgewaehlt werden */
 			$access_groups->setError(true);
-			$access_groups->setCssClass('select_groups_view');
+			$access_groups->setCssClass('select_groups show');
 			/* Ausgabe des Formulars */
 			echo $form->getForm();
 		}
 		else {
 			$error = false;
-			
+
 	        /* ID Str ermitteln */
 			$validate_id_str = ValidateFileSystem($caption->getValue());
 			$validate_id_str = str_replace('_', '', $validate_id_str);
@@ -167,7 +167,7 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && !($current_album[
 							'Der angegebene Albumnamen existiert bereits.');
 					$caption->setError(true);
 					if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
-						$access_groups->setCssClass('select_groups_view');
+						$access_groups->setCssClass('select_groups show');
 					}
 					echo $form->getForm();
 					$error = true;
@@ -193,14 +193,14 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && !($current_album[
 								'Der angegebene Albumnamen existiert bereits.');
 						$caption->setError(true);
 						if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
-							$access_groups->setCssClass('select_groups_view');
+							$access_groups->setCssClass('select_groups show');
 						}
 						echo $form->getForm();
 						$error = true;
 					}
 				}
 			}
-			
+
 			if ($error == false) {
 				/* Benutzerberechtigungen */
 				if (ACP_ACCESS_SYSTEM_EN) {
@@ -219,7 +219,7 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && !($current_album[
 				else {
 					$access = 0;
 				}
-				
+
 				/* Verzeichnisschutz */
 				if (isset($_GET['new'])) {
 					$ftp->ChangeDir($current_path.$validate_id_str);
@@ -245,29 +245,30 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && !($current_album[
 					/* Verzeichnisschutz muss entfernt werden, sofern er vohanden ist */
 					$ftp->Delete('.htaccess');
 				}
-			
+
 				/* Abspeichern */
 				if (isset($_GET['new'])) {
 					/* Das neue Album wird hinten angehaengt (Sortierung) */
-					$result = mysql_query('SELECT menu_order FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE menu_sub='.$current_album['id'].'
-							ORDER BY menu_order DESC LIMIT 0,1', DB_CMS)
+					$result = Database::instance()->query('SELECT menu_order FROM '.DB_TABLE_PLUGIN.'photoalbum WHERE menu_sub='.$current_album['id'].'
+							ORDER BY menu_order DESC LIMIT 0,1')
 							OR FatalError(FATAL_ERROR_MYSQL);
-					if ($line = mysql_fetch_assoc($result)) {
+					if ($line = $result->fetch_assoc()) {
 						$menu_order = $line['menu_order'] + 1;
 					}
 					else {
 						$menu_order = 1;
 					}
-					
+
 					/* Datenbankeintrag erstellen */
-					if (mysql_query('INSERT INTO '.DB_TABLE_PLUGIN.'photoalbum(id_str, menu_sub, menu_order, caption, description, writer, timestamp, access, locked)
+					$database_handle = Database::instance();
+					if ($database_handle->query('INSERT INTO '.DB_TABLE_PLUGIN.'photoalbum(id_str, menu_sub, menu_order, caption, description, writer, timestamp, access, locked)
 							VALUES("'.$validate_id_str.'", "'.$current_album['id'].'", "'.$menu_order.'", "'.StdSqlSafety(StdString($caption->getValue())).'",
-							"'.StdSqlSafety(StdContent($description->getValue())).'", '.$_SESSION['admin_id'].', '.TIME_STAMP.', '.$access.', 
-							'.(int)$locked->getValue().')', DB_CMS)) {
+							"'.StdSqlSafety(StdContent($description->getValue())).'", '.$_SESSION['admin_id'].', '.TIME_STAMP.', '.$access.',
+							'.(int)$locked->getValue().')')) {
 						/* Die Config Datei speichern */
 						$config = array(
 								'module' => 'photos',
-								'album_id' => mysql_insert_id(DB_CMS),
+								'album_id' => $database_handle->getHandle()->insert_id,
 								'access' => $access,
 								'locked' => (int) $locked->getValue()
 								);
@@ -284,12 +285,12 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && !($current_album[
 				}
 				else {
 					/* Datenbankeintrag aktualisieren */
-					if (mysql_query('UPDATE '.DB_TABLE_PLUGIN.'photoalbum SET id_str="'.$validate_id_str.'",
+					if (Database::instance()->query('UPDATE '.DB_TABLE_PLUGIN.'photoalbum SET id_str="'.$validate_id_str.'",
 							caption="'.StdSqlSafety(StdString($caption->getValue())).'",
 							description="'.StdSqlSafety(StdContent($description->getValue())).'",
 							writer='.$_SESSION['admin_id'].', timestamp='.TIME_STAMP.',
 							access='.$access.', locked='.(int)$locked->getValue().'
-							WHERE id='.$current_album['id'], DB_CMS)) {
+							WHERE id='.$current_album['id'])) {
 						/* Die Config Datei speichern */
 						$config = array(
 								'module' => 'photos',
@@ -315,7 +316,7 @@ if (($current_album = readAlbumConfig($ftp, $current_path)) && !($current_album[
 	else {
 		/* Ausgabe des Formulars */
 		if (ACP_ACCESS_SYSTEM_EN && $access_grp->getValue()) {
-			$access_groups->setCssClass('select_groups_view');
+			$access_groups->setCssClass('select_groups show');
 		}
 		echo $form->getForm();
 	}

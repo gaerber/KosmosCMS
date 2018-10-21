@@ -31,7 +31,7 @@ if (ACP_ACCESS_SYSTEM_EN) {
 			&& $_SESSION['user_id']) {
 		/* Angemeldeter Benutzer */
 		/* Angaben pruefen */
-		$result = mysql_query("SELECT user_name, user_email, user_email_show, user_tel,
+		$result = Database::instance()->query("SELECT user_name, user_email, user_email_show, user_tel,
 				user_website, user_description, user_access
 				FROM ".DB_TABLE_ROOT."cms_access_user
 				WHERE user_id=".$_SESSION['user_id']."
@@ -39,7 +39,7 @@ if (ACP_ACCESS_SYSTEM_EN) {
 				&& user_password='".$_SESSION['user_password']."'
 				&& user_locked=0")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_assoc($result)) {
+		if ($line = $result->fetch_assoc()) {
 			/* Alle Infos aktualisieren */
 			$_SESSION = array_merge($_SESSION, $line);
 		}

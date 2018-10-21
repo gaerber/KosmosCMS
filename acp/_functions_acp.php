@@ -104,11 +104,11 @@ function LoginSystem($db_cms) {
 	if (isset($_SESSION['admin_id'], $_SESSION['admin_login'], $_SESSION['admin_password'],
 			$_SESSION['admin_time_lastaction'])) {
 		/* Administrator pruefen */
-		$result = mysql_query("SELECT name, access FROM ".DB_TABLE_ROOT."cms_admin
+		$result = $db_cms->query("SELECT name, access FROM ".DB_TABLE_ROOT."cms_admin
 				WHERE admin_id=".$_SESSION['admin_id']." && login='".$_SESSION['admin_login']."'
-				&& password='".$_SESSION['admin_password']."' && locked=0", $db_cms)
+				&& password='".$_SESSION['admin_password']."' && locked=0")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line = mysql_fetch_array($result)) {
+		if ($line = $result->fetch_assoc()) {
 			/* Rechte aktualisieren falls sie geaendert wurden */
 			if ($_SESSION['admin_access'] != $line['access'])
 				$_SESSION['admin_access'] = $line['access'];
@@ -143,7 +143,7 @@ function ACP_AdminAccess($rang_zone, $main=false) {
 			SessionDelete();
 			LoginFormular(0);
 			/* Weiteres ausfuehren verhindern */
-			@mysql_close($db_cms);
+			Database::instance()->close();
 			die();
 		}
 		else {
@@ -158,7 +158,7 @@ function ACP_AdminAccess($rang_zone, $main=false) {
 function FileSystemFolders($folder_name, $level, $path) {
 	global $FileSystem_ModulePahts;
 	global $folderList;
-	
+
 	/* Darf kein Ordner von Modulen sein */
 	if (!in_array($path.$folder_name.'/', $FileSystem_ModulePahts)) {
 		/* Der Formular-Klasse hinzufuegen */
@@ -166,7 +166,7 @@ function FileSystemFolders($folder_name, $level, $path) {
 		(bool) (isset($_GET['folder']) && $path.$folder_name.'/' == $_GET['folder']));
 		return true;
 	}
-	
+
 	return false;
 }
 

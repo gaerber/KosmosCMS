@@ -88,10 +88,10 @@ $submit = $form->addElement('submit', 'btn', NULL, 'Speichern');
 /* Defaultwerte Setzen */
 if (!$form->checkSubmit() && isset($_GET['id'])) {
 	/* Daten lesen */
-	$result = mysql_query('SELECT * FROM '.DB_TABLE_ROOT.'cms_access_user
-			WHERE user_id='.StdSqlSafety($_GET['id']), DB_CMS)
+	$result = Database::instance()->query('SELECT * FROM '.DB_TABLE_ROOT.'cms_access_user
+			WHERE user_id='.StdSqlSafety($_GET['id']))
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		if (ACP_ACCESS_SYSTEM_EN)
 			$login->setValue($line['user_login']);
 		$name->setValue($line['user_name']);
@@ -106,10 +106,10 @@ if (!$form->checkSubmit() && isset($_GET['id'])) {
 		if ($line['user_locked'])
 			$locked->setChecked(true);
 		/* Gruppen */
-		$result = mysql_query('SELECT id, name FROM '.DB_TABLE_ROOT.'cms_access_group
-				ORDER BY name ASC', DB_CMS)
+		$result = Database::instance()->query('SELECT id, name FROM '.DB_TABLE_ROOT.'cms_access_group
+				ORDER BY name ASC')
 				OR FatalError(FATAL_ERROR_MYSQL);
-		while ($row = mysql_fetch_array($result)) {
+		while ($row = $result->fetch_assoc()) {
 			$access_groups->addOption($row['name'], (1<<$row['id']),
 					(bool) ($line['user_access'] & (1<<$row['id'])));
 		}
@@ -127,10 +127,10 @@ if (!$form->checkSubmit() && isset($_GET['id'])) {
 }
 else {
 	/* Gruppen */
-	$result = mysql_query('SELECT id, name FROM '.DB_TABLE_ROOT.'cms_access_group
-			ORDER BY name ASC', DB_CMS)
+	$result = Database::instance()->query('SELECT id, name FROM '.DB_TABLE_ROOT.'cms_access_group
+			ORDER BY name ASC')
 			OR FatalError(FATAL_ERROR_MYSQL);
-	while ($row = mysql_fetch_array($result)) {
+	while ($row = $result->fetch_assoc()) {
 		$access_groups->addOption($row['name'], (1<<$row['id']));
 	}
 }
@@ -142,17 +142,17 @@ if (!isset($dont_show_form)) {
 			/* Loginnamen pruefen */
 			$validate_login = StdSqlSafety(substr($login->getValue(), 0, 20));
 			if (isset($_GET['id'])) {
-				$result = mysql_query('SELECT user_id FROM '.DB_TABLE_ROOT.'cms_access_user
-						WHERE user_login="'.$validate_login.'" && user_id!='.StdSqlSafety($_GET['id']), DB_CMS)
+				$result = Database::instance()->query('SELECT user_id FROM '.DB_TABLE_ROOT.'cms_access_user
+						WHERE user_login="'.$validate_login.'" && user_id!='.StdSqlSafety($_GET['id']))
 						OR FatalError(FATAL_ERROR_MYSQL);
 			}
 			else {
-				$result = mysql_query('SELECT user_id FROM '.DB_TABLE_ROOT.'cms_access_user
-						WHERE user_login="'.$validate_login.'"', DB_CMS)
+				$result = Database::instance()->query('SELECT user_id FROM '.DB_TABLE_ROOT.'cms_access_user
+						WHERE user_login="'.$validate_login.'"')
 						OR FatalError(FATAL_ERROR_MYSQL);
 			}
 		}
-		if (!ACP_ACCESS_SYSTEM_EN || mysql_num_rows($result) == 0) {
+		if (!ACP_ACCESS_SYSTEM_EN || $result->num_rows == 0) {
 			/* Gruppen */
 			$access = 1;
 			if (sizeof($access_groups->getValue())) {
@@ -169,9 +169,9 @@ if (!isset($dont_show_form)) {
 				/* Moegliches umbenennen des Benutzerbildes */
 				if (is_array($UserSystem_imagesSettings)) {
 					/* Alter ID Str ermitteln */
-					$result = mysql_query('SELECT user_id_str FROM '.DB_TABLE_ROOT.'cms_access_user
-							WHERE user_id='.StdSqlSafety($_GET['id']), DB_CMS);
-					if ($line = mysql_fetch_array($result)) {
+					$result = Database::instance()->query('SELECT user_id_str FROM '.DB_TABLE_ROOT.'cms_access_user
+							WHERE user_id='.StdSqlSafety($_GET['id']));
+					if ($line = $result->fetch_assoc()) {
 						/* Bild umbenennen falls id_str geaendert hat */
 						if ($validate_id_str != $line['user_id_str']) {
 							$ftp = new ftp();
@@ -198,7 +198,7 @@ if (!isset($dont_show_form)) {
 					$sql .= ', '.$custline[0].'="'.StdSqlSafety($customParameters[$id]->getValue()).'" ';
 				}
 				
-				if (mysql_query("UPDATE ".DB_TABLE_ROOT."cms_access_user SET
+				if (Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_access_user SET
 						user_id_str='".$validate_id_str."',
 						user_name='".StdSqlSafety($name->getValue())."',
 						user_email='".StdSqlSafety($email->getValue())."',
@@ -206,14 +206,14 @@ if (!isset($dont_show_form)) {
 						user_website='".StdSqlSafety($website->getValue())."',
 						user_access=".$access.", user_locked=".(int) $locked->getValue()."
 						".$sql."
-						WHERE user_id=".StdSqlSafety($_GET['id']), DB_CMS)) {
+						WHERE user_id=".StdSqlSafety($_GET['id']))) {
 					echo ActionReport(REPORT_OK, "Benutzer gespeichert",
 							"Die Änderungen wurde erfolgreich übernommen.");
 				}
 				else {
 					echo ActionReport(REPORT_ERROR, "Fehler",
 							"Die Änderungen konnten nicht übernommen werden.
-							<br />MySQL Fehler: ".mysql_error(DB_CMS));
+							<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 				}
 			}
 			else {
@@ -239,14 +239,14 @@ if (!isset($dont_show_form)) {
 					$sql_data .= '"'.StdSqlSafety($customParameters[$id]->getValue()).'", ';
 				}
 				
-				if (mysql_query("INSERT INTO ".DB_TABLE_ROOT."cms_access_user(".$sql_col."
+				if (Database::instance()->query("INSERT INTO ".DB_TABLE_ROOT."cms_access_user(".$sql_col."
 						user_id_str, user_name, user_email, user_email_show, user_website,
 						user_access, user_regist, user_locked)
 						VALUES(".$sql_data."
 						'".$validate_id_str."',
 						'".StdSqlSafety($name->getValue())."', '".StdSqlSafety($email->getValue())."',
 						".(int)$email_show->getValue().", '".StdSqlSafety($website->getValue())."',
-						".$access.", ".TIME_STAMP.", ".(int) $locked->getValue().")", DB_CMS)) {
+						".$access.", ".TIME_STAMP.", ".(int) $locked->getValue().")")) {
 					echo ActionReport(REPORT_OK, "Benutzer erstellt",
 							"Der Benutzer wurde erfolgreich erstellt.");
 					/* Speichern des Benutzerbildes */
@@ -261,7 +261,7 @@ if (!isset($dont_show_form)) {
 				else {
 					echo ActionReport(REPORT_ERROR, "Fehler",
 							"Der Benutzer konnten nicht erstellt werden.
-							<br />MySQL Fehler: ".mysql_error(DB_CMS));
+							<br />MySQL Fehler: ".Database::instance()->getErrorMessage());
 				}
 			}
 		}

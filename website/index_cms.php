@@ -23,6 +23,7 @@
  |2.0.5.2 | 29.08.2012 | Offlinenachricht mit HTTP E.
  |2.0.5.3 | 16.09.2012 | Bugfix {module_path}
  |2.0.5.4 | 14.03.2015 | Debugausgabe Projektabhaengig
+ |2.1     | 13.10.2018 | SQL API Umstellung
  -----------------------------------------------------
  Beschreibung :
  CMS Software fuer die Seiteninhalte.
@@ -67,10 +68,6 @@ include('_functions.php');
 /* Messung der Generierungszeit starten */
 $Anfangszeit = getMicrotime();
 
-/* Datenbankverbindung herstellen */
-$db_stream = DatabaseConnect();
-define('DB_CMS', $db_stream);
-
 /* Globale Template Variablen */
 $HomepageContent = array();
 $PluginContent = array();
@@ -78,10 +75,10 @@ $MenuOutput = array();
 
 
 /*** Homepage offline schalten **********************/
-$result = mysql_query('SELECT *	FROM '.DB_TABLE_ROOT.'cms_setting
-		ORDER BY id DESC LIMIT 1', DB_CMS)
+$result = Database::instance()->query('SELECT * FROM '.DB_TABLE_ROOT.'cms_setting
+		ORDER BY id DESC LIMIT 1')
 		OR FatalError(FATAL_ERROR_MYSQL);
-if ((!($line = mysql_fetch_array($result)))
+if ((!($line = $result->fetch_assoc()))
 		|| ($line['online'] == 0)) {
 	/* Homepage ist offline */
 	header('HTTP/1.1 503 Service Unavailable');
@@ -99,7 +96,7 @@ if ((!($line = mysql_fetch_array($result)))
 		$tpl->compress_gzip();
 	}
 	/* Datenbankverbindung schliessen */
-	mysql_close(DB_CMS);
+	Database::instance()->close();
 	/* Der Rest nicht mehr ausfuehren */
 	die();
 }
@@ -118,7 +115,7 @@ else {
 
 
 /*** Seite selektieren ******************************/
-$o_activePage = new activePage(DB_CMS);
+$o_activePage = new activePage(Database::instance());
 
 if ($o_activePage->calcActivePage(isset($_GET[CONTENT_POINTER])
 		? StdSqlSafety($_GET[CONTENT_POINTER]) : "") == false) {
@@ -158,22 +155,22 @@ if (!$o_activePage->getUserAccess()) {
 
 
 /*** Seite aus Datenbank holen **********************/
-$result = mysql_query('SELECT * FROM '.DB_TABLE_ROOT.'cms_menu
-		WHERE id='.$o_activePage->getActivePage().' LIMIT 1', DB_CMS)
+$result = Database::instance()->query('SELECT * FROM '.DB_TABLE_ROOT.'cms_menu
+		WHERE id='.$o_activePage->getActivePage().' LIMIT 1')
 				OR FatalError(FATAL_ERROR_MYSQL);
 /* Existiert diese Seite? */
-if (!($HomepageContent = mysql_fetch_array($result))) {
+if (!($HomepageContent = $result->fetch_assoc())) {
 	/* Diese Seite muss existieren */
 	FatalError(FATAL_ERROR_CONTENT);
 }
 
 
 /*** Inhalt der Seite auslesen **********************/
-$result = mysql_query('SELECT html FROM '.DB_TABLE_ROOT.'cms_content
+$result = Database::instance()->query('SELECT html FROM '.DB_TABLE_ROOT.'cms_content
 		WHERE page_id='.$HomepageContent['id'].'
-		ORDER BY timestamp DESC LIMIT 1', DB_CMS)
+		ORDER BY timestamp DESC LIMIT 1')
 		OR FatalError(FATAL_ERROR_MYSQL);
-if ($line = mysql_fetch_array($result)) {
+if ($line = $result->fetch_assoc()) {
 	$HomepageContent['html'] = $line['html'];
 }
 else {
@@ -200,28 +197,28 @@ $HomepageContent['date'] = printDate($HomepageContent['timestamp']);
 /* Module */
 if ($HomepageContent['plugin'] > 0) {
 	/* Plugin */
-	$result = mysql_query('SELECT path FROM '.DB_TABLE_ROOT.'cms_plugin
-			WHERE id='.$HomepageContent['plugin'].' && locked = 0', DB_CMS)
+	$result = Database::instance()->query('SELECT path FROM '.DB_TABLE_ROOT.'cms_plugin
+			WHERE id='.$HomepageContent['plugin'].' && locked = 0')
 					OR FatalError(FATAL_ERROR_MYSQL);
-	if (mysql_num_rows($result) == 0) {
+	if ($result->num_rows == 0) {
 		die('Module could not found!');
 	}
-	$line = mysql_fetch_array($result);
+	$line = $result->fetch_assoc();
 	if (!file_exists(ROOT_PLUGIN.$line['path'])) {
 		die('Module '.$line['path'].' could not load!');
 	}
-	
+
 	/* Parameter */
 	$moduleParameter = array();
 	$HomepageContent['html'] = preg_replace_callback('/\{MODUL([^\}]+)\}/i',
 			'moduleCallback', $HomepageContent['html']);
-	
+
 	/* Plugin ausfuehren */
 	ob_start();										// Buffer starten
 	include(ROOT_PLUGIN.$line['path']);				// Datei wird in Buffer geladen
 	$plugin_content = ob_get_contents();			// Buffer wird in $content geschrieben
 	ob_end_clean();									// Buffer wird geloescht
-	
+
 	/* PlugIn Ausgabe in Content schreiben */
 	$HomepageContent['html'] = str_replace('<p>{MODUL}</p>', $plugin_content, $HomepageContent['html']);
 	$HomepageContent['html'] = str_replace('{MODUL}', $plugin_content, $HomepageContent['html']);
@@ -233,7 +230,7 @@ $HomepageContent['html'] = preg_replace_callback('/{Abstract: (PHP|FUNC) (.*?)\(
 
 
 /*** Menue generieren *******************************/
-$o_menuClass = new buildMenuTree(DB_CMS, $o_activePage->getSubElements());
+$o_menuClass = new buildMenuTree(Database::instance(), $o_activePage->getSubElements());
 $o_menuClass->setSqlCondition(" && menu_view=1 && locked=0 && ".CheckSQLAccess());
 
 foreach ($array_MenuConfigurations AS $name => $settings) {
@@ -290,11 +287,11 @@ else
 $print->assign('cms_version', SWISS_WEBDESIGN);
 
 /* Einstellungen */
-$result = mysql_query('SELECT company, header, description, admin_email
-		FROM '.DB_TABLE_ROOT.'cms_setting ORDER BY id DESC LIMIT 1', DB_CMS)
+$result = Database::instance()->query('SELECT company, header, description, admin_email
+		FROM '.DB_TABLE_ROOT.'cms_setting ORDER BY id DESC LIMIT 1')
 		OR FatalError(FATAL_ERROR_MYSQL);
-if (mysql_num_rows($result)) {
-	$print->assign(mysql_fetch_array($result));
+if ($result->num_rows) {
+	$print->assign($result->fetch_assoc());
 }
 
 /* Generierungszeit */
@@ -317,6 +314,6 @@ else {
 
 
 /*** Datenbankverbindung trennen ********************/
-mysql_close(DB_CMS);
+Database::instance()->close();
 
 ?>

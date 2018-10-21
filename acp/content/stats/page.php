@@ -35,9 +35,9 @@ $ACP_ApplicationInfo['menu_replace'] = 'id="secondmenu_stats"';
 echo '<h1 class="first">Top Seiten</h1>';
 
 /* Maximum ermitteln */
-$result = mysql_query('SELECT MAX(views) FROM '.DB_TABLE_PLUGIN.'stats_page', DB_CMS)
+$result = Database::instance()->query('SELECT MAX(views) FROM '.DB_TABLE_PLUGIN.'stats_page')
 		OR FatalError(FATAL_ERROR_MYSQL);
-if (($line = mysql_fetch_row($result)) && $line[0] > 0) {
+if (($line = $result->fetch_row()) && $line[0] > 0) {
 	$max = $line[0];
 
 	echo '<table>';
@@ -48,14 +48,14 @@ if (($line = mysql_fetch_row($result)) && $line[0] > 0) {
 			<td></td>
 			</tr>';
 	
-	$result = mysql_query('SELECT label, visitors, views
+	$result = Database::instance()->query('SELECT label, visitors, views
 			FROM '.DB_TABLE_PLUGIN.'stats_page AS db_page
 			LEFT JOIN '.DB_TABLE_ROOT.'cms_menu AS db_menu ON db_menu.id = db_page.page_id
-			ORDER BY views DESC LIMIT 50', DB_CMS)
+			ORDER BY views DESC LIMIT 50')
 			OR FatalError(FATAL_ERROR_MYSQL);
 	
 	$row_ctr = 0;
-	while ($row = mysql_fetch_assoc($result)) {
+	while ($row = $result->fetch_assoc()) {
 		if ($row_ctr++ % 2)
 			echo '<tr class="table_even">';
 		else

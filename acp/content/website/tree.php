@@ -44,44 +44,44 @@ echo "<h1 class=\"first\">Menü Stammbaum</h1>\r\n";
 
 /* Eine Ebene hinein */
 if (isset($_GET['in'])) {
-	$res_element = mysql_query("SELECT id, id_str, menu_is_categorie, menu_sub, menu_order
-			FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".StdSqlSafety($_GET["in"]), DB_CMS)
+	$res_element = Database::instance()->query("SELECT id, id_str, menu_is_categorie, menu_sub, menu_order
+			FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".StdSqlSafety($_GET["in"]))
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line_element = mysql_fetch_array($res_element)) {
-		$res_change = mysql_query("SELECT id, menu_sub, menu_order
+	if ($line_element = $res_element->fetch_assoc()) {
+		$res_change = Database::instance()->query("SELECT id, menu_sub, menu_order
 				FROM ".DB_TABLE_ROOT."cms_menu WHERE menu_sub=".$line_element["menu_sub"]."
 				&& menu_order<".$line_element["menu_order"]."
-				ORDER BY menu_order DESC LIMIT 1", DB_CMS)
+				ORDER BY menu_order DESC LIMIT 1")
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line_change = mysql_fetch_array($res_change)) {
+		if ($line_change = $res_change->fetch_assoc()) {
 			/* Pruefen, dass max. Levels eingehalten werden */
 			if (($line_element['menu_is_categorie'] && (countLevels($line_element['id']) < MENU_MAX_LEVEL_CATEGORIE))
 					|| (!$line_element['menu_is_categorie']
 						&& ((countLevels($line_element['id']) + countSubLevels($line_element['id'])) < MENU_MAX_LEVEL))) {
 				/* Pruefen, dass id_str nicht doppelt existiert */
-				$res_check = mysql_query("SELECT count(*) FROM ".DB_TABLE_ROOT."cms_menu
+				$res_check = Database::instance()->query("SELECT count(*) FROM ".DB_TABLE_ROOT."cms_menu
 						WHERE id_str='".$line_element["id_str"]."'
-						&& menu_sub=".$line_change["id"], DB_CMS)
+						&& menu_sub=".$line_change["id"])
 						OR FatalError(FATAL_ERROR_MYSQL);
-				if (($line_check = mysql_fetch_array($res_check)) && (!$line_check[0])) {
+				if (($line_check = $res_check->fetch_assoc()) && (!$line_check[0])) {
 					/* Alte Reihenfolge korrigieren */
-					mysql_query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_order=(menu_order-1)
+					Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_order=(menu_order-1)
 							WHERE menu_sub=".$line_element["menu_sub"]."
-							&& menu_order>".$line_element["menu_order"], DB_CMS)
+							&& menu_order>".$line_element["menu_order"])
 							OR FatalError(FATAL_ERROR_MYSQL);
 					/* Neue menu_order berechnen */
-					$res_order = mysql_query("SELECT menu_order
+					$res_order = Database::instance()->query("SELECT menu_order
 							FROM ".DB_TABLE_ROOT."cms_menu WHERE menu_sub=".$line_change["id"]."
-							ORDER BY menu_order DESC LIMIT 1", DB_CMS)
+							ORDER BY menu_order DESC LIMIT 1")
 							OR FatalError(FATAL_ERROR_MYSQL);
-					if ($order = mysql_fetch_array($res_order))
+					if ($order = $res_order->fetch_assoc())
 						$order = $order['menu_order'] + 1;
 					else
 						$order = 1;
 
 					/* Verschieben */
-					mysql_query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_sub=".$line_change["id"].",
-							menu_order=".$order." WHERE id=".$line_element["id"], DB_CMS)
+					Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_sub=".$line_change["id"].",
+							menu_order=".$order." WHERE id=".$line_element["id"])
 							OR FatalError(FATAL_ERROR_MYSQL);
 				}
 				else {
@@ -108,36 +108,36 @@ if (isset($_GET['in'])) {
 
 /* Eine Ebene hinaus */
 if (isset($_GET['out'])) {
-	$res_element = mysql_query("SELECT id, id_str, menu_sub, menu_order
-			FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".StdSqlSafety($_GET["out"]), DB_CMS)
+	$res_element = Database::instance()->query("SELECT id, id_str, menu_sub, menu_order
+			FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".StdSqlSafety($_GET["out"]))
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line_element = mysql_fetch_array($res_element)) {
+	if ($line_element = $res_element->fetch_assoc()) {
 		if ($line_element['menu_sub']) {
-			$res_change = mysql_query("SELECT id, menu_sub, menu_order
-					FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".$line_element["menu_sub"], DB_CMS)
+			$res_change = Database::instance()->query("SELECT id, menu_sub, menu_order
+					FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".$line_element["menu_sub"])
 					OR FatalError(FATAL_ERROR_MYSQL);
-			if ($line_change = mysql_fetch_array($res_change)) {
+			if ($line_change = $res_change->fetch_assoc()) {
 				/* Pruefen, dass id_str nicht doppelt existiert */
-				$res_check = mysql_query("SELECT count(*) FROM ".DB_TABLE_ROOT."cms_menu
+				$res_check = Database::instance()->query("SELECT count(*) FROM ".DB_TABLE_ROOT."cms_menu
 						WHERE id_str='".$line_element["id_str"]."'
-						&& menu_sub=".$line_change["menu_sub"], DB_CMS)
+						&& menu_sub=".$line_change["menu_sub"])
 						OR FatalError(FATAL_ERROR_MYSQL);
-				if (($line_check = mysql_fetch_array($res_check)) && (!$line_check[0])) {
+				if (($line_check = $res_check->fetch_assoc()) && (!$line_check[0])) {
 					/* Menue Reihenfolge manipulieren */
-					mysql_query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_order=(menu_order+1)
+					Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_order=(menu_order+1)
 							WHERE menu_sub=".$line_change["menu_sub"]."
-							&& menu_order>".$line_change["menu_order"], DB_CMS)
+							&& menu_order>".$line_change["menu_order"])
 							OR FatalError(FATAL_ERROR_MYSQL);
 					/* Alte Reihenfolge korrigieren */
-					mysql_query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_order=(menu_order-1)
+					Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_order=(menu_order-1)
 							WHERE menu_sub=".$line_element["menu_sub"]."
-							&& menu_order>".$line_element["menu_order"], DB_CMS)
+							&& menu_order>".$line_element["menu_order"])
 							OR FatalError(FATAL_ERROR_MYSQL);
 					/* Verschieben */
-					mysql_query("UPDATE ".DB_TABLE_ROOT."cms_menu SET
+					Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_menu SET
 							menu_sub=".$line_change["menu_sub"].",
 							menu_order=".($line_change["menu_order"] + 1)."
-							WHERE id=".$line_element["id"], DB_CMS)
+							WHERE id=".$line_element["id"])
 							OR FatalError(FATAL_ERROR_MYSQL);
 				}
 				else {
@@ -164,33 +164,33 @@ if (isset($_GET['out'])) {
 /* Ein Element hoch oder runter */
 if (isset($_GET['up']) || isset($_GET['down'])) {
 	if (isset($_GET['up']))
-		$res_element = mysql_query("SELECT id, menu_sub, menu_order
-				FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".StdSqlSafety($_GET["up"]), DB_CMS)
+		$res_element = Database::instance()->query("SELECT id, menu_sub, menu_order
+				FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".StdSqlSafety($_GET["up"]))
 				OR FatalError(FATAL_ERROR_MYSQL);
 	else
-		$res_element = mysql_query("SELECT id, menu_sub, menu_order
-				FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".StdSqlSafety($_GET["down"]), DB_CMS)
+		$res_element = Database::instance()->query("SELECT id, menu_sub, menu_order
+				FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".StdSqlSafety($_GET["down"]))
 				OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line_element = mysql_fetch_array($res_element)) {
+	if ($line_element = $res_element->fetch_assoc()) {
 		if (isset($_GET['up']))
-			$res_change = mysql_query("SELECT id, menu_order FROM ".DB_TABLE_ROOT."cms_menu
+			$res_change = Database::instance()->query("SELECT id, menu_order FROM ".DB_TABLE_ROOT."cms_menu
 					WHERE menu_sub=".$line_element["menu_sub"]."
 					&& menu_order<".$line_element["menu_order"]."
-					ORDER BY menu_order DESC LIMIT 1", DB_CMS)
+					ORDER BY menu_order DESC LIMIT 1")
 					OR FatalError(FATAL_ERROR_MYSQL);
 		else
-			$res_change = mysql_query("SELECT id, menu_order FROM ".DB_TABLE_ROOT."cms_menu
+			$res_change = Database::instance()->query("SELECT id, menu_order FROM ".DB_TABLE_ROOT."cms_menu
 					WHERE menu_sub=".$line_element["menu_sub"]."
 					&& menu_order>".$line_element["menu_order"]."
-					ORDER BY menu_order ASC LIMIT 1", DB_CMS)
+					ORDER BY menu_order ASC LIMIT 1")
 					OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line_change = mysql_fetch_array($res_change)) {
+		if ($line_change = $res_change->fetch_assoc()) {
 			/* Tauschen von menu_order */
-			if (!(mysql_query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_order=".$line_change["menu_order"]."
-					WHERE id=".$line_element["id"], DB_CMS)
-					&& mysql_query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_order=".$line_element["menu_order"]."
-					WHERE id=".$line_change["id"], DB_CMS))) {
-				echo ActionReport(REPORT_ERROR, "Interner Fehler", mysql_error());
+			if (!(Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_order=".$line_change["menu_order"]."
+					WHERE id=".$line_element["id"])
+					&& Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_order=".$line_element["menu_order"]."
+					WHERE id=".$line_change["id"]))) {
+				echo ActionReport(REPORT_ERROR, "Interner Fehler", Database::instance()->getErrorMessage());
 			}
 		}
 		else {
@@ -215,8 +215,8 @@ if (isset($_GET['menu_view'])) {
 		echo ActionReport(REPORT_ERROR, "Nicht möglich", "Die HTTP Fehlerseite darf nicht im Menü angezeigt werden!");
 	}
 	else {
-		if (!(mysql_query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_view=(!menu_view)
-				WHERE id=".StdSqlSafety($_GET["menu_view"]), DB_CMS))) {
+		if (!(Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_menu SET menu_view=(!menu_view)
+				WHERE id=".StdSqlSafety($_GET["menu_view"])))) {
 			echo ActionReport(REPORT_EINGABE, "Nicht gefunden",
 					"Die Kategorie / Seite wurde in der Datenbank nicht gefunden!");
 		}
@@ -230,8 +230,8 @@ if (isset($_GET['locked'])) {
 		echo ActionReport(REPORT_ERROR, "Nicht möglich", "Die HTTP Fehlerseite darf nicht gesperrt werden!");
 	}
 	else {
-		if (!(mysql_query("UPDATE ".DB_TABLE_ROOT."cms_menu SET locked=(!locked)
-				WHERE id=".StdSqlSafety($_GET["locked"]), DB_CMS))) {
+		if (!(Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_menu SET locked=(!locked)
+				WHERE id=".StdSqlSafety($_GET["locked"])))) {
 			echo ActionReport(REPORT_EINGABE, "Nicht gefunden",
 					"Die Kategorie / Seite wurde in der Datenbank nicht gefunden!");
 		}
@@ -246,31 +246,31 @@ if (isset($_GET['delete'])) {
 	}
 	else {
 		/* Die untermenus eine Ebene nach vorne nehmen */
-		$res_element = mysql_query("SELECT id, menu_sub, menu_order FROM ".DB_TABLE_ROOT."cms_menu
-				WHERE id=".StdSqlSafety($_GET["delete"]), DB_CMS)
+		$res_element = Database::instance()->query("SELECT id, menu_sub, menu_order FROM ".DB_TABLE_ROOT."cms_menu
+				WHERE id=".StdSqlSafety($_GET["delete"]))
 				OR FatalError(FATAL_ERROR_MYSQL);
-		if ($line_element = mysql_fetch_array($res_element)) {
+		if ($line_element = $res_element->fetch_assoc()) {
 			/* Menue Reihenfolge */
-			$res_change = mysql_query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu
-					WHERE menu_sub=".$line_element["id"]." ORDER BY menu_order ASC", DB_CMS)
+			$res_change = Database::instance()->query("SELECT id FROM ".DB_TABLE_ROOT."cms_menu
+					WHERE menu_sub=".$line_element["id"]." ORDER BY menu_order ASC")
 					OR FatalError(FATAL_ERROR_MYSQL);
 			/* Platz machen */
-			mysql_query("UPDATE ".DB_TABLE_ROOT."cms_menu
-					SET menu_order=(menu_order + ".(mysql_num_rows($res_change) - 1).")
-					WHERE menu_sub=".$line_element["menu_sub"]." && menu_order>".$line_element["menu_order"], DB_CMS)
+			Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_menu
+					SET menu_order=(menu_order + ".($res_change->num_rows - 1).")
+					WHERE menu_sub=".$line_element["menu_sub"]." && menu_order>".$line_element["menu_order"])
 					OR FatalError(FATAL_ERROR_MYSQL);
 			/* Submenus nach vorne nehmen */
-			for ($i=0; $row=mysql_fetch_array($res_change); $i++) {
-				mysql_query("UPDATE ".DB_TABLE_ROOT."cms_menu
+			for ($i=0; $row=$res_change->fetch_assoc(); $i++) {
+				Database::instance()->query("UPDATE ".DB_TABLE_ROOT."cms_menu
 						SET menu_sub=".$line_element["menu_sub"].", menu_order=".($line_element["menu_order"] + $i)."
-						WHERE id=".$row["id"], DB_CMS)
+						WHERE id=".$row["id"])
 						OR FatalError(FATAL_ERROR_MYSQL);
 			}
 			/* Alle Inhalte Loeschen und dann die Seite */
-			if (!(mysql_query("DELETE FROM ".DB_TABLE_ROOT."cms_content
-					WHERE page_id=".$line_element["id"], DB_CMS)
-					&& mysql_query("DELETE FROM ".DB_TABLE_ROOT."cms_menu
-					WHERE id=".$line_element["id"], DB_CMS))) {
+			if (!(Database::instance()->query("DELETE FROM ".DB_TABLE_ROOT."cms_content
+					WHERE page_id=".$line_element["id"])
+					&& Database::instance()->query("DELETE FROM ".DB_TABLE_ROOT."cms_menu
+					WHERE id=".$line_element["id"]))) {
 				echo ActionReport(REPORT_ERROR, "Nicht gelöscht", "Die Kategorie / Seite konnte nicht gelöscht werden!");
 			}
 		}
@@ -282,7 +282,7 @@ if (isset($_GET['delete'])) {
 }
 
 /* Ausgabe Menustammbaum */
-$o_menutree = new buildMenuTree(DB_CMS);
+$o_menutree = new buildMenuTree(Database::instance());
 $menutree_txt = $o_menutree->getMenuTree(0, 99, 1, true, "menu/tree/{pos}");
 
 $a_options = explode("|", $menutree_txt);
@@ -301,10 +301,10 @@ for ($i=0; $i < sizeof($a_options); $i++) {
 	$a_options_data = explode("$", $a_options[$i]);
 
 	/* Datensatz holen */
-	$result = mysql_query("SELECT id, label, menu_is_categorie, menu_view, locked
-			FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".$a_options_data[0], DB_CMS)
+	$result = Database::instance()->query("SELECT id, label, menu_is_categorie, menu_view, locked
+			FROM ".DB_TABLE_ROOT."cms_menu WHERE id=".$a_options_data[0])
 			OR FatalError(FATAL_ERROR_MYSQL);
-	if ($line = mysql_fetch_array($result)) {
+	if ($line = $result->fetch_assoc()) {
 		if ($i % 2)
 			$html .= "    <tr class=\"table_even\">\r\n";
 		else

@@ -16,8 +16,8 @@
  |4.0     | 12.10.2012 | Programm erstellt
  -----------------------------------------------------
  Beschreibung :
- Datenlogger der alle Besucher und deren Aktionen 
- aufzeichnet. Dieses Modul darf nur fuer Analyse 
+ Datenlogger der alle Besucher und deren Aktionen
+ aufzeichnet. Dieses Modul darf nur fuer Analyse
  Zwecken eingesetzt werden.
 
  (c) by Kevin Gerber
@@ -81,6 +81,6 @@ foreach ($user_data as $key => $value) {
 $col .= 'day, time';
 $data .= 'now(), now()';
 
-mysql_query('INSERT INTO '.DB_TABLE_PLUGIN.'spy('.$col.')VALUES('.$data.')', DB_CMS) OR FatalError(FATAL_ERROR_MYSQL);
+Database::instance()->query('INSERT INTO '.DB_TABLE_PLUGIN.'spy('.$col.')VALUES('.$data.')') OR FatalError(FATAL_ERROR_MYSQL);
 
 ?>
