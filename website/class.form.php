@@ -749,6 +749,14 @@ class formWizardDropdown extends formWizardElement {
 	/* Array mit allen Optionen */
 	private $options = array();
 
+	public function getValue() {
+		if (empty($this->value) && $this->use_multiple) {
+			return array();
+		}
+
+		return $this->value;
+	}
+
 	/* Funktionen um die speziellen Parameter einzustellen */
 	public function setMultiple($multiple) {
 		$this->use_multiple = $multiple;
