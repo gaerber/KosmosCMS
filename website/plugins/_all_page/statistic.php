@@ -87,8 +87,8 @@ if (1 || ACP_MODULE_STATISTIC) {
 		/* Existiert der Heutige Tag in der DB ? */
 		if (!$line[0]) {
 			/* Erster Besucher Heute -> Neue DB-Zeile anlegen */
-			Database::instance()->query('INSERT INTO '.DB_TABLE_PLUGIN.'stats_day(day)
-					VALUES(CURRENT_DATE)')
+			Database::instance()->query('INSERT INTO '.DB_TABLE_PLUGIN.'stats_day(day, visitors, views)
+					VALUES(CURRENT_DATE, 0, 0)')
 					OR FatalError(FATAL_ERROR_MYSQL);
 		}
 
