@@ -105,7 +105,6 @@ CREATE TABLE IF NOT EXISTS `cms_content` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `page_id` int(11) NOT NULL,
   `html` longtext NOT NULL,
-  `content` longtext NOT NULL,
   `writer` int(11) NOT NULL,
   `timestamp` int(11) NOT NULL,
   PRIMARY KEY (`id`)
@@ -115,10 +114,10 @@ CREATE TABLE IF NOT EXISTS `cms_content` (
 -- Daten für Tabelle `cms_content`
 --
 
-INSERT INTO `cms_content` (`id`, `page_id`, `html`, `content`, `writer`, `timestamp`) VALUES
-(1, 1, '<h1 class="first">Keine Berechtigung</h1>\r\n<p>Sie besitzen keine Rechte um diese Datei / diesen Ordner anzusehen!</p>\r\n<p>{MODULE}</p>', '', 1, 0),
-(2, 2, '<h1 class="first">Datei oder Verzeichnis wurde nicht gefunden</h1>\r\n<p>Die von Ihnen gesuchte Seite wurde eventuell entfernt, die Seite ist vorübergehend nicht verfügbar, oder Sie haben die Websiteadresse nicht richtig geschrieben.</p>\r\n<p>Falls Sie über einen Hyperlink auf diese Seite gekommen sind, informieren Sie bitte den <a href="/ueber-mich/kontakt.html">Administrator</a>.</p>\r\n<p>Falls Sie etwas Bestimmtes suchen, finden Sie auf der <a href="/portal/seitenuebersicht.html">Seitenübersicht</a> eine vollständige Liste mit allen Seiten dieser Website.</p>', '', 1, 0),
-(3, 3, '<div class="box_error">\r\n<h1>Anmeldungsdaten sind fehlerhaft</h1>\r\n<p>Ihr angegebener Benutzernamen und/oder das Passwort sind falsch!</p></div>\r\n<p>{MODUL}</p>', '', 1, 0);
+INSERT INTO `cms_content` (`id`, `page_id`, `html`, `writer`, `timestamp`) VALUES
+(1, 1, '<h1 class="first">Keine Berechtigung</h1>\r\n<p>Sie besitzen keine Rechte um diese Datei / diesen Ordner anzusehen!</p>\r\n<p>{MODULE}</p>', 1, 0),
+(2, 2, '<h1 class="first">Datei oder Verzeichnis wurde nicht gefunden</h1>\r\n<p>Die von Ihnen gesuchte Seite wurde eventuell entfernt, die Seite ist vorübergehend nicht verfügbar, oder Sie haben die Websiteadresse nicht richtig geschrieben.</p>\r\n<p>Falls Sie über einen Hyperlink auf diese Seite gekommen sind, informieren Sie bitte den <a href="/ueber-mich/kontakt.html">Administrator</a>.</p>\r\n<p>Falls Sie etwas Bestimmtes suchen, finden Sie auf der <a href="/portal/seitenuebersicht.html">Seitenübersicht</a> eine vollständige Liste mit allen Seiten dieser Website.</p>', 1, 0),
+(3, 3, '<div class="box_error">\r\n<h1>Anmeldungsdaten sind fehlerhaft</h1>\r\n<p>Ihr angegebener Benutzernamen und/oder das Passwort sind falsch!</p></div>\r\n<p>{MODUL}</p>', 1, 0);
 
 -- --------------------------------------------------------
 
