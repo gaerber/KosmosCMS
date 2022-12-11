@@ -1485,7 +1485,7 @@ class ftpOpenDir {
 			foreach ($rawList as $Current) {
 				$Split = preg_split('[ ]', $Current, 9, PREG_SPLIT_NO_EMPTY);
  				if ($Split[0] != 'total' && substr($Split[8], 0, 1) != '.') {
-					$Output[$i]['isdir']     = ($Split[0] {0} === 'd') ? 1 : 0;
+					$Output[$i]['isdir']     = ($Split[0][0] === 'd') ? 1 : 0;
 					$Output[$i]['perms']     = $Split[0];
 					$Output[$i]['number']    = $Split[1];
 					$Output[$i]['owner']     = $Split[2];
